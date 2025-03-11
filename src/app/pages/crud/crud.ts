@@ -57,12 +57,12 @@ interface ExportColumn {
     template: `
         <p-toolbar styleClass="mb-6">
             <ng-template #start>
-                <p-button label="New" icon="pi pi-plus" severity="secondary" class="mr-2" (onClick)="openNew()" />
-                <p-button severity="secondary" label="Delete" icon="pi pi-trash" outlined (onClick)="deleteSelectedProducts()" [disabled]="!selectedProducts || !selectedProducts.length" />
+                <p-button label="Ajouter" icon="pi pi-plus" severity="secondary" class="mr-2" (onClick)="openNew()" />
+                <p-button severity="secondary" label="Supprimer" icon="pi pi-trash" outlined (onClick)="deleteSelectedProducts()" [disabled]="!selectedProducts || !selectedProducts.length" />
             </ng-template>
 
             <ng-template #end>
-                <p-button label="Export" icon="pi pi-upload" severity="secondary" (onClick)="exportCSV()" />
+                <p-button label="Exporter" icon="pi pi-upload" severity="secondary" (onClick)="exportCSV()" />
             </ng-template>
         </p-toolbar>
 
@@ -83,10 +83,10 @@ interface ExportColumn {
         >
             <ng-template #caption>
                 <div class="flex items-center justify-between">
-                    <h5 class="m-0">Manage Products</h5>
+                    <h5 class="m-0">Gestion des services</h5>
                     <p-iconfield>
                         <p-inputicon styleClass="pi pi-search" />
-                        <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Search..." />
+                        <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Recherche..." />
                     </p-iconfield>
                 </div>
             </ng-template>
@@ -97,20 +97,20 @@ interface ExportColumn {
                     </th>
                     <th style="min-width: 16rem">Code</th>
                     <th pSortableColumn="name" style="min-width:16rem">
-                        Name
+                        Nom
                         <p-sortIcon field="name" />
                     </th>
                     <th>Image</th>
                     <th pSortableColumn="price" style="min-width: 8rem">
-                        Price
+                        Prix
                         <p-sortIcon field="price" />
                     </th>
                     <th pSortableColumn="category" style="min-width:10rem">
-                        Category
+                        Categorie
                         <p-sortIcon field="category" />
                     </th>
                     <th pSortableColumn="rating" style="min-width: 12rem">
-                        Reviews
+                        Avis
                         <p-sortIcon field="rating" />
                     </th>
                     <th pSortableColumn="inventoryStatus" style="min-width: 12rem">
@@ -249,9 +249,8 @@ export class Crud implements OnInit {
         });
 
         this.statuses = [
-            { label: 'INSTOCK', value: 'instock' },
-            { label: 'LOWSTOCK', value: 'lowstock' },
-            { label: 'OUTOFSTOCK', value: 'outofstock' }
+            { label: 'Disponible', value: 'instock' },
+            { label: 'Indisponible', value: 'outofstock' }
         ];
 
         this.cols = [
@@ -344,11 +343,9 @@ export class Crud implements OnInit {
 
     getSeverity(status: string) {
         switch (status) {
-            case 'INSTOCK':
+            case 'Disponible':
                 return 'success';
-            case 'LOWSTOCK':
-                return 'warn';
-            case 'OUTOFSTOCK':
+            case 'INdisponible':
                 return 'danger';
             default:
                 return 'info';

@@ -26,7 +26,7 @@ import { Router, RouterModule } from '@angular/router';
                                 />
                             </g>
                         </svg>
-                        <h4 class="font-medium text-3xl text-surface-900 dark:text-surface-0">SAKAI</h4>
+                        <h4 class="font-medium text-xl text-surface-900 dark:text-surface-0">m1p12mean-Fy-Isabelle</h4>
                     </a>
                 </div>
 

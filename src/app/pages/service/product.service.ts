@@ -26,71 +26,71 @@ export class ProductService {
             {
                 id: '1000',
                 code: 'f230fh0g3',
-                name: 'Bamboo Watch',
+                name: 'Vidange d #&aps huile et remplacement du filtre',
                 description: 'Product Description',
                 image: 'bamboo-watch.jpg',
                 price: 65,
-                category: 'Accessories',
+                category: 'Suspension et Direction',
                 quantity: 24,
-                inventoryStatus: 'INSTOCK',
+                inventoryStatus: 'Disponible',
                 rating: 5
             },
             {
                 id: '1001',
                 code: 'nvklal433',
-                name: 'Black Watch',
+                name: 'Contrôle et remplacement des liquides (refroidissement, frein, direction assistée)',
                 description: 'Product Description',
                 image: 'black-watch.jpg',
                 price: 72,
-                category: 'Accessories',
+                category: 'Suspension et Direction',
                 quantity: 61,
-                inventoryStatus: 'INSTOCK',
+                inventoryStatus: 'Disponible',
                 rating: 4
             },
             {
                 id: '1002',
                 code: 'zz21cz3c1',
-                name: 'Blue Band',
+                name: 'Vérification et remplacement des filtres (air, carburant, habitacle)',
                 description: 'Product Description',
                 image: 'blue-band.jpg',
                 price: 79,
-                category: 'Fitness',
+                category: 'Autres services',
                 quantity: 2,
-                inventoryStatus: 'LOWSTOCK',
+                inventoryStatus: 'Indisponible',
                 rating: 3
             },
             {
                 id: '1003',
                 code: '244wgerg2',
-                name: 'Blue T-Shirt',
+                name: 'Réglage des feux et signalisation',
                 description: 'Product Description',
                 image: 'blue-t-shirt.jpg',
                 price: 29,
-                category: 'Clothing',
+                category: 'Entretiens courants',
                 quantity: 25,
-                inventoryStatus: 'INSTOCK',
+                inventoryStatus: 'Disponible',
                 rating: 5
             },
             {
                 id: '1004',
                 code: 'h456wer53',
-                name: 'Bracelet',
+                name: 'Alternateur et démarreur',
                 description: 'Product Description',
                 image: 'bracelet.jpg',
                 price: 15,
-                category: 'Accessories',
+                category: 'Suspension et Direction',
                 quantity: 73,
-                inventoryStatus: 'INSTOCK',
+                inventoryStatus: 'Disponible',
                 rating: 4
             },
             {
                 id: '1005',
                 code: 'av2231fwg',
-                name: 'Brown Purse',
+                name: 'Diagnostic électronique avec valise OBD',
                 description: 'Product Description',
                 image: 'brown-purse.jpg',
                 price: 120,
-                category: 'Accessories',
+                category: 'Suspension et Direction',
                 quantity: 0,
                 inventoryStatus: 'OUTOFSTOCK',
                 rating: 4
@@ -98,59 +98,59 @@ export class ProductService {
             {
                 id: '1006',
                 code: 'bib36pfvm',
-                name: 'Chakra Bracelet',
+                name: 'Vérification des niveaux et serrage des éléments essentiels',
                 description: 'Product Description',
                 image: 'chakra-bracelet.jpg',
                 price: 32,
-                category: 'Accessories',
+                category: 'Suspension et Direction',
                 quantity: 5,
-                inventoryStatus: 'LOWSTOCK',
+                inventoryStatus: 'Indisponible',
                 rating: 3
             },
             {
                 id: '1007',
                 code: 'mbvjkgip5',
-                name: 'Galaxy Earrings',
+                name: 'Inspection de l &aps état général du véhicule',
                 description: 'Product Description',
                 image: 'galaxy-earrings.jpg',
                 price: 34,
-                category: 'Accessories',
+                category: 'Suspension et Direction',
                 quantity: 23,
-                inventoryStatus: 'INSTOCK',
+                inventoryStatus: 'Disponible',
                 rating: 5
             },
             {
                 id: '1008',
                 code: 'vbb124btr',
-                name: 'Game Controller',
+                name: 'Contrôle et remplacement des plaquettes et disques de frein',
                 description: 'Product Description',
                 image: 'game-controller.jpg',
                 price: 99,
-                category: 'Electronics',
+                category: 'Batterie et électricité',
                 quantity: 2,
-                inventoryStatus: 'LOWSTOCK',
+                inventoryStatus: 'Indisponible',
                 rating: 4
             },
             {
                 id: '1009',
                 code: 'cm230f032',
-                name: 'Gaming Set',
+                name: 'Purge et remplacement du liquide de frein',
                 description: 'Product Description',
                 image: 'gaming-set.jpg',
                 price: 299,
-                category: 'Electronics',
+                category: 'Batterie et électricité',
                 quantity: 63,
-                inventoryStatus: 'INSTOCK',
+                inventoryStatus: 'Disponible',
                 rating: 3
             },
             {
                 id: '1010',
                 code: 'plb34234v',
-                name: 'Gold Phone Case',
+                name: 'Vérification du frein à main',
                 description: 'Product Description',
                 image: 'gold-phone-case.jpg',
                 price: 24,
-                category: 'Accessories',
+                category: 'Suspension et Direction',
                 quantity: 0,
                 inventoryStatus: 'OUTOFSTOCK',
                 rating: 4
@@ -158,230 +158,14 @@ export class ProductService {
             {
                 id: '1011',
                 code: '4920nnc2d',
-                name: 'Green Earbuds',
+                name: 'Test et remplacement de la batterie',
                 description: 'Product Description',
                 image: 'green-earbuds.jpg',
                 price: 89,
-                category: 'Electronics',
+                category: 'Batterie et électricité',
                 quantity: 23,
-                inventoryStatus: 'INSTOCK',
+                inventoryStatus: 'Disponible',
                 rating: 4
-            },
-            {
-                id: '1012',
-                code: '250vm23cc',
-                name: 'Green T-Shirt',
-                description: 'Product Description',
-                image: 'green-t-shirt.jpg',
-                price: 49,
-                category: 'Clothing',
-                quantity: 74,
-                inventoryStatus: 'INSTOCK',
-                rating: 5
-            },
-            {
-                id: '1013',
-                code: 'fldsmn31b',
-                name: 'Grey T-Shirt',
-                description: 'Product Description',
-                image: 'grey-t-shirt.jpg',
-                price: 48,
-                category: 'Clothing',
-                quantity: 0,
-                inventoryStatus: 'OUTOFSTOCK',
-                rating: 3
-            },
-            {
-                id: '1014',
-                code: 'waas1x2as',
-                name: 'Headphones',
-                description: 'Product Description',
-                image: 'headphones.jpg',
-                price: 175,
-                category: 'Electronics',
-                quantity: 8,
-                inventoryStatus: 'LOWSTOCK',
-                rating: 5
-            },
-            {
-                id: '1015',
-                code: 'vb34btbg5',
-                name: 'Light Green T-Shirt',
-                description: 'Product Description',
-                image: 'light-green-t-shirt.jpg',
-                price: 49,
-                category: 'Clothing',
-                quantity: 34,
-                inventoryStatus: 'INSTOCK',
-                rating: 4
-            },
-            {
-                id: '1016',
-                code: 'k8l6j58jl',
-                name: 'Lime Band',
-                description: 'Product Description',
-                image: 'lime-band.jpg',
-                price: 79,
-                category: 'Fitness',
-                quantity: 12,
-                inventoryStatus: 'INSTOCK',
-                rating: 3
-            },
-            {
-                id: '1017',
-                code: 'v435nn85n',
-                name: 'Mini Speakers',
-                description: 'Product Description',
-                image: 'mini-speakers.jpg',
-                price: 85,
-                category: 'Clothing',
-                quantity: 42,
-                inventoryStatus: 'INSTOCK',
-                rating: 4
-            },
-            {
-                id: '1018',
-                code: '09zx9c0zc',
-                name: 'Painted Phone Case',
-                description: 'Product Description',
-                image: 'painted-phone-case.jpg',
-                price: 56,
-                category: 'Accessories',
-                quantity: 41,
-                inventoryStatus: 'INSTOCK',
-                rating: 5
-            },
-            {
-                id: '1019',
-                code: 'mnb5mb2m5',
-                name: 'Pink Band',
-                description: 'Product Description',
-                image: 'pink-band.jpg',
-                price: 79,
-                category: 'Fitness',
-                quantity: 63,
-                inventoryStatus: 'INSTOCK',
-                rating: 4
-            },
-            {
-                id: '1020',
-                code: 'r23fwf2w3',
-                name: 'Pink Purse',
-                description: 'Product Description',
-                image: 'pink-purse.jpg',
-                price: 110,
-                category: 'Accessories',
-                quantity: 0,
-                inventoryStatus: 'OUTOFSTOCK',
-                rating: 4
-            },
-            {
-                id: '1021',
-                code: 'pxpzczo23',
-                name: 'Purple Band',
-                description: 'Product Description',
-                image: 'purple-band.jpg',
-                price: 79,
-                category: 'Fitness',
-                quantity: 6,
-                inventoryStatus: 'LOWSTOCK',
-                rating: 3
-            },
-            {
-                id: '1022',
-                code: '2c42cb5cb',
-                name: 'Purple Gemstone Necklace',
-                description: 'Product Description',
-                image: 'purple-gemstone-necklace.jpg',
-                price: 45,
-                category: 'Accessories',
-                quantity: 62,
-                inventoryStatus: 'INSTOCK',
-                rating: 4
-            },
-            {
-                id: '1023',
-                code: '5k43kkk23',
-                name: 'Purple T-Shirt',
-                description: 'Product Description',
-                image: 'purple-t-shirt.jpg',
-                price: 49,
-                category: 'Clothing',
-                quantity: 2,
-                inventoryStatus: 'LOWSTOCK',
-                rating: 5
-            },
-            {
-                id: '1024',
-                code: 'lm2tny2k4',
-                name: 'Shoes',
-                description: 'Product Description',
-                image: 'shoes.jpg',
-                price: 64,
-                category: 'Clothing',
-                quantity: 0,
-                inventoryStatus: 'INSTOCK',
-                rating: 4
-            },
-            {
-                id: '1025',
-                code: 'nbm5mv45n',
-                name: 'Sneakers',
-                description: 'Product Description',
-                image: 'sneakers.jpg',
-                price: 78,
-                category: 'Clothing',
-                quantity: 52,
-                inventoryStatus: 'INSTOCK',
-                rating: 4
-            },
-            {
-                id: '1026',
-                code: 'zx23zc42c',
-                name: 'Teal T-Shirt',
-                description: 'Product Description',
-                image: 'teal-t-shirt.jpg',
-                price: 49,
-                category: 'Clothing',
-                quantity: 3,
-                inventoryStatus: 'LOWSTOCK',
-                rating: 3
-            },
-            {
-                id: '1027',
-                code: 'acvx872gc',
-                name: 'Yellow Earbuds',
-                description: 'Product Description',
-                image: 'yellow-earbuds.jpg',
-                price: 89,
-                category: 'Electronics',
-                quantity: 35,
-                inventoryStatus: 'INSTOCK',
-                rating: 3
-            },
-            {
-                id: '1028',
-                code: 'tx125ck42',
-                name: 'Yoga Mat',
-                description: 'Product Description',
-                image: 'yoga-mat.jpg',
-                price: 20,
-                category: 'Fitness',
-                quantity: 15,
-                inventoryStatus: 'INSTOCK',
-                rating: 5
-            },
-            {
-                id: '1029',
-                code: 'gwuby345v',
-                name: 'Yoga Set',
-                description: 'Product Description',
-                image: 'yoga-set.jpg',
-                price: 20,
-                category: 'Fitness',
-                quantity: 25,
-                inventoryStatus: 'INSTOCK',
-                rating: 8
             }
         ];
     }
@@ -395,9 +179,9 @@ export class ProductService {
                 description: 'Product Description',
                 image: 'bamboo-watch.jpg',
                 price: 65,
-                category: 'Accessories',
+                category: 'Suspension et Direction',
                 quantity: 24,
-                inventoryStatus: 'INSTOCK',
+                inventoryStatus: 'Disponible',
                 rating: 5,
                 orders: [
                     {
@@ -445,9 +229,9 @@ export class ProductService {
                 description: 'Product Description',
                 image: 'black-watch.jpg',
                 price: 72,
-                category: 'Accessories',
+                category: 'Suspension et Direction',
                 quantity: 61,
-                inventoryStatus: 'INSTOCK',
+                inventoryStatus: 'Disponible',
                 rating: 4,
                 orders: [
                     {
@@ -477,9 +261,9 @@ export class ProductService {
                 description: 'Product Description',
                 image: 'blue-band.jpg',
                 price: 79,
-                category: 'Fitness',
+                category: 'Autres services',
                 quantity: 2,
-                inventoryStatus: 'LOWSTOCK',
+                inventoryStatus: 'Indisponible',
                 rating: 3,
                 orders: [
                     {
@@ -509,9 +293,9 @@ export class ProductService {
                 description: 'Product Description',
                 image: 'blue-t-shirt.jpg',
                 price: 29,
-                category: 'Clothing',
+                category: 'Entretiens courants',
                 quantity: 25,
-                inventoryStatus: 'INSTOCK',
+                inventoryStatus: 'Disponible',
                 rating: 5,
                 orders: []
             },
@@ -522,9 +306,9 @@ export class ProductService {
                 description: 'Product Description',
                 image: 'bracelet.jpg',
                 price: 15,
-                category: 'Accessories',
+                category: 'Suspension et Direction',
                 quantity: 73,
-                inventoryStatus: 'INSTOCK',
+                inventoryStatus: 'Disponible',
                 rating: 4,
                 orders: [
                     {
@@ -554,7 +338,7 @@ export class ProductService {
                 description: 'Product Description',
                 image: 'brown-purse.jpg',
                 price: 120,
-                category: 'Accessories',
+                category: 'Suspension et Direction',
                 quantity: 0,
                 inventoryStatus: 'OUTOFSTOCK',
                 rating: 4,
@@ -595,9 +379,9 @@ export class ProductService {
                 description: 'Product Description',
                 image: 'chakra-bracelet.jpg',
                 price: 32,
-                category: 'Accessories',
+                category: 'Suspension et Direction',
                 quantity: 5,
-                inventoryStatus: 'LOWSTOCK',
+                inventoryStatus: 'Indisponible',
                 rating: 3,
                 orders: [
                     {
@@ -627,9 +411,9 @@ export class ProductService {
                 description: 'Product Description',
                 image: 'galaxy-earrings.jpg',
                 price: 34,
-                category: 'Accessories',
+                category: 'Suspension et Direction',
                 quantity: 23,
-                inventoryStatus: 'INSTOCK',
+                inventoryStatus: 'Disponible',
                 rating: 5,
                 orders: [
                     {
@@ -650,9 +434,9 @@ export class ProductService {
                 description: 'Product Description',
                 image: 'game-controller.jpg',
                 price: 99,
-                category: 'Electronics',
+                category: 'Batterie et électricité',
                 quantity: 2,
-                inventoryStatus: 'LOWSTOCK',
+                inventoryStatus: 'Indisponible',
                 rating: 4,
                 orders: [
                     {
@@ -682,9 +466,9 @@ export class ProductService {
                 description: 'Product Description',
                 image: 'gaming-set.jpg',
                 price: 299,
-                category: 'Electronics',
+                category: 'Batterie et électricité',
                 quantity: 63,
-                inventoryStatus: 'INSTOCK',
+                inventoryStatus: 'Disponible',
                 rating: 3,
                 orders: [
                     {
@@ -732,7 +516,7 @@ export class ProductService {
                 description: 'Product Description',
                 image: 'gold-phone-case.jpg',
                 price: 24,
-                category: 'Accessories',
+                category: 'Suspension et Direction',
                 quantity: 0,
                 inventoryStatus: 'OUTOFSTOCK',
                 rating: 4,
@@ -764,9 +548,9 @@ export class ProductService {
                 description: 'Product Description',
                 image: 'green-earbuds.jpg',
                 price: 89,
-                category: 'Electronics',
+                category: 'Batterie et électricité',
                 quantity: 23,
-                inventoryStatus: 'INSTOCK',
+                inventoryStatus: 'Disponible',
                 rating: 4,
                 orders: [
                     {
@@ -787,9 +571,9 @@ export class ProductService {
                 description: 'Product Description',
                 image: 'green-t-shirt.jpg',
                 price: 49,
-                category: 'Clothing',
+                category: 'Entretiens courants',
                 quantity: 74,
-                inventoryStatus: 'INSTOCK',
+                inventoryStatus: 'Disponible',
                 rating: 5,
                 orders: [
                     {
@@ -819,7 +603,7 @@ export class ProductService {
                 description: 'Product Description',
                 image: 'grey-t-shirt.jpg',
                 price: 48,
-                category: 'Clothing',
+                category: 'Entretiens courants',
                 quantity: 0,
                 inventoryStatus: 'OUTOFSTOCK',
                 rating: 3,
@@ -842,9 +626,9 @@ export class ProductService {
                 description: 'Product Description',
                 image: 'headphones.jpg',
                 price: 175,
-                category: 'Electronics',
+                category: 'Batterie et électricité',
                 quantity: 8,
-                inventoryStatus: 'LOWSTOCK',
+                inventoryStatus: 'Indisponible',
                 rating: 5,
                 orders: [
                     {
@@ -874,9 +658,9 @@ export class ProductService {
                 description: 'Product Description',
                 image: 'light-green-t-shirt.jpg',
                 price: 49,
-                category: 'Clothing',
+                category: 'Entretiens courants',
                 quantity: 34,
-                inventoryStatus: 'INSTOCK',
+                inventoryStatus: 'Disponible',
                 rating: 4,
                 orders: [
                     {
@@ -897,9 +681,9 @@ export class ProductService {
                 description: 'Product Description',
                 image: 'lime-band.jpg',
                 price: 79,
-                category: 'Fitness',
+                category: 'Autres services',
                 quantity: 12,
-                inventoryStatus: 'INSTOCK',
+                inventoryStatus: 'Disponible',
                 rating: 3,
                 orders: []
             },
@@ -910,9 +694,9 @@ export class ProductService {
                 description: 'Product Description',
                 image: 'mini-speakers.jpg',
                 price: 85,
-                category: 'Clothing',
+                category: 'Entretiens courants',
                 quantity: 42,
-                inventoryStatus: 'INSTOCK',
+                inventoryStatus: 'Disponible',
                 rating: 4,
                 orders: [
                     {
@@ -933,9 +717,9 @@ export class ProductService {
                 description: 'Product Description',
                 image: 'painted-phone-case.jpg',
                 price: 56,
-                category: 'Accessories',
+                category: 'Suspension et Direction',
                 quantity: 41,
-                inventoryStatus: 'INSTOCK',
+                inventoryStatus: 'Disponible',
                 rating: 5,
                 orders: [
                     {
@@ -965,9 +749,9 @@ export class ProductService {
                 description: 'Product Description',
                 image: 'pink-band.jpg',
                 price: 79,
-                category: 'Fitness',
+                category: 'Autres services',
                 quantity: 63,
-                inventoryStatus: 'INSTOCK',
+                inventoryStatus: 'Disponible',
                 rating: 4,
                 orders: []
             },
@@ -978,7 +762,7 @@ export class ProductService {
                 description: 'Product Description',
                 image: 'pink-purse.jpg',
                 price: 110,
-                category: 'Accessories',
+                category: 'Suspension et Direction',
                 quantity: 0,
                 inventoryStatus: 'OUTOFSTOCK',
                 rating: 4,
@@ -1010,9 +794,9 @@ export class ProductService {
                 description: 'Product Description',
                 image: 'purple-band.jpg',
                 price: 79,
-                category: 'Fitness',
+                category: 'Autres services',
                 quantity: 6,
-                inventoryStatus: 'LOWSTOCK',
+                inventoryStatus: 'Indisponible',
                 rating: 3,
                 orders: [
                     {
@@ -1033,9 +817,9 @@ export class ProductService {
                 description: 'Product Description',
                 image: 'purple-gemstone-necklace.jpg',
                 price: 45,
-                category: 'Accessories',
+                category: 'Suspension et Direction',
                 quantity: 62,
-                inventoryStatus: 'INSTOCK',
+                inventoryStatus: 'Disponible',
                 rating: 4,
                 orders: [
                     {
@@ -1065,9 +849,9 @@ export class ProductService {
                 description: 'Product Description',
                 image: 'purple-t-shirt.jpg',
                 price: 49,
-                category: 'Clothing',
+                category: 'Entretiens courants',
                 quantity: 2,
-                inventoryStatus: 'LOWSTOCK',
+                inventoryStatus: 'Indisponible',
                 rating: 5,
                 orders: [
                     {
@@ -1088,9 +872,9 @@ export class ProductService {
                 description: 'Product Description',
                 image: 'shoes.jpg',
                 price: 64,
-                category: 'Clothing',
+                category: 'Entretiens courants',
                 quantity: 0,
-                inventoryStatus: 'INSTOCK',
+                inventoryStatus: 'Disponible',
                 rating: 4,
                 orders: []
             },
@@ -1101,9 +885,9 @@ export class ProductService {
                 description: 'Product Description',
                 image: 'sneakers.jpg',
                 price: 78,
-                category: 'Clothing',
+                category: 'Entretiens courants',
                 quantity: 52,
-                inventoryStatus: 'INSTOCK',
+                inventoryStatus: 'Disponible',
                 rating: 4,
                 orders: [
                     {
@@ -1133,9 +917,9 @@ export class ProductService {
                 description: 'Product Description',
                 image: 'teal-t-shirt.jpg',
                 price: 49,
-                category: 'Clothing',
+                category: 'Entretiens courants',
                 quantity: 3,
-                inventoryStatus: 'LOWSTOCK',
+                inventoryStatus: 'Indisponible',
                 rating: 3,
                 orders: [
                     {
@@ -1156,9 +940,9 @@ export class ProductService {
                 description: 'Product Description',
                 image: 'yellow-earbuds.jpg',
                 price: 89,
-                category: 'Electronics',
+                category: 'Batterie et électricité',
                 quantity: 35,
-                inventoryStatus: 'INSTOCK',
+                inventoryStatus: 'Disponible',
                 rating: 3,
                 orders: [
                     {
@@ -1188,9 +972,9 @@ export class ProductService {
                 description: 'Product Description',
                 image: 'yoga-mat.jpg',
                 price: 20,
-                category: 'Fitness',
+                category: 'Autres services',
                 quantity: 15,
-                inventoryStatus: 'INSTOCK',
+                inventoryStatus: 'Disponible',
                 rating: 5,
                 orders: []
             },
@@ -1201,9 +985,9 @@ export class ProductService {
                 description: 'Product Description',
                 image: 'yoga-set.jpg',
                 price: 20,
-                category: 'Fitness',
+                category: 'Autres services',
                 quantity: 25,
-                inventoryStatus: 'INSTOCK',
+                inventoryStatus: 'Disponible',
                 rating: 8,
                 orders: [
                     {
@@ -1220,7 +1004,7 @@ export class ProductService {
         ];
     }
 
-    status: string[] = ['OUTOFSTOCK', 'INSTOCK', 'LOWSTOCK'];
+    status: string[] = ['OUTOFSTOCK', 'Disponible', 'Indisponible'];
 
     productNames: string[] = [
         'Bamboo Watch',

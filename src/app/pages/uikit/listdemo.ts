@@ -15,7 +15,7 @@ import { Product, ProductService } from '../service/product.service';
     imports: [CommonModule, DataViewModule, FormsModule, SelectButtonModule, PickListModule, OrderListModule, TagModule, ButtonModule],
     template: ` <div class="flex flex-col">
         <div class="card">
-            <div class="font-semibold text-xl">DataView</div>
+            <div class="font-semibold text-xl">Liste des services</div>
             <p-dataview [value]="products" [layout]="layout">
                 <ng-template #header>
                     <div class="flex justify-end">
@@ -62,7 +62,7 @@ import { Product, ProductService } from '../service/product.service';
                                         <span class="text-xl font-semibold">$ {{ item.price }}</span>
                                         <div class="flex flex-row-reverse md:flex-row gap-2">
                                             <p-button icon="pi pi-heart" styleClass="h-full" [outlined]="true"></p-button>
-                                            <p-button icon="pi pi-shopping-cart" label="Buy Now" [disabled]="item.inventoryStatus === 'OUTOFSTOCK'" styleClass="flex-auto md:flex-initial whitespace-nowrap"></p-button>
+                                            <p-button icon="pi pi-calculator" label="devis" [disabled]="item.inventoryStatus === 'Indisponible'" styleClass="flex-auto md:flex-initial whitespace-nowrap"></p-button>
                                         </div>
                                     </div>
                                 </div>
@@ -107,7 +107,7 @@ import { Product, ProductService } from '../service/product.service';
                                     <div class="flex flex-col gap-6 mt-6">
                                         <span class="text-2xl font-semibold">$ {{ item.price }}</span>
                                         <div class="flex gap-2">
-                                            <p-button icon="pi pi-shopping-cart" label="Buy Now" [disabled]="item.inventoryStatus === 'OUTOFSTOCK'" class="flex-auto whitespace-nowrap" styleClass="w-full"></p-button>
+                                            <p-button icon="pi pi-calculator" label="Demander le Devis" [disabled]="item.inventoryStatus === 'indisponible'" class="flex-auto whitespace-nowrap" styleClass="w-full"></p-button>
                                             <p-button icon="pi pi-heart" styleClass="h-full" [outlined]="true"></p-button>
                                         </div>
                                     </div>
@@ -117,30 +117,6 @@ import { Product, ProductService } from '../service/product.service';
                     </div>
                 </ng-template>
             </p-dataview>
-        </div>
-
-        <div class="flex flex-col lg:flex-row gap-20">
-            <div class="lg:w-2/3">
-                <div class="card">
-                    <div class="font-semibold text-xl mb-4">PickList</div>
-                    <p-pick-list [source]="sourceCities" [target]="targetCities" breakpoint="1400px">
-                        <ng-template #item let-item>
-                            {{ item.name }}
-                        </ng-template>
-                    </p-pick-list>
-                </div>
-            </div>
-
-            <div class="lg:w-1/3">
-                <div class="card">
-                    <div class="font-semibold text-xl mb-4">OrderList</div>
-                    <p-orderlist [value]="orderCities" dataKey="id" breakpoint="575px">
-                        <ng-template #option let-option>
-                            {{ option.name }}
-                        </ng-template>
-                    </p-orderlist>
-                </div>
-            </div>
         </div>
     </div>`,
     styles: `
@@ -195,13 +171,11 @@ export class ListDemo {
 
     getSeverity(product: Product) {
         switch (product.inventoryStatus) {
-            case 'INSTOCK':
+            case 'Disponible':
                 return 'success';
 
-            case 'LOWSTOCK':
-                return 'warn';
 
-            case 'OUTOFSTOCK':
+            case 'Indisponible':
                 return 'danger';
 
             default:

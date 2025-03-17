@@ -64,8 +64,35 @@ export class AppMenu {
                     {
                         label: 'Crud',
                         icon: 'pi pi-fw pi-pencil',
-                        routerLink: ['/pages/crud']
+                        items:[
+                            {
+                                label: 'crud',
+                                icon: 'pi pi-fw pi-sign-in',
+                                routerLink: ['/pages/crud']
+                            },
+                            {
+                                label: 'Catégorie',
+                                icon: 'pi pi-fw pi-sign-in',
+                                routerLink: ['/pages/category']
+                            },
+                            {
+                                label: 'Services',
+                                icon: 'pi pi-fw pi-sign-in',
+                                routerLink: ['/pages/service']
+                            },
+                            {
+                                label: 'Produits',
+                                icon: 'pi pi-fw pi-sign-in',
+                                routerLink: ['/pages/produit']
+                            },
+                            {
+                                label: 'Utilisateurs',
+                                icon: 'pi pi-fw pi-sign-in',
+                                routerLink: ['/pages/utilisateur']
+                            },
+                        ]
                     },
+
                     {
                         label: 'Not Found',
                         icon: 'pi pi-fw pi-exclamation-circle',

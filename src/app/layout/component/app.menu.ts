@@ -97,6 +97,11 @@ export class AppMenu {
                         label: 'Not Found',
                         icon: 'pi pi-fw pi-exclamation-circle',
                         routerLink: ['/pages/notfound']
+                    },
+                    {
+                        label: 'Calendrier',
+                        icon: 'pi pi-fw pi-exclamation-circle',
+                        routerLink: ['/pages/calendrier']
                     }
                 ]
             }

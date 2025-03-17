@@ -4,11 +4,13 @@ import { Category } from './crud/category';
 import { Service } from './crud/service';
 import { Produit } from './crud/produit';
 import { Utilisateur } from './crud/utilisateur';
+import { CalendarComponent } from './uikit/calendar';
 export default [
     { path: 'crud', component: Crud },
     { path: 'category', component: Category },
     { path: 'service', component: Service },
     { path: 'produit', component: Produit },
     { path: 'utilisateur', component: Utilisateur },
+    { path: 'calendrier', component: CalendarComponent },
     { path: '**', redirectTo: '/notfound' }
 ] as Routes;

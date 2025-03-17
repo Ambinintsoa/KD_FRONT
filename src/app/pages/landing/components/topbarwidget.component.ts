@@ -221,7 +221,7 @@ import { CommonModule } from "@angular/common";
           pButton
           pRipple
           label="Création de compte"
-          routerLink="/auth/login"
+          routerLink="/auth/register"
           [rounded]="true"
         ></button>
       </div>

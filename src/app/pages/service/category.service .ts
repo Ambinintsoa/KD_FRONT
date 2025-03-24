@@ -51,7 +51,7 @@ export class CategoryService {
             }))
         );
     }
-    updateCategories(product: CategoryObject): Observable<any> {
+    updateCategorie(product: CategoryObject): Observable<any> {
         return this.http.put(`${this.apiUrl}/update`, product);
     }
     deleteCategorie(Product:CategoryObject):Observable<any>{

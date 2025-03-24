@@ -306,21 +306,13 @@ export class Category implements OnInit {
     return this.CategoryObjects.findIndex((item) => item._id === id);
   }
 
-  createId(): string {
-    let id = "";
-    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    for (let i = 0; i < 5; i++) {
-      id += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return id;
-  }
 
   saveProduct() {
     this.submitted = true;
     if (!this.CategoryObject.nom_categorie?.trim()) return;
 
     if (this.CategoryObject._id) {
-      this.categoryService.updateCategories(this.CategoryObject).subscribe({
+      this.categoryService.updateCategorie(this.CategoryObject).subscribe({
         next: () => {
           const index = this.findIndexById(this.CategoryObject._id ?? "");
           if (index !== -1) {
@@ -347,7 +339,6 @@ export class Category implements OnInit {
         },
       });
     } else {
-      this.CategoryObject._id = this.createId();
       this.categoryService.createCategory(this.CategoryObject).subscribe({
         next: (newCategory: CategoryObject) => {
           this.CategoryObjects = [...this.CategoryObjects, newCategory];

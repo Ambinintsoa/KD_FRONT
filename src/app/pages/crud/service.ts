@@ -73,7 +73,6 @@ interface ExportColumn {
         <p-table
             #dt
             [value]="ServiceObjects"
-            [rows]="10"
             [columns]="cols"
             [paginator]="true"
             [globalFilterFields]="['nom_service', 'duree', 'prix', 'categorie_service']"

@@ -10,7 +10,7 @@ export interface ServiceObject {
     nom_service?: string;
     duree?:number,
     prix?:number,
-    categorie_service?:string
+    categorie?:any
 }
 export interface ServiceResponse {
     services:ServiceObject[],
@@ -32,7 +32,7 @@ export class ServiceService {
                        nom_service: item.nom_service,
                        duree: item.duree,
                        prix:item.prix,
-                       Category_service : item.category_service
+                      categorie : item.categorie_service
                    })),
                    currentPage: data.currentPage,
                    totalItems: data.totalItems,
@@ -40,15 +40,22 @@ export class ServiceService {
                }))
            );
        }
+       
       createService(serviceObject: ServiceObject): Observable<any> {
           return this.http.post(`${this.apiUrl}/save`, {"nom_service":serviceObject.nom_service
             , "duree":serviceObject.duree,
             "prix": serviceObject.prix,
-            "categorie_service":serviceObject.categorie_service
+            "categorie_service":serviceObject.categorie._id
           });
       }
-        updateService(product: ServiceObject): Observable<any> {
-              return this.http.put(`${this.apiUrl}/update`, product);
+        updateService(serviceObject: ServiceObject): Observable<any> {
+              return this.http.put(`${this.apiUrl}/update`,  {
+                "_id":serviceObject._id,
+                "nom_service":serviceObject.nom_service
+                , "duree":serviceObject.duree,
+                "prix": serviceObject.prix,
+                "categorie_service":serviceObject.categorie._id
+              });
           }
           deleteService(Product:ServiceObject):Observable<any>{
               return this.http.delete(`${this.apiUrl}/${Product._id}`);

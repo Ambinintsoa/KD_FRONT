@@ -22,6 +22,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ServiceObject, ServiceResponse, ServiceService } from '../service/service.service';
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 import { ListParams } from '../service/Params';
+import { CategoryResponse, CategoryService } from '../service/category.service ';
 
 interface Column {
     field: string;
@@ -139,7 +140,7 @@ interface ExportColumn {
             </ng-template>
         </p-table>
 
-        <p-dialog [(visible)]="productDialog" [style]="{ width: '450px' }" header="Product Details" [modal]="true">
+        <p-dialog [(visible)]="productDialog" [style]="{ width: '450px' }" header="Détails Service" [modal]="true">
             <ng-template #content>
                 <div class="flex flex-col gap-6">
                 <div>
@@ -148,7 +149,7 @@ interface ExportColumn {
                         <small class="text-red-500" *ngIf="submitted && !ServiceObject.nom_service">Nom est requis.</small>
                     </div>
                     <div>
-                        <label for="name" class="block font-bold mb-3">Durée du service</label>
+                        <label for="name" class="block font-bold mb-3">Durée du service(min)</label>
                         <input type="number" pInputText id="name" [(ngModel)]="ServiceObject.duree" required autofocus fluid />
                         <small class="text-red-500" *ngIf="submitted && !ServiceObject.duree">Durée est requis.</small>
                     </div>
@@ -158,26 +159,20 @@ interface ExportColumn {
                         <small class="text-red-500" *ngIf="submitted && !ServiceObject.prix">Prix est requis.</small>
                     </div>
                     <div>
-                        <span class="block font-bold mb-4">Category</span>
-                        <div class="grid grid-cols-12 gap-4">
-                            <div class="flex items-center gap-2 col-span-6">
-                                <p-radiobutton id="category1" name="category" value="Accessories" [(ngModel)]="ServiceObject.categorie_service" />
-                                <label for="category1">Accessories</label>
-                            </div>
-                            <div class="flex items-center gap-2 col-span-6">
-                                <p-radiobutton id="category2" name="category" value="Clothing" [(ngModel)]="ServiceObject.categorie_service" />
-                                <label for="category2">Clothing</label>
-                            </div>
-                            <div class="flex items-center gap-2 col-span-6">
-                                <p-radiobutton id="category3" name="category" value="Electronics" [(ngModel)]="ServiceObject.categorie_service" />
-                                <label for="category3">Electronics</label>
-                            </div>
-                            <div class="flex items-center gap-2 col-span-6">
-                                <p-radiobutton id="category4" name="category" value="Fitness" [(ngModel)]="ServiceObject.categorie_service" />
-                                <label for="category4">Fitness</label>
-                            </div>
-                        </div>
-                    </div>
+        <span class="block font-bold mb-4">Categories</span>
+        <div class="grid grid-cols-12 gap-4">
+            <!-- Dynamically generate radio buttons for categories -->
+            <div *ngFor="let category of categories" class="flex items-center gap-2 col-span-6">
+            <p-radiobutton 
+    [id]="'category' + category._id" 
+    name="categorie_service" 
+    [value]="category._id" 
+    [(ngModel)]="ServiceObject.categorie._id"
+/>
+                <label [for]="'category' + category._id">{{ category.nom_categorie }}</label>
+            </div>
+        </div>
+    </div>
                 </div>
             </ng-template>
 
@@ -199,7 +194,7 @@ export class Service implements OnInit {
     ServiceObject!: ServiceObject;
 
     selectedProducts!: ServiceObject[] | null;
-
+    categories: any[] = []; // Liste des catégories
     submitted: boolean = false;
  private loadDataSubject = new Subject<ListParams>();
     statuses!: any[];
@@ -222,8 +217,10 @@ export class Service implements OnInit {
         private ServiceService: ServiceService,
         private messageService: MessageService,
         private confirmationService: ConfirmationService,
-            private cdr: ChangeDetectorRef
+            private cdr: ChangeDetectorRef,
+            private categoryService: CategoryService
     ) {
+      this.loadCategories();
           this.loadDataSubject
               .pipe(debounceTime(300), distinctUntilChanged())
               .subscribe((params) => {
@@ -296,6 +293,23 @@ export class Service implements OnInit {
        },
      });
    }
+   loadCategories(){
+     this.categoryService.getAllCategories().subscribe({
+          next: (data: CategoryResponse) => {
+            console.log("Réponse complète du backend :", data);
+            this.categories = data.categories || [];
+          },
+          error: (err: Error) => {
+            console.error("Erreur lors du chargement :", err);
+            this.messageService.add({
+              severity: "error",
+              summary: "Erreur",
+              detail: "Échec du chargement des données",
+              life: 3000,
+            });
+          },
+        });
+   }
    onGlobalFilter(dt: any, event: any) {
         this.search = event.target.value;
         this.page = 1;
@@ -304,12 +318,16 @@ export class Service implements OnInit {
     }
 
     openNew() {
-        this.ServiceObject = {};
+        this.ServiceObject = {nom_service: '',  // Valeur par défaut
+          duree: 0,      // Valeur par défaut
+          prix: 0,       // Valeur par défaut
+          categorie: { _id: null }};
         this.submitted = false;
         this.productDialog = true;
     }
 
     editProduct(product: ServiceObject) {
+      console.log(product)
         this.ServiceObject = { ...product };
         this.productDialog = true;
     }

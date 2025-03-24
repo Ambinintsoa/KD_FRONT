@@ -1,5 +1,5 @@
 
-import { Component, OnInit, signal, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, signal, ViewChild } from '@angular/core';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { Table, TableModule } from 'primeng/table';
 import { CommonModule } from '@angular/common';
@@ -19,7 +19,9 @@ import { TagModule } from 'primeng/tag';
 import { InputIconModule } from 'primeng/inputicon';
 import { IconFieldModule } from 'primeng/iconfield';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { ServiceObject,ServiceService } from '../service/service.service';
+import { ServiceObject, ServiceResponse, ServiceService } from '../service/service.service';
+import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
+import { ListParams } from '../service/Params';
 
 interface Column {
     field: string;
@@ -69,18 +71,23 @@ interface ExportColumn {
 
         <p-table
             #dt
-            [value]="ServiceObjects()"
+            [value]="ServiceObjects"
             [rows]="10"
             [columns]="cols"
             [paginator]="true"
-            [globalFilterFields]="['nom_service', 'duree', 'prix', 'categorie']"
+            [globalFilterFields]="['nom_service', 'duree', 'prix', 'categorie_service']"
             [tableStyle]="{ 'min-width': '75rem' }"
             [(selection)]="selectedProducts"
             [rowHover]="true"
-            dataKey="id"
+            dataKey="_id"
+            [sortField]="sortBy"
+      [sortOrder]="orderBy === 'asc' ? 1 : -1"
+      [rows]="limit"
             currentPageReportTemplate=" {first} à {last} sur {totalRecords} services    "
             [showCurrentPageReport]="true"
             [rowsPerPageOptions]="[10, 20, 30]"
+             (onLazyLoad)="onLazyLoad($event)"
+      (onSort)="onSortChange($event)"
         >
             <ng-template #caption>
                 <div class="flex items-center justify-between">
@@ -96,7 +103,7 @@ interface ExportColumn {
                     <th style="width: 3rem">
                         <p-tableHeaderCheckbox />
                     </th>
-                    <th pSortableColumn="name" style="min-width:16rem">
+                    <th pSortableColumn="nom_service" style="min-width:16rem">
                         Service
                         <p-sortIcon field="nom_service" />
                     </th>
@@ -108,7 +115,7 @@ interface ExportColumn {
                         Prix
                         <p-sortIcon field="prix" />
                     </th>
-                    <th pSortableColumn="name" style="min-width:16rem">
+                    <th pSortableColumn="categorie_service" style="min-width:16rem">
                         Catégorie
                         <p-sortIcon field="categorie.nom_categorie" />
                     </th>
@@ -154,19 +161,19 @@ interface ExportColumn {
                         <span class="block font-bold mb-4">Category</span>
                         <div class="grid grid-cols-12 gap-4">
                             <div class="flex items-center gap-2 col-span-6">
-                                <p-radiobutton id="category1" name="category" value="Accessories" [(ngModel)]="ServiceObject.categorie" />
+                                <p-radiobutton id="category1" name="category" value="Accessories" [(ngModel)]="ServiceObject.categorie_service" />
                                 <label for="category1">Accessories</label>
                             </div>
                             <div class="flex items-center gap-2 col-span-6">
-                                <p-radiobutton id="category2" name="category" value="Clothing" [(ngModel)]="ServiceObject.categorie" />
+                                <p-radiobutton id="category2" name="category" value="Clothing" [(ngModel)]="ServiceObject.categorie_service" />
                                 <label for="category2">Clothing</label>
                             </div>
                             <div class="flex items-center gap-2 col-span-6">
-                                <p-radiobutton id="category3" name="category" value="Electronics" [(ngModel)]="ServiceObject.categorie" />
+                                <p-radiobutton id="category3" name="category" value="Electronics" [(ngModel)]="ServiceObject.categorie_service" />
                                 <label for="category3">Electronics</label>
                             </div>
                             <div class="flex items-center gap-2 col-span-6">
-                                <p-radiobutton id="category4" name="category" value="Fitness" [(ngModel)]="ServiceObject.categorie" />
+                                <p-radiobutton id="category4" name="category" value="Fitness" [(ngModel)]="ServiceObject.categorie_service" />
                                 <label for="category4">Fitness</label>
                             </div>
                         </div>
@@ -187,15 +194,23 @@ interface ExportColumn {
 export class Service implements OnInit {
     productDialog: boolean = false;
 
-    ServiceObjects = signal<ServiceObject[]>([]);
+     ServiceObjects: ServiceObject[] = [];
 
     ServiceObject!: ServiceObject;
 
     selectedProducts!: ServiceObject[] | null;
 
     submitted: boolean = false;
-
+ private loadDataSubject = new Subject<ListParams>();
     statuses!: any[];
+    totalRecords: number = 0;
+    totalPages: number = 0;
+    page: number = 1;
+    limit: number = 10;
+    first: number = 0;
+    search: string = "";
+    sortBy: string = "nom_service";
+    orderBy: string = "asc";
 
     @ViewChild('dt') dt!: Table;
 
@@ -206,35 +221,86 @@ export class Service implements OnInit {
     constructor(
         private ServiceService: ServiceService,
         private messageService: MessageService,
-        private confirmationService: ConfirmationService
-    ) {}
+        private confirmationService: ConfirmationService,
+            private cdr: ChangeDetectorRef
+    ) {
+          this.loadDataSubject
+              .pipe(debounceTime(300), distinctUntilChanged())
+              .subscribe((params) => {
+                this.loadDemoData(params.page, params.limit, params.search, params.sortBy, params.orderBy);
+              });
+    }
 
     exportCSV() {
         this.dt.exportCSV();
     }
 
     ngOnInit() {
-        this.loadDemoData();
+        this.cols = [{ field: "nom_service", header: "Nom" }];
+    this.exportColumns = this.cols.map((col) => ({
+      title: col.header,
+      dataKey: col.field,
+    }));
+    this.loadDemoData(this.page, this.limit, this.search, this.sortBy, this.orderBy);
     }
 
-    loadDemoData() {
-        this.ServiceService.getProducts().then((data) => {
-            this.ServiceObjects.set(data);
+    onSortChange(event: any) {
+        const field = event.field;
+        const order = event.order === 1 ? "asc" : "desc";
+        if (this.sortBy === field && this.orderBy === order) return;
+        this.sortBy = field;
+        this.orderBy = order;
+        this.triggerLoadData();
+      }
+    
+      onLazyLoad(event: any) {
+        this.page = Math.floor(event.first / event.rows) + 1;
+        this.limit = event.rows;
+        this.first = event.first;
+        this.sortBy = event.sortField || this.sortBy;
+        this.orderBy = event.sortOrder === 1 ? "asc" : "desc";
+        this.triggerLoadData();
+      }
+    
+      private triggerLoadData() {
+        this.loadDataSubject.next({
+          page: this.page,
+          limit: this.limit,
+          search: this.search,
+          sortBy: this.sortBy,
+          orderBy: this.orderBy,
         });
-
-        this.cols = [
-            { field: 'nom_service', header: 'Nom' },
-            { field: 'duree', header: 'Durée' },
-            { field: 'prix', header: 'Prix' },
-            { field: 'categorie', header: 'Catégorie' },
-
-        ];
-
-        this.exportColumns = this.cols.map((col) => ({ title: col.header, dataKey: col.field }));
-    }
-
-    onGlobalFilter(table: Table, event: Event) {
-        table.filterGlobal((event.target as HTMLInputElement).value, 'contains');
+      }
+    
+   loadDemoData(page: number, limit: number, search: string, sortBy: string, orderBy: string) {
+     this.ServiceService.getServices({ page, limit, search, sortBy, orderBy }).subscribe({
+       next: (data: ServiceResponse) => {
+         console.log("Réponse complète du backend :", data);
+         this.ServiceObjects = data.services || [];
+         this.totalRecords = data.totalItems || 0;
+         this.totalPages = data.totalPages || 0;
+         this.page = data.currentPage || 1;
+         this.first = (this.page - 1) * this.limit;
+         this.cdr.detectChanges();
+         console.log("CategoryObjects après mise à jour :", this.ServiceObjects);
+         console.log("totalRecords après mise à jour :", this.totalRecords);
+       },
+       error: (err: Error) => {
+         console.error("Erreur lors du chargement :", err);
+         this.messageService.add({
+           severity: "error",
+           summary: "Erreur",
+           detail: "Échec du chargement des données",
+           life: 3000,
+         });
+       },
+     });
+   }
+   onGlobalFilter(dt: any, event: any) {
+        this.search = event.target.value;
+        this.page = 1;
+        this.first = 0;
+        this.triggerLoadData();
     }
 
     openNew() {
@@ -250,56 +316,66 @@ export class Service implements OnInit {
 
     deleteSelectedProducts() {
         this.confirmationService.confirm({
-            message: 'Êtes-vous sûr de vouloir supprimer ce service',
-            header: 'Confirmer',
-            icon: 'pi pi-exclamation-triangle',
-            accept: () => {
-                this.ServiceObjects.set(this.ServiceObjects().filter((val) => !this.selectedProducts?.includes(val)));
-                this.selectedProducts = null;
-                this.messageService.add({
-                    severity: 'success',
-                    summary: 'Successful',
-                    detail: 'Categorie supprimées',
-                    life: 3000
-                });
-            }
+          message: "Êtes-vous sûr de vouloir supprimer ces services ?",
+          header: "Confirmer",
+          icon: "pi pi-exclamation-triangle",
+          accept: () => {
+            this.ServiceObjects = this.ServiceObjects.filter(
+              (val) => !this.selectedProducts?.includes(val)
+            );
+            this.selectedProducts = null;
+            this.messageService.add({
+              severity: "success",
+              summary: "Succès",
+              detail: "Services supprimées",
+              life: 3000,
+            });
+            this.triggerLoadData();
+          },
         });
-    }
+      }
 
     hideDialog() {
         this.productDialog = false;
         this.submitted = false;
     }
 
-    deleteProduct(product: ServiceObject) {
-        this.confirmationService.confirm({
-            message: 'Êtes-vous sûr de vouloir supprimer  ' + product.nom_service + '?',
-            header: 'Confirm',
-            icon: 'pi pi-exclamation-triangle',
-            accept: () => {
-                this.ServiceObjects.set(this.ServiceObjects().filter((val) => val.id !== product.id));
-                this.ServiceObject = {};
-                this.messageService.add({
-                    severity: 'success',
-                    summary: 'Successful',
-                    detail: 'Product Deleted',
-                    life: 3000
-                });
-            }
+  deleteProduct(product: ServiceObject) {
+    this.confirmationService.confirm({
+      message: "Êtes-vous sûr de vouloir supprimer " + product.nom_service + " ?",
+      header: "Confirmer",
+      icon: "pi pi-exclamation-triangle",
+      accept: () => {
+        this.ServiceService.deleteService(product).subscribe({
+          next: () => {
+            this.ServiceObjects = this.ServiceObjects.filter((item) => item._id !== product._id);
+            this.messageService.add({
+              severity: "success",
+              summary: "Succès",
+              detail: "Service supprimée",
+              life: 3000,
+            });
+            this.triggerLoadData();
+          },
+          error: (err:Error) => {
+            console.error("Erreur lors de la suppression :", err);
+            this.messageService.add({
+              severity: "error",
+              summary: "Erreur",
+              detail: "Échec de la suppression",
+              life: 3000,
+            });
+          },
         });
-    }
+        this.ServiceObject = {};
+      },
+    });
+  }
 
-    findIndexById(id: string): number {
-        let index = -1;
-        for (let i = 0; i < this.ServiceObjects().length; i++) {
-            if (this.ServiceObjects()[i].id === id) {
-                index = i;
-                break;
-            }
-        }
+  findIndexById(id: string): number {
+    return this.ServiceObjects.findIndex((item) => item._id === id);
+  }
 
-        return index;
-    }
 
     createId(): string {
         let id = '';
@@ -311,32 +387,62 @@ export class Service implements OnInit {
     }
 
 
-    saveProduct() {
-        this.submitted = true;
-        let _products = this.ServiceObjects();
-        if (this.ServiceObject.nom_service?.trim()) {
-            if (this.ServiceObject.id) {
-                _products[this.findIndexById(this.ServiceObject.id)] = this.ServiceObject;
-                this.ServiceObjects.set([..._products]);
-                this.messageService.add({
-                    severity: 'success',
-                    summary: 'Successful',
-                    detail: 'Product Updated',
-                    life: 3000
-                });
-            } else {
-                this.ServiceObject.id = this.createId();
-                this.messageService.add({
-                    severity: 'success',
-                    summary: 'Successful',
-                    detail: 'Product Created',
-                    life: 3000
-                });
-                this.ServiceObjects.set([..._products, this.ServiceObject]);
-            }
+  saveProduct() {
+    this.submitted = true;
+    if (!this.ServiceObject.nom_service?.trim()) return;
 
-            this.productDialog = false;
-            this.ServiceObject = {};
-        }
+    if (this.ServiceObject._id) {
+      this.ServiceService.updateService(this.ServiceObject).subscribe({
+        next: () => {
+          const index = this.findIndexById(this.ServiceObject._id ?? "");
+          if (index !== -1) {
+            this.ServiceObjects[index] = { ...this.ServiceObject };
+          }
+          this.messageService.add({
+            severity: "success",
+            summary: "Succès",
+            detail: "Service mise à jour",
+            life: 3000,
+          });
+          this.productDialog = false;
+          this.ServiceObject = {};
+          this.triggerLoadData();
+        },
+        error: (err:Error) => {
+          console.error("Erreur lors de la mise à jour :", err);
+          this.messageService.add({
+            severity: "error",
+            summary: "Erreur",
+            detail: "Échec de la mise à jour",
+            life: 3000,
+          });
+        },
+      });
+    } else {
+      this.ServiceObject._id = this.createId();
+      this.ServiceService.createService(this.ServiceObject).subscribe({
+        next: (newCategory: ServiceObject) => {
+          this.ServiceObjects = [...this.ServiceObjects, newCategory];
+          this.messageService.add({
+            severity: "success",
+            summary: "Succès",
+            detail: "Catégorie créée",
+            life: 3000,
+          });
+          this.productDialog = false;
+          this.ServiceObject = {};
+          this.triggerLoadData();
+        },
+        error: (err: Error) => {
+          console.error("Erreur lors de la création :", err);
+          this.messageService.add({
+            severity: "error",
+            summary: "Erreur",
+            detail: "Échec de la création",
+            life: 3000,
+          });
+        },
+      });
     }
+  }
 }

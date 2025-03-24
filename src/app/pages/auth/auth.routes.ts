@@ -9,4 +9,5 @@ export default [
     { path: 'error', component: Error },
     { path: 'login', component: Login },
     { path: 'register', component: Register },
+    { path: '', redirectTo: 'login', pathMatch: 'full' }
 ] as Routes;

@@ -1,46 +1,56 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { CategoryObject } from './category.service ';
-
+import { map, Observable, tap } from 'rxjs';
+import { environment } from '../../../environments/environment';
+import { ListParams } from './Params';
 
 
 export interface ServiceObject {
-    id?: string;
+    _id?: string;
     nom_service?: string;
-    duree?: number;
-    prix?: number;
-    categorie?:CategoryObject;
-
-
+    duree?:number,
+    prix?:number,
+    categorie_service?:string
+}
+export interface ServiceResponse {
+    services:ServiceObject[],
+    currentPage:number,
+    totalItems:number,
+    totalPages:number
 }
 
 @Injectable()
 export class ServiceService {
-    getProductsData() {
-        return [
-            {
-                id: '1000',
-                nom_service: 'Vidange d #&aps huile et remplacement du filtre',
-                duree:2,
-                prix:5,
-                categorie:{
-                    id:'1',
-                    nom_categorie:"aaaaa",
-                }
-            },
-            {
-                id: '1001',
-                nom_service: 'Contrôle et remplacement des liquides (refroidissement, frein, direction assistée)',
-                duree:2,
-                prix:5,
-                categorie:{
-                    id:'1',
-                    nom_categorie:"aaaaa",
-                }
-            },
-        ];
-    }
-    getProducts() {
-        return Promise.resolve(this.getProductsData());
-    }
+    private apiUrl = `${environment.apiUrl}/service`
+      constructor(private http: HttpClient) {}
+    getServices(params:ListParams): Observable<ServiceResponse> {
+           return this.http.get<ServiceResponse>(`${this.apiUrl}?page=${params.page}&limit=${params.limit}&search=${params.search}&sortBy=${params.sortBy}&orderBy=${params.orderBy}`).pipe(
+               tap(data => console.log("Données brutes reçues de l'API :", data)), // Vérification
+               map(data => ({
+                   services: data.services.map((item: any) => ({
+                       _id: item._id,
+                       nom_service: item.nom_service,
+                       duree: item.duree,
+                       prix:item.prix,
+                       Category_service : item.category_service
+                   })),
+                   currentPage: data.currentPage,
+                   totalItems: data.totalItems,
+                   totalPages: data.totalPages
+               }))
+           );
+       }
+      createService(serviceObject: ServiceObject): Observable<any> {
+          return this.http.post(`${this.apiUrl}/save`, {"nom_service":serviceObject.nom_service
+            , "duree":serviceObject.duree,
+            "prix": serviceObject.prix,
+            "categorie_service":serviceObject.categorie_service
+          });
+      }
+        updateService(product: ServiceObject): Observable<any> {
+              return this.http.put(`${this.apiUrl}/update`, product);
+          }
+          deleteService(Product:ServiceObject):Observable<any>{
+              return this.http.delete(`${this.apiUrl}/${Product._id}`);
+          }
 }

@@ -114,7 +114,6 @@ export class AuthService {
 
     private storeUser(token: any) {
         const decodedToken = this.decodeToken(token.token_access);
-        const decodedTokenRefresh = this.decodeToken(token.token_access);
         if (!decodedToken) return;
 
         const user: User = {
@@ -125,19 +124,17 @@ export class AuthService {
             token
         };
         console.log(new Date())
-        console.log(new Date(decodedToken.exp) )
-        const expirationDateAcces = decodedToken.exp ? new Date(decodedToken.exp) : undefined;
-        const expirationDateRefresh = decodedTokenRefresh.exp ? new Date(decodedTokenRefresh.exp) : undefined;
+        const expirationDate = token.expiration ? new Date(token.expiration) : undefined;
 
         this.cookieService.set('access_token', token.token_access, {
-            expires: expirationDateAcces,
+            expires: expirationDate,
             path: '/',
             secure: false, // Mettez `true` en production
             sameSite: 'Strict'
         });
 
         this.cookieService.set('refresh_token', token.token_refresh, {
-            expires: expirationDateRefresh,
+            expires: expirationDate,
             path: '/',
             secure: false,
             sameSite: 'Strict'

@@ -36,7 +36,7 @@ export class ProduitService {
                     _id: item._id,
                     nom_produit: item.nom_produit,
                     unite:item.unite,
-                    status: item.statut === 0 ? "Disponible" : "Non-Disponible"
+                    statut: item.statut === 0 ? "Disponible" : "Non-Disponible"
 
                 })),
                 currentPage: data.currentPage,
@@ -49,7 +49,9 @@ export class ProduitService {
     updateProduit(product: ProduitObject): Observable<any> {
         return this.http.put(`${this.apiUrl}/update`, product);
     }
-    deleteProduit(Product:ProduitObject):Observable<any>{
-        return this.http.delete(`${this.apiUrl}/${Product._id}`);
+    deleteProduit(ids:string[]):Observable<any>{
+        return this.http.delete(`${this.apiUrl}`, {
+            body: ids
+          });
     }
 }

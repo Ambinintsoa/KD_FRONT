@@ -104,7 +104,7 @@ interface ExportColumn {
                     <th style="width: 3rem">
                         <p-tableHeaderCheckbox />
                     </th>
-                    <th pSortableColumn="name" style="min-width:16rem">
+                    <th pSortableColumn="nom_produit" style="min-width:16rem">
                         Produit
                         <p-sortIcon field="nom_produit" />
                     </th>
@@ -112,9 +112,9 @@ interface ExportColumn {
                         Unité
                         <p-sortIcon field="unite" />
                     </th>
-                    <th pSortableColumn="unite" style="min-width:16rem">
+                    <th pSortableColumn="statut" style="min-width:16rem">
                         Disponibilité
-                        <p-sortIcon field="unite" />
+                        <p-sortIcon field="statut" />
                     </th>
                     <th style="min-width: 12rem"></th>
                 </tr>
@@ -126,7 +126,7 @@ interface ExportColumn {
                     </td>
                     <td style="min-width: 16rem">{{ product.nom_produit }}</td>
                     <td style="min-width: 16rem">{{ product.unite }}</td>
-                    <td style="min-width: 16rem">{{ product.status }}</td>
+                    <td style="min-width: 16rem">{{ product.statut }}</td>
                     <td>
                         <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true" (click)="editProduct(product)" />
                         <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true" (click)="deleteProduct(product)" />
@@ -142,6 +142,9 @@ interface ExportColumn {
                         <label for="name" class="block font-bold mb-3">Nom du produit</label>
                         <input type="text" pInputText id="name" [(ngModel)]="ProduitObject.nom_produit" required autofocus fluid />
                         <small class="text-red-500" *ngIf="submitted && !ProduitObject.nom_produit">Nom est requis.</small>
+                        <small class="text-red-500" *ngIf="errors?.nom_produit">
+    {{ errors.nom_produit }}
+  </small>
                     </div>
                     <div>
                         <span class="block font-bold mb-4">Unité</span>
@@ -174,6 +177,7 @@ interface ExportColumn {
     providers: [MessageService, ProduitService, ConfirmationService]
 })
 export class Produit implements OnInit {
+  errors:any= {};
     totalRecords: number = 0;
     totalPages: number = 0;
     page: number = 1;
@@ -294,26 +298,43 @@ private loadDataSubject = new Subject<ListParams>();
       }
     
 
-    deleteSelectedProducts() {
+      deleteSelectedProducts() {
         this.confirmationService.confirm({
           message: "Êtes-vous sûr de vouloir supprimer ces catégories ?",
           header: "Confirmer",
           icon: "pi pi-exclamation-triangle",
           accept: () => {
-            this.ProduitObjects = this.ProduitObjects.filter(
-              (val) => !this.selectedProducts?.includes(val)
-            );
-            this.selectedProducts = null;
-            this.messageService.add({
-              severity: "success",
-              summary: "Succès",
-              detail: "Produits supprimées",
-              life: 3000,
+            const ids: string[] = this.selectedProducts
+            ?.filter(cat => !!cat._id)
+            .map(cat => String(cat._id)) ?? [];
+            this.ProduitService.deleteProduit(ids).subscribe({
+              next: () => {
+                this.ProduitObjects = this.ProduitObjects.filter(
+                  (val) => !this.selectedProducts?.includes(val)
+                );
+                this.messageService.add({
+                  severity: "success",
+                  summary: "Succès",
+                  detail: "Produit supprimé",
+                  life: 3000,
+                });
+                this.triggerLoadData();
+              },
+              error: (err:Error) => {
+                console.error("Erreur lors de la suppression :", err);
+                this.messageService.add({
+                  severity: "error",
+                  summary: "Erreur",
+                  detail: "Échec de la suppression",
+                  life: 3000,
+                });
+              },
             });
-            this.triggerLoadData();
+            this.ProduitObject = {};
           },
         });
       }
+    
 
     hideDialog() {
         this.productDialog = false;
@@ -326,7 +347,7 @@ private loadDataSubject = new Subject<ListParams>();
             header: "Confirmer",
             icon: "pi pi-exclamation-triangle",
             accept: () => {
-              this.ProduitService.deleteProduit(product).subscribe({
+              this.ProduitService.deleteProduit([product._id||'']).subscribe({
                 next: () => {
                   this.ProduitObjects = this.ProduitObjects.filter((item) => item._id !== product._id);
                   this.messageService.add({
@@ -378,14 +399,11 @@ private loadDataSubject = new Subject<ListParams>();
           this.ProduitObject = {};
           this.triggerLoadData();
         },
-        error: (err:Error) => {
-          console.error("Erreur lors de la mise à jour :", err);
-          this.messageService.add({
-            severity: "error",
-            summary: "Erreur",
-            detail: "Échec de la mise à jour",
-            life: 3000,
-          });
+        error: (err:any) => {
+          if (err.error && err.error.field) {
+            // Mappe l'erreur en fonction du champ renvoyé par le backend
+            this.errors[err.error.field] = err.error.message;
+          }
         },
       });
     } else {
@@ -402,14 +420,11 @@ private loadDataSubject = new Subject<ListParams>();
           this.ProduitObject = {};
           this.triggerLoadData();
         },
-        error: (err: Error) => {
-          console.error("Erreur lors de la création :", err);
-          this.messageService.add({
-            severity: "error",
-            summary: "Erreur",
-            detail: "Échec de la création",
-            life: 3000,
-          });
+        error: (err: any) => {
+          if (err.error && err.error.field) {
+            // Mappe l'erreur en fonction du champ renvoyé par le backend
+            this.errors[err.error.field] = err.error.message;
+          }
         },
       });
     }

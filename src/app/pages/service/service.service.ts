@@ -57,7 +57,9 @@ export class ServiceService {
                 "categorie_service":serviceObject.categorie._id
               });
           }
-          deleteService(Product:ServiceObject):Observable<any>{
-              return this.http.delete(`${this.apiUrl}/${Product._id}`);
+          deleteService(ids:string[]):Observable<any>{
+            return this.http.delete(`${this.apiUrl}`, {
+                body: ids
+              });
           }
 }

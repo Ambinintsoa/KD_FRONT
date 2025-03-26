@@ -95,25 +95,35 @@ export class AuthService {
         return decoded?.exp ? new Date(decoded.exp * 1000) > new Date() : false;
     }
 
-    refreshToken(): Observable<User> {
-        const refreshToken = this.getRefreshToken();
+    refreshToken(): Observable<any> {
+        const refreshToken = this.getRefreshToken(); // récupéré depuis localStorage ou cookie
+    console.log(refreshToken)
         if (!refreshToken) {
-            this.logout();
-            return throwError(() => new Error('Aucun refresh token disponible'));
+          this.logout();
+          return throwError(() => new Error('Aucun refresh token disponible'));
         }
-
-        return this.http.post<User>(`${environment.apiUrl}/user/refresh`, { refreshToken }).pipe(
-            tap(response => {
-                if (response?.token) {
-                    this.storeUser(response.token);
-                }
-            }),
-            catchError(this.handleError)
+    
+        return this.http.post<any>(`${environment.apiUrl}/user/refresh`, { refreshToken }).pipe(
+          tap(response => {
+            if (response?.token) {
+                const decoded = this.decodeToken(response.token);
+              // 👉 Stocke le token dans un cookie manuellement
+              const expirationDate = decoded.exp ? new Date(decoded.exp*1000) : undefined;
+              this.cookieService.set('access_token', response.token, {
+                expires:expirationDate,
+                secure: true, // HTTPS obligatoire en prod
+                sameSite: 'Lax',
+                path: '/'
+              });
+            }
+          }),
+          catchError(this.handleError)
         );
-    }
+      }
 
     private storeUser(token: any) {
         const decodedToken = this.decodeToken(token.token_access);
+        const decodedRefreshToken = this.decodeToken(token.token_refresh);
         if (!decodedToken) return;
 
         const user: User = {
@@ -123,8 +133,7 @@ export class AuthService {
             email: decodedToken.email,
             token
         };
-        console.log(new Date())
-        const expirationDate = token.expiration ? new Date(token.expiration) : undefined;
+        const expirationDate = decodedToken.exp ? new Date(decodedToken.exp*1000) : undefined;
 
         this.cookieService.set('access_token', token.token_access, {
             expires: expirationDate,
@@ -132,9 +141,9 @@ export class AuthService {
             secure: false, // Mettez `true` en production
             sameSite: 'Strict'
         });
-
+        const expirationDateRefresh = decodedRefreshToken.exp ? new Date(decodedRefreshToken.exp*1000) : undefined;
         this.cookieService.set('refresh_token', token.token_refresh, {
-            expires: expirationDate,
+            expires: expirationDateRefresh,
             path: '/',
             secure: false,
             sameSite: 'Strict'

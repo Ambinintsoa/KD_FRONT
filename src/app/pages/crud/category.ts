@@ -44,7 +44,7 @@ import { Subject } from "rxjs";
     TagModule,
     InputIconModule,
     IconFieldModule,
-    ConfirmDialogModule,
+    ConfirmDialogModule
   ],
   template: `
     <p-toolbar styleClass="mb-6">
@@ -113,6 +113,9 @@ import { Subject } from "rxjs";
             <label for="name" class="block font-bold mb-3">Nom de la catégorie</label>
             <input type="text" pInputText id="name" [(ngModel)]="CategoryObject.nom_categorie" required autofocus fluid />
             <small class="text-red-500" *ngIf="submitted && !CategoryObject.nom_categorie">Nom est requis.</small>
+  <small class="text-red-500" *ngIf="errors?.nom_categorie">
+    {{ errors.nom_categorie }}
+  </small>
           </div>
         </div>
       </ng-template>
@@ -122,10 +125,13 @@ import { Subject } from "rxjs";
       </ng-template>
     </p-dialog>
     <p-confirmdialog [style]="{ width: '450px' }" />
+
+
   `,
   providers: [MessageService, CategoryService, ConfirmationService],
 })
 export class Category implements OnInit {
+  errors: any = {};
   totalRecords: number = 0;
   totalPages: number = 0;
   page: number = 1;
@@ -250,17 +256,33 @@ export class Category implements OnInit {
       header: "Confirmer",
       icon: "pi pi-exclamation-triangle",
       accept: () => {
-        this.CategoryObjects = this.CategoryObjects.filter(
-          (val) => !this.selectedProducts?.includes(val)
-        );
-        this.selectedProducts = null;
-        this.messageService.add({
-          severity: "success",
-          summary: "Succès",
-          detail: "Catégories supprimées",
-          life: 3000,
+        const ids: string[] = this.selectedProducts
+        ?.filter(cat => !!cat._id)
+        .map(cat => String(cat._id)) ?? [];
+        this.categoryService.deleteCategorie(ids).subscribe({
+          next: () => {
+            this.CategoryObjects = this.CategoryObjects.filter(
+              (val) => !this.selectedProducts?.includes(val)
+            );
+            this.messageService.add({
+              severity: "success",
+              summary: "Succès",
+              detail: "Catégorie supprimée",
+              life: 3000,
+            });
+            this.triggerLoadData();
+          },
+          error: (err:Error) => {
+            console.error("Erreur lors de la suppression :", err);
+            this.messageService.add({
+              severity: "error",
+              summary: "Erreur",
+              detail: "Échec de la suppression",
+              life: 3000,
+            });
+          },
         });
-        this.triggerLoadData();
+        this.CategoryObject = {};
       },
     });
   }
@@ -268,6 +290,7 @@ export class Category implements OnInit {
   hideDialog() {
     this.productDialog = false;
     this.submitted = false;
+    this.errors= {};
   }
 
   deleteProduct(product: CategoryObject) {
@@ -276,7 +299,7 @@ export class Category implements OnInit {
       header: "Confirmer",
       icon: "pi pi-exclamation-triangle",
       accept: () => {
-        this.categoryService.deleteCategorie(product).subscribe({
+        this.categoryService.deleteCategorie([product._id||'']).subscribe({
           next: () => {
             this.CategoryObjects = this.CategoryObjects.filter((item) => item._id !== product._id);
             this.messageService.add({
@@ -306,21 +329,13 @@ export class Category implements OnInit {
     return this.CategoryObjects.findIndex((item) => item._id === id);
   }
 
-  createId(): string {
-    let id = "";
-    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    for (let i = 0; i < 5; i++) {
-      id += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return id;
-  }
 
   saveProduct() {
     this.submitted = true;
     if (!this.CategoryObject.nom_categorie?.trim()) return;
 
     if (this.CategoryObject._id) {
-      this.categoryService.updateCategories(this.CategoryObject).subscribe({
+      this.categoryService.updateCategorie(this.CategoryObject).subscribe({
         next: () => {
           const index = this.findIndexById(this.CategoryObject._id ?? "");
           if (index !== -1) {
@@ -336,18 +351,14 @@ export class Category implements OnInit {
           this.CategoryObject = {};
           this.triggerLoadData();
         },
-        error: (err:Error) => {
-          console.error("Erreur lors de la mise à jour :", err);
-          this.messageService.add({
-            severity: "error",
-            summary: "Erreur",
-            detail: "Échec de la mise à jour",
-            life: 3000,
-          });
+        error: (err:any) => {
+          if (err.error && err.error.field) {
+            // Mappe l'erreur en fonction du champ renvoyé par le backend
+            this.errors[err.error.field] = err.error.message;
+          }
         },
       });
     } else {
-      this.CategoryObject._id = this.createId();
       this.categoryService.createCategory(this.CategoryObject).subscribe({
         next: (newCategory: CategoryObject) => {
           this.CategoryObjects = [...this.CategoryObjects, newCategory];
@@ -361,14 +372,11 @@ export class Category implements OnInit {
           this.CategoryObject = {};
           this.triggerLoadData();
         },
-        error: (err: Error) => {
-          console.error("Erreur lors de la création :", err);
-          this.messageService.add({
-            severity: "error",
-            summary: "Erreur",
-            detail: "Échec de la création",
-            life: 3000,
-          });
+        error: (err:any) => {
+          if (err.error && err.error.field) {
+            // Mappe l'erreur en fonction du champ renvoyé par le backend
+            this.errors[err.error.field] = err.error.message;
+          }
         },
       });
     }

@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, signal, ViewChild } from '@angular/core';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { Table, TableModule } from 'primeng/table';
 import { CommonModule } from '@angular/common';
@@ -18,7 +18,9 @@ import { TagModule } from 'primeng/tag';
 import { InputIconModule } from 'primeng/inputicon';
 import { IconFieldModule } from 'primeng/iconfield';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { ProduitObject,ProduitService } from '../service/produit.service';
+import { ProduitObject,ProduitResponse,ProduitService } from '../service/produit.service';
+import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
+import { ListParams } from '../service/Params';
 
 interface Column {
     field: string;
@@ -68,18 +70,25 @@ interface ExportColumn {
 
         <p-table
             #dt
-            [value]="ProduitObjects()"
-            [rows]="10"
+            [value]="ProduitObjects"
             [columns]="cols"
-            [paginator]="true"
+            [lazy]="true"
+      [paginator]="true"
+      [totalRecords]="totalRecords"
             [globalFilterFields]="['nom_produit', 'unité']"
             [tableStyle]="{ 'min-width': '75rem' }"
             [(selection)]="selectedProducts"
             [rowHover]="true"
-            dataKey="id"
-            currentPageReportTemplate=" {first} à {last} sur {totalRecords} catégories    "
+            dataKey="_id"
+      [sortField]="sortBy"
+      [sortOrder]="orderBy === 'asc' ? 1 : -1"
+      [rows]="limit"
+      [first]="first"
+            currentPageReportTemplate=" {first} à {last} sur {totalRecords} produits    "
             [showCurrentPageReport]="true"
             [rowsPerPageOptions]="[10, 20, 30]"
+                (onLazyLoad)="onLazyLoad($event)"
+      (onSort)="onSortChange($event)"
         >
             <ng-template #caption>
                 <div class="flex items-center justify-between">
@@ -95,13 +104,17 @@ interface ExportColumn {
                     <th style="width: 3rem">
                         <p-tableHeaderCheckbox />
                     </th>
-                    <th pSortableColumn="name" style="min-width:16rem">
+                    <th pSortableColumn="nom_produit" style="min-width:16rem">
                         Produit
                         <p-sortIcon field="nom_produit" />
                     </th>
                     <th pSortableColumn="unite" style="min-width:16rem">
                         Unité
                         <p-sortIcon field="unite" />
+                    </th>
+                    <th pSortableColumn="statut" style="min-width:16rem">
+                        Disponibilité
+                        <p-sortIcon field="statut" />
                     </th>
                     <th style="min-width: 12rem"></th>
                 </tr>
@@ -113,6 +126,7 @@ interface ExportColumn {
                     </td>
                     <td style="min-width: 16rem">{{ product.nom_produit }}</td>
                     <td style="min-width: 16rem">{{ product.unite }}</td>
+                    <td style="min-width: 16rem">{{ product.statut }}</td>
                     <td>
                         <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true" (click)="editProduct(product)" />
                         <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true" (click)="deleteProduct(product)" />
@@ -128,6 +142,9 @@ interface ExportColumn {
                         <label for="name" class="block font-bold mb-3">Nom du produit</label>
                         <input type="text" pInputText id="name" [(ngModel)]="ProduitObject.nom_produit" required autofocus fluid />
                         <small class="text-red-500" *ngIf="submitted && !ProduitObject.nom_produit">Nom est requis.</small>
+                        <small class="text-red-500" *ngIf="errors?.nom_produit">
+    {{ errors.nom_produit }}
+  </small>
                     </div>
                     <div>
                         <span class="block font-bold mb-4">Unité</span>
@@ -160,9 +177,18 @@ interface ExportColumn {
     providers: [MessageService, ProduitService, ConfirmationService]
 })
 export class Produit implements OnInit {
+  errors:any= {};
+    totalRecords: number = 0;
+    totalPages: number = 0;
+    page: number = 1;
+    limit: number = 10;
+    first: number = 0;
+    search: string = "";
+    sortBy: string = "nom_produit";
+    orderBy: string = "asc";
     productDialog: boolean = false;
-
-    ProduitObjects = signal<ProduitObject[]>([]);
+private loadDataSubject = new Subject<ListParams>();
+    ProduitObjects:ProduitObject[]= [];
 
     ProduitObject!: ProduitObject;
 
@@ -181,32 +207,75 @@ export class Produit implements OnInit {
     constructor(
         private ProduitService: ProduitService,
         private messageService: MessageService,
-        private confirmationService: ConfirmationService
-    ) {}
+        private confirmationService: ConfirmationService,
+         private cdr: ChangeDetectorRef
+    ) {
+            this.loadDataSubject
+              .pipe(debounceTime(300), distinctUntilChanged())
+              .subscribe((params) => {
+                this.loadDemoData(params.page, params.limit, params.search, params.sortBy, params.orderBy);
+              });
+    }
 
     exportCSV() {
         this.dt.exportCSV();
     }
 
     ngOnInit() {
-        this.loadDemoData();
-    }
+        this.cols = [{ field: "nom_produit", header: "Nom" }];
+        this.exportColumns = this.cols.map((col) => ({
+          title: col.header,
+          dataKey: col.field,
+        }));
+        this.loadDemoData(this.page, this.limit, this.search, this.sortBy, this.orderBy); // Chargement initial direct
+      }
 
-    loadDemoData() {
-        this.ProduitService.getProducts().then((data) => {
-            this.ProduitObjects.set(data);
+  loadDemoData(page: number, limit: number, search: string, sortBy: string, orderBy: string) {
+    this.ProduitService.getProduits({ page, limit, search, sortBy, orderBy }).subscribe({
+      next: (data: ProduitResponse) => {
+        console.log("Réponse complète du backend :", data);
+        this.ProduitObjects = data.produits || [];
+        this.totalRecords = data.totalItems || 0;
+        this.totalPages = data.totalPages || 0;
+        this.page = data.currentPage || 1;
+        this.first = (this.page - 1) * this.limit;
+        this.cdr.detectChanges();
+        console.log("Produit après mise à jour :", this.ProduitObjects);
+        console.log("totalRecords après mise à jour :", this.totalRecords);
+      },
+      error: (err: Error) => {
+        console.error("Erreur lors du chargement :", err);
+        this.messageService.add({
+          severity: "error",
+          summary: "Erreur",
+          detail: "Échec du chargement des données",
+          life: 3000,
         });
-
-        this.cols = [
-            { field: 'nom_categorie', header: 'Nom' }
-        ];
-
-        this.exportColumns = this.cols.map((col) => ({ title: col.header, dataKey: col.field }));
-    }
-
-    onGlobalFilter(table: Table, event: Event) {
-        table.filterGlobal((event.target as HTMLInputElement).value, 'contains');
-    }
+      },
+    });
+  }
+  onLazyLoad(event: any) {
+    this.page = Math.floor(event.first / event.rows) + 1;
+    this.limit = event.rows;
+    this.first = event.first;
+    this.sortBy = event.sortField || this.sortBy;
+    this.orderBy = event.sortOrder === 1 ? "asc" : "desc";
+    this.triggerLoadData();
+  }
+  onSortChange(event: any) {
+    const field = event.field;
+    const order = event.order === 1 ? "asc" : "desc";
+    if (this.sortBy === field && this.orderBy === order) return;
+    this.sortBy = field;
+    this.orderBy = order;
+    this.triggerLoadData();
+  }
+  onGlobalFilter(dt: any, event: any) {
+    this.search = event.target.value;
+    this.page = 1;
+    this.first = 0;
+    this.triggerLoadData();
+  }
 
     openNew() {
         this.ProduitObject = {};
@@ -218,24 +287,54 @@ export class Produit implements OnInit {
         this.ProduitObject = { ...product };
         this.productDialog = true;
     }
-
-    deleteSelectedProducts() {
-        this.confirmationService.confirm({
-            message: 'Êtes-vous sûr de vouloir supprimer cette catégories',
-            header: 'Confirmer',
-            icon: 'pi pi-exclamation-triangle',
-            accept: () => {
-                this.ProduitObjects.set(this.ProduitObjects().filter((val) => !this.selectedProducts?.includes(val)));
-                this.selectedProducts = null;
-                this.messageService.add({
-                    severity: 'success',
-                    summary: 'Successful',
-                    detail: 'Categorie supprimées',
-                    life: 3000
-                });
-            }
+    private triggerLoadData() {
+        this.loadDataSubject.next({
+          page: this.page,
+          limit: this.limit,
+          search: this.search,
+          sortBy: this.sortBy,
+          orderBy: this.orderBy,
         });
-    }
+      }
+    
+
+      deleteSelectedProducts() {
+        this.confirmationService.confirm({
+          message: "Êtes-vous sûr de vouloir supprimer ces catégories ?",
+          header: "Confirmer",
+          icon: "pi pi-exclamation-triangle",
+          accept: () => {
+            const ids: string[] = this.selectedProducts
+            ?.filter(cat => !!cat._id)
+            .map(cat => String(cat._id)) ?? [];
+            this.ProduitService.deleteProduit(ids).subscribe({
+              next: () => {
+                this.ProduitObjects = this.ProduitObjects.filter(
+                  (val) => !this.selectedProducts?.includes(val)
+                );
+                this.messageService.add({
+                  severity: "success",
+                  summary: "Succès",
+                  detail: "Produit supprimé",
+                  life: 3000,
+                });
+                this.triggerLoadData();
+              },
+              error: (err:Error) => {
+                console.error("Erreur lors de la suppression :", err);
+                this.messageService.add({
+                  severity: "error",
+                  summary: "Erreur",
+                  detail: "Échec de la suppression",
+                  life: 3000,
+                });
+              },
+            });
+            this.ProduitObject = {};
+          },
+        });
+      }
+    
 
     hideDialog() {
         this.productDialog = false;
@@ -244,70 +343,90 @@ export class Produit implements OnInit {
 
     deleteProduct(product: ProduitObject) {
         this.confirmationService.confirm({
-            message: 'Êtes-vous sûr de vouloir supprimer ' + product.nom_produit + '?',
-            header: 'Confirm',
-            icon: 'pi pi-exclamation-triangle',
+            message: "Êtes-vous sûr de vouloir supprimer " + product.nom_produit + " ?",
+            header: "Confirmer",
+            icon: "pi pi-exclamation-triangle",
             accept: () => {
-                this.ProduitObjects.set(this.ProduitObjects().filter((val) => val.id !== product.id));
-                this.ProduitObject = {};
-                this.messageService.add({
-                    severity: 'success',
-                    summary: 'Successful',
-                    detail: 'Product Deleted',
-                    life: 3000
-                });
-            }
-        });
-    }
-
-    findIndexById(id: string): number {
-        let index = -1;
-        for (let i = 0; i < this.ProduitObjects().length; i++) {
-            if (this.ProduitObjects()[i].id === id) {
-                index = i;
-                break;
-            }
+              this.ProduitService.deleteProduit([product._id||'']).subscribe({
+                next: () => {
+                  this.ProduitObjects = this.ProduitObjects.filter((item) => item._id !== product._id);
+                  this.messageService.add({
+                    severity: "success",
+                    summary: "Succès",
+                    detail: "Produit supprimée",
+                    life: 3000,
+                  });
+                  this.triggerLoadData();
+                },
+                error: (err:Error) => {
+                  console.error("Erreur lors de la suppression :", err);
+                  this.messageService.add({
+                    severity: "error",
+                    summary: "Erreur",
+                    detail: "Échec de la suppression",
+                    life: 3000,
+                  });
+                },
+              });
+              this.ProduitObject = {};
+            },
+          });
         }
 
-        return index;
+        findIndexById(id: string): number {
+            return this.ProduitObjects.findIndex((item) => item._id === id);
+          }
+
+
+  saveProduct() {
+    this.submitted = true;
+    if (!this.ProduitObject.nom_produit?.trim()) return;
+
+    if (this.ProduitObject._id) {
+      this.ProduitService.updateProduit(this.ProduitObject).subscribe({
+        next: () => {
+          const index = this.findIndexById(this.ProduitObject._id ?? "");
+          if (index !== -1) {
+            this.ProduitObjects[index] = { ...this.ProduitObject };
+          }
+          this.messageService.add({
+            severity: "success",
+            summary: "Succès",
+            detail: "Catégorie mise à jour",
+            life: 3000,
+          });
+          this.productDialog = false;
+          this.ProduitObject = {};
+          this.triggerLoadData();
+        },
+        error: (err:any) => {
+          if (err.error && err.error.field) {
+            // Mappe l'erreur en fonction du champ renvoyé par le backend
+            this.errors[err.error.field] = err.error.message;
+          }
+        },
+      });
+    } else {
+      this.ProduitService.createProduit(this.ProduitObject).subscribe({
+        next: (newCategory: ProduitObject) => {
+          this.ProduitObjects = [...this.ProduitObjects, newCategory];
+          this.messageService.add({
+            severity: "success",
+            summary: "Succès",
+            detail: "Catégorie créée",
+            life: 3000,
+          });
+          this.productDialog = false;
+          this.ProduitObject = {};
+          this.triggerLoadData();
+        },
+        error: (err: any) => {
+          if (err.error && err.error.field) {
+            // Mappe l'erreur en fonction du champ renvoyé par le backend
+            this.errors[err.error.field] = err.error.message;
+          }
+        },
+      });
     }
-
-    createId(): string {
-        let id = '';
-        var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        for (var i = 0; i < 5; i++) {
-            id += chars.charAt(Math.floor(Math.random() * chars.length));
-        }
-        return id;
-    }
-
-
-    saveProduct() {
-        this.submitted = true;
-        let _products = this.ProduitObjects();
-        if (this.ProduitObject.nom_produit?.trim()) {
-            if (this.ProduitObject.id) {
-                _products[this.findIndexById(this.ProduitObject.id)] = this.ProduitObject;
-                this.ProduitObjects.set([..._products]);
-                this.messageService.add({
-                    severity: 'success',
-                    summary: 'Successful',
-                    detail: 'Product Updated',
-                    life: 3000
-                });
-            } else {
-                this.ProduitObject.id = this.createId();
-                this.messageService.add({
-                    severity: 'success',
-                    summary: 'Successful',
-                    detail: 'Product Created',
-                    life: 3000
-                });
-                this.ProduitObjects.set([..._products, this.ProduitObject]);
-            }
-
-            this.productDialog = false;
-            this.ProduitObject = {};
-        }
-    }
+  }
 }

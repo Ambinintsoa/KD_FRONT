@@ -15,11 +15,7 @@ export interface CategoryResponse {
     totalItems:number,
     totalPages:number
 }
-interface ApiResponse {
-    _id: string;
-    nom_categorie: string;
-}
-@Injectable()
+@Injectable({providedIn: 'root'})
 export class CategoryService {
     private apiUrl = `${environment.apiUrl}/categorie`
       constructor(private http: HttpClient) {}
@@ -41,11 +37,28 @@ export class CategoryService {
             }))
         );
     }
-    updateCategories(product: CategoryObject): Observable<any> {
+    getAllCategories(): Observable<CategoryResponse> {
+        return this.http.get<CategoryResponse>(`${this.apiUrl}/getAll`).pipe(
+            tap(data => console.log("Données brutes reçues de l'API :", data)), // Vérification
+            map(data => ({
+                categories: data.categories.map((item: any) => ({
+                    _id: item._id,
+                    nom_categorie: item.nom_categorie
+                })),
+                currentPage: data.currentPage,
+                totalItems: data.totalItems,
+                totalPages: data.totalPages
+            }))
+        );
+    }
+    updateCategorie(product: CategoryObject): Observable<any> {
         return this.http.put(`${this.apiUrl}/update`, product);
     }
-    deleteCategorie(Product:CategoryObject):Observable<any>{
-        return this.http.delete(`${this.apiUrl}/${Product._id}`);
-    }
+    deleteCategorie(ids: string[]): Observable<any> {
+        return this.http.delete(`${this.apiUrl}`, {
+          body: ids
+        });
+      }
+      
     
 }

@@ -1,16 +1,18 @@
-import { Injectable, signal } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, tap, catchError, throwError } from 'rxjs';
 import { User } from '../models/user';
 import { environment } from '../../environments/environment';
 import { CookieService } from 'ngx-cookie-service';
+import { Router } from '@angular/router';
 
 @Injectable({
     providedIn: 'root'
 })
 export class AuthService {
     private currentUser = signal<User | null>(null);
-
+    private router = inject(Router);
+    private userProfile: string | null = null;
     constructor(
         private http: HttpClient,
         private cookieService: CookieService
@@ -71,9 +73,11 @@ export class AuthService {
     }
 
     logout(): void {
+        console.log("logout");
         this.cookieService.delete('access_token', '/');
         this.cookieService.delete('refresh_token', '/');
         this.currentUser.set(null);
+        this.router.navigate(['/auth/login']);
     }
 
     isLoggedIn(): boolean {
@@ -94,26 +98,28 @@ export class AuthService {
         const decoded = this.decodeToken(accessToken);
         return decoded?.exp ? new Date(decoded.exp * 1000) > new Date() : false;
     }
-
-    refreshToken(): Observable<User> {
+    refreshToken(): Observable<any> {
         const refreshToken = this.getRefreshToken();
         if (!refreshToken) {
-            this.logout();
-            return throwError(() => new Error('Aucun refresh token disponible'));
+          this.logout();
+          return throwError(() => new Error('Aucun refresh token disponible'));
         }
-
-        return this.http.post<User>(`${environment.apiUrl}/user/refresh`, { refreshToken }).pipe(
-            tap(response => {
-                if (response?.token) {
-                    this.storeUser(response.token);
-                }
-            }),
-            catchError(this.handleError)
+        return this.http.post<any>(`${environment.apiUrl}/user/refresh`, {refresh: refreshToken }).pipe(
+          tap(response => {
+            if (response.token) {
+              this.storeToken(response.token);
+            }
+          }),
+          catchError(err => {
+            this.logout();
+            return throwError(() => err);
+          })
         );
-    }
+      }
 
     private storeUser(token: any) {
         const decodedToken = this.decodeToken(token.token_access);
+        const decodedRefreshToken = this.decodeToken(token.token_refresh);
         if (!decodedToken) return;
 
         const user: User = {
@@ -123,21 +129,16 @@ export class AuthService {
             email: decodedToken.email,
             token
         };
-        console.log(new Date())
-        const expirationDate = token.expiration ? new Date(token.expiration) : undefined;
+        const expirationDate = decodedToken.exp ? new Date(decodedToken.exp*1000) : undefined;
 
         this.cookieService.set('access_token', token.token_access, {
             expires: expirationDate,
             path: '/',
-            secure: false, // Mettez `true` en production
-            sameSite: 'Strict'
         });
-
+        const expirationDateRefresh = decodedRefreshToken.exp ? new Date(decodedRefreshToken.exp*1000) : undefined;
         this.cookieService.set('refresh_token', token.token_refresh, {
-            expires: expirationDate,
+            expires: expirationDateRefresh,
             path: '/',
-            secure: false,
-            sameSite: 'Strict'
         });
 
         this.currentUser.set(user);
@@ -147,4 +148,26 @@ export class AuthService {
         console.error('Erreur API:', error);
         return throwError(() => new Error(error?.error?.message || 'Une erreur est survenue'));
     }
+    storeToken(token: string): void {
+        const decodedToken = this.decodeToken(token);
+        const expirationDate = decodedToken.exp ? new Date(decodedToken.exp*1000) : undefined;
+
+        this.cookieService.set('access_token', token, {
+            expires: expirationDate,
+            path: '/'
+        });
+      }
+      getUserProfile(): string | null {
+        if (!this.userProfile) {
+          const token = this.cookieService.get('access_token');
+          if (token) {
+            const decoded = this.decodeToken(token);
+            this.userProfile = decoded?.role || null; // Supposons que le profil est dans le token
+          }
+        }
+        return this.userProfile;
+      }
+      isAdmin(): boolean {
+        return this.getUserProfile() === 'admin';
+      }
 }

@@ -22,6 +22,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ServiceObject, ServiceResponse, ServiceService } from '../service/service.service';
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 import { ListParams } from '../service/Params';
+import { CategoryResponse, CategoryService } from '../service/category.service ';
 
 interface Column {
     field: string;
@@ -72,7 +73,6 @@ interface ExportColumn {
         <p-table
             #dt
             [value]="ServiceObjects"
-            [rows]="10"
             [columns]="cols"
             [paginator]="true"
             [globalFilterFields]="['nom_service', 'duree', 'prix', 'categorie_service']"
@@ -139,45 +139,51 @@ interface ExportColumn {
             </ng-template>
         </p-table>
 
-        <p-dialog [(visible)]="productDialog" [style]="{ width: '450px' }" header="Product Details" [modal]="true">
+        <p-dialog [(visible)]="productDialog" [style]="{ width: '450px' }" header="Détails Service" [modal]="true">
             <ng-template #content>
                 <div class="flex flex-col gap-6">
                 <div>
                         <label for="name" class="block font-bold mb-3">Nom du service</label>
                         <input type="text" pInputText id="name" [(ngModel)]="ServiceObject.nom_service" required autofocus fluid />
                         <small class="text-red-500" *ngIf="submitted && !ServiceObject.nom_service">Nom est requis.</small>
+                        <small class="text-red-500" *ngIf="errors?.nom_service">
+    {{ errors.nom_service }}
+  </small>
                     </div>
                     <div>
-                        <label for="name" class="block font-bold mb-3">Durée du service</label>
+                        <label for="name" class="block font-bold mb-3">Durée du service(min)</label>
                         <input type="number" pInputText id="name" [(ngModel)]="ServiceObject.duree" required autofocus fluid />
                         <small class="text-red-500" *ngIf="submitted && !ServiceObject.duree">Durée est requis.</small>
+                        <small class="text-red-500" *ngIf="errors?.duree">
+    {{ errors.duree }}
+  </small>
                     </div>
                     <div>
                         <label for="name" class="block font-bold mb-3">Prix du service</label>
                         <input type="number" pInputText id="name" [(ngModel)]="ServiceObject.prix" required autofocus fluid />
                         <small class="text-red-500" *ngIf="submitted && !ServiceObject.prix">Prix est requis.</small>
+                        <small class="text-red-500" *ngIf="errors?.prix">
+    {{ errors.prix }}
+  </small>
                     </div>
                     <div>
-                        <span class="block font-bold mb-4">Category</span>
-                        <div class="grid grid-cols-12 gap-4">
-                            <div class="flex items-center gap-2 col-span-6">
-                                <p-radiobutton id="category1" name="category" value="Accessories" [(ngModel)]="ServiceObject.categorie_service" />
-                                <label for="category1">Accessories</label>
-                            </div>
-                            <div class="flex items-center gap-2 col-span-6">
-                                <p-radiobutton id="category2" name="category" value="Clothing" [(ngModel)]="ServiceObject.categorie_service" />
-                                <label for="category2">Clothing</label>
-                            </div>
-                            <div class="flex items-center gap-2 col-span-6">
-                                <p-radiobutton id="category3" name="category" value="Electronics" [(ngModel)]="ServiceObject.categorie_service" />
-                                <label for="category3">Electronics</label>
-                            </div>
-                            <div class="flex items-center gap-2 col-span-6">
-                                <p-radiobutton id="category4" name="category" value="Fitness" [(ngModel)]="ServiceObject.categorie_service" />
-                                <label for="category4">Fitness</label>
-                            </div>
-                        </div>
-                    </div>
+        <span class="block font-bold mb-4">Categories</span>
+        <div class="grid grid-cols-12 gap-4">
+            <!-- Dynamically generate radio buttons for categories -->
+            <div *ngFor="let category of categories" class="flex items-center gap-2 col-span-6">
+            <p-radiobutton 
+    [id]="'category' + category._id" 
+    name="categorie_service" 
+    [value]="category._id" 
+    [(ngModel)]="ServiceObject.categorie._id"
+/>
+                <label [for]="'category' + category._id">{{ category.nom_categorie }}</label>
+            </div>
+            <small class="text-red-500" *ngIf="errors?.categorie_service">
+    {{ errors.categorie_service }}
+  </small>
+        </div>
+    </div>
                 </div>
             </ng-template>
 
@@ -192,6 +198,7 @@ interface ExportColumn {
     providers: [MessageService, ServiceService, ConfirmationService]
 })
 export class Service implements OnInit {
+  errors: any = {};
     productDialog: boolean = false;
 
      ServiceObjects: ServiceObject[] = [];
@@ -199,7 +206,7 @@ export class Service implements OnInit {
     ServiceObject!: ServiceObject;
 
     selectedProducts!: ServiceObject[] | null;
-
+    categories: any[] = []; // Liste des catégories
     submitted: boolean = false;
  private loadDataSubject = new Subject<ListParams>();
     statuses!: any[];
@@ -222,8 +229,10 @@ export class Service implements OnInit {
         private ServiceService: ServiceService,
         private messageService: MessageService,
         private confirmationService: ConfirmationService,
-            private cdr: ChangeDetectorRef
+            private cdr: ChangeDetectorRef,
+            private categoryService: CategoryService
     ) {
+      this.loadCategories();
           this.loadDataSubject
               .pipe(debounceTime(300), distinctUntilChanged())
               .subscribe((params) => {
@@ -296,6 +305,23 @@ export class Service implements OnInit {
        },
      });
    }
+   loadCategories(){
+     this.categoryService.getAllCategories().subscribe({
+          next: (data: CategoryResponse) => {
+            console.log("Réponse complète du backend :", data);
+            this.categories = data.categories || [];
+          },
+          error: (err: Error) => {
+            console.error("Erreur lors du chargement :", err);
+            this.messageService.add({
+              severity: "error",
+              summary: "Erreur",
+              detail: "Échec du chargement des données",
+              life: 3000,
+            });
+          },
+        });
+   }
    onGlobalFilter(dt: any, event: any) {
         this.search = event.target.value;
         this.page = 1;
@@ -304,36 +330,56 @@ export class Service implements OnInit {
     }
 
     openNew() {
-        this.ServiceObject = {};
+        this.ServiceObject = {nom_service: '',  // Valeur par défaut
+          duree: 0,      // Valeur par défaut
+          prix: 0,       // Valeur par défaut
+          categorie: { _id: null }};
         this.submitted = false;
         this.productDialog = true;
     }
 
     editProduct(product: ServiceObject) {
+      console.log(product)
         this.ServiceObject = { ...product };
         this.productDialog = true;
     }
 
     deleteSelectedProducts() {
-        this.confirmationService.confirm({
-          message: "Êtes-vous sûr de vouloir supprimer ces services ?",
-          header: "Confirmer",
-          icon: "pi pi-exclamation-triangle",
-          accept: () => {
-            this.ServiceObjects = this.ServiceObjects.filter(
-              (val) => !this.selectedProducts?.includes(val)
-            );
-            this.selectedProducts = null;
-            this.messageService.add({
-              severity: "success",
-              summary: "Succès",
-              detail: "Services supprimées",
-              life: 3000,
-            });
-            this.triggerLoadData();
-          },
-        });
-      }
+      this.confirmationService.confirm({
+        message: "Êtes-vous sûr de vouloir supprimer ces services ?",
+        header: "Confirmer",
+        icon: "pi pi-exclamation-triangle",
+        accept: () => {
+          const ids: string[] = this.selectedProducts
+          ?.filter(cat => !!cat._id)
+          .map(cat => String(cat._id)) ?? [];
+          this.ServiceService.deleteService(ids).subscribe({
+            next: () => {
+              this.ServiceObjects = this.ServiceObjects.filter(
+                (val) => !this.selectedProducts?.includes(val)
+              );
+              this.messageService.add({
+                severity: "success",
+                summary: "Succès",
+                detail: "Service supprimé",
+                life: 3000,
+              });
+              this.triggerLoadData();
+            },
+            error: (err:Error) => {
+              console.error("Erreur lors de la suppression :", err);
+              this.messageService.add({
+                severity: "error",
+                summary: "Erreur",
+                detail: "Échec de la suppression",
+                life: 3000,
+              });
+            },
+          });
+          this.ServiceObject = {};
+        },
+      });
+    }
 
     hideDialog() {
         this.productDialog = false;
@@ -346,7 +392,7 @@ export class Service implements OnInit {
       header: "Confirmer",
       icon: "pi pi-exclamation-triangle",
       accept: () => {
-        this.ServiceService.deleteService(product).subscribe({
+        this.ServiceService.deleteService([product._id||'']).subscribe({
           next: () => {
             this.ServiceObjects = this.ServiceObjects.filter((item) => item._id !== product._id);
             this.messageService.add({
@@ -377,14 +423,6 @@ export class Service implements OnInit {
   }
 
 
-    createId(): string {
-        let id = '';
-        var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        for (var i = 0; i < 5; i++) {
-            id += chars.charAt(Math.floor(Math.random() * chars.length));
-        }
-        return id;
-    }
 
 
   saveProduct() {
@@ -408,18 +446,18 @@ export class Service implements OnInit {
           this.ServiceObject = {};
           this.triggerLoadData();
         },
-        error: (err:Error) => {
-          console.error("Erreur lors de la mise à jour :", err);
-          this.messageService.add({
-            severity: "error",
-            summary: "Erreur",
-            detail: "Échec de la mise à jour",
-            life: 3000,
-          });
+        error: (err:any) => {
+          if (err.error && Array.isArray(err.error.errors)) {
+            // Si le backend renvoie plusieurs erreurs dans un tableau
+            err.error.errors.forEach((error: { field: string, message: string }) => {
+              // Mappe l'erreur en fonction du champ renvoyé par le backend
+              this.errors[error.field] = error.message;
+            });
+          }
+          
         },
       });
     } else {
-      this.ServiceObject._id = this.createId();
       this.ServiceService.createService(this.ServiceObject).subscribe({
         next: (newCategory: ServiceObject) => {
           this.ServiceObjects = [...this.ServiceObjects, newCategory];
@@ -433,14 +471,15 @@ export class Service implements OnInit {
           this.ServiceObject = {};
           this.triggerLoadData();
         },
-        error: (err: Error) => {
-          console.error("Erreur lors de la création :", err);
-          this.messageService.add({
-            severity: "error",
-            summary: "Erreur",
-            detail: "Échec de la création",
-            life: 3000,
-          });
+        error: (err: any) => {
+          if (err.error && Array.isArray(err.error.errors)) {
+            // Si le backend renvoie plusieurs erreurs dans un tableau
+            err.error.errors.forEach((error: { field: string, message: string }) => {
+              // Mappe l'erreur en fonction du champ renvoyé par le backend
+              this.errors[error.field] = error.message;
+            });
+            console.log(this.errors)
+          }
         },
       });
     }

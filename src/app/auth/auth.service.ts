@@ -167,4 +167,7 @@ export class AuthService {
         }
         return this.userProfile;
       }
+      isAdmin(): boolean {
+        return this.getUserProfile() === 'admin';
+      }
 }

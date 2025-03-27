@@ -9,13 +9,14 @@ export const authGuard: CanActivateFn = (route, state) => {
   const requiredProfile = route.data['profile'] as string; // Profil requis pour la route
 
   if (!authService.isLoggedIn()) {
-    router.navigate(['/login'], { queryParams: { returnUrl: state.url } });
+    router.navigate(['/auth/login'], { queryParams: { returnUrl: state.url } });
     return false;
   }
 
   const userProfile = authService.getUserProfile();
+  console.log(userProfile)
   if (requiredProfile && userProfile !== requiredProfile) {
-    router.navigate(['/unauthorized']); // Page pour accès non autorisé
+    router.navigate(['/auth/access']); // Page pour accès non autorisé
     return false;
   }
 

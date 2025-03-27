@@ -119,6 +119,7 @@ import Swal from 'sweetalert2';
                       id="rememberme1"
                       binary
                       class="mr-2"
+                      name="rememberme"
                     ></p-checkbox>
                     <label for="rememberme1">Se souvenir de moi</label>
                   </div>

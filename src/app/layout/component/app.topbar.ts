@@ -75,7 +75,7 @@ import { AuthService } from '../../auth/auth.service';
                     </button>
                     <button type="button" class="layout-topbar-action flex items-center space-x-2" aria-label="Déconnexion" (click)="logout()">
     <i class="pi pi-sign-out"></i>
-    <span>Déconnexion</span>
+    <span >Déconnexion</span>
 </button>
 
                 </div>

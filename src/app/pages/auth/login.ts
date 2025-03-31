@@ -142,9 +142,9 @@ import Swal from 'sweetalert2';
   `,
 })
 export class Login {
-  email: string = "";
+  email: string = "my_email2@gmail.com";
 
-  password: string = "";
+  password: string = "password";
 
   checked: boolean = false;
   constructor(

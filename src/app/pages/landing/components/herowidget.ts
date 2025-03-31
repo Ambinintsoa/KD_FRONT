@@ -14,7 +14,6 @@ import { RippleModule } from 'primeng/ripple';
             <div class="mx-6 md:mx-20 mt-0 md:mt-6">
                 <h1 class="text-6xl font-bold text-gray-900 leading-tight"><span class="font-light block">Panne ou entretien ?</span> Votre garage de confiance est à un clic.</h1>
                 <p class="font-normal text-2xl leading-normal md:mt-4 text-gray-700">Prenez rendez-vous maintenant ou Obtenez votre devis gratuit.</p>
-                <button pButton pRipple [rounded]="true" type="button" label="Se connecter" class="!text-xl mt-8 !px-4"></button>
             </div>
             <div class="flex justify-center md:justify-end">
                 <img src="/images/reparation.png" alt="Hero Image" class="w-6/12 md:w-2/4" />

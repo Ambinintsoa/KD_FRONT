@@ -324,43 +324,6 @@ export class TopbarWidget implements OnInit {
       ],
     },
     {
-      label: "Promotion",
-      icon: "pi pi-fw pi-gift",
-      items: [
-        [
-          {
-            label: "Living Room",
-            items: [
-              { label: "Living Room Item" },
-              { label: "Living Room Item" },
-            ],
-          },
-          {
-            label: "Kitchen",
-            items: [
-              { label: "Kitchen Item" },
-              { label: "Kitchen Item" },
-              { label: "Kitchen Item" },
-            ],
-          },
-        ],
-        [
-          {
-            label: "Bedroom",
-            items: [{ label: "Bedroom Item" }, { label: "Bedroom Item" }],
-          },
-          {
-            label: "Outdoor",
-            items: [
-              { label: "Outdoor Item" },
-              { label: "Outdoor Item" },
-              { label: "Outdoor Item" },
-            ],
-          },
-        ],
-      ],
-    },
-    {
       label: "Voiture de location",
       icon: "pi pi-fw pi-car",
       items: [

@@ -1,39 +1,46 @@
-import { Component } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
-import { Router, RouterModule } from '@angular/router';
-import { ButtonModule } from 'primeng/button';
-import { CheckboxModule } from 'primeng/checkbox';
-import { InputTextModule } from 'primeng/inputtext';
-import { PasswordModule } from 'primeng/password';
-import { RippleModule } from 'primeng/ripple';
-import { AppFloatingConfigurator } from '../../layout/component/app.floatingconfigurator';
-import { AuthService } from '../../auth/auth.service';
-import { CreateUser } from '../../models/CreateUser';
-import Swal from 'sweetalert2';
+import { Component } from "@angular/core";
+import { FormsModule } from "@angular/forms";
+import { CommonModule } from "@angular/common";
+import { Router, RouterModule } from "@angular/router";
+import { ButtonModule } from "primeng/button";
+import { CheckboxModule } from "primeng/checkbox";
+import { InputTextModule } from "primeng/inputtext";
+import { PasswordModule } from "primeng/password";
+import { RippleModule } from "primeng/ripple";
+import { AppFloatingConfigurator } from "../../layout/component/app.floatingconfigurator";
+import { AuthService } from "../../auth/auth.service";
+import { CreateUser } from "../../models/CreateUser";
+import Swal from "sweetalert2";
 
 @Component({
-    selector: 'app-register',
-    standalone: true,
-    imports: [
-        ButtonModule,
-        CheckboxModule,
-        InputTextModule,
-        PasswordModule,
-        FormsModule,
-        RouterModule,
-        RippleModule,
-        CommonModule,
-        AppFloatingConfigurator
-    ],
-    template: `
-        <app-floating-configurator />
-        <div   class="bg-surface-50 dark:bg-surface-950 flex items-center justify-center min-h-screen min-w-[100vw] overflow-hidden">
-            <div class="flex flex-col items-center justify-center">
-                <div style="border-radius: 56px; padding: 0.3rem; background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%)">
-                    <div class="w-full bg-surface-0 dark:bg-surface-900 py-20 px-8 sm:px-20" style="border-radius: 53px">
-                        <div class="text-center mb-8">
-                        <svg
+  selector: "app-register",
+  standalone: true,
+  imports: [
+    ButtonModule,
+    CheckboxModule,
+    InputTextModule,
+    PasswordModule,
+    FormsModule,
+    RouterModule,
+    RippleModule,
+    CommonModule,
+    AppFloatingConfigurator,
+  ],
+  template: `
+    <app-floating-configurator />
+    <div
+      class="bg-surface-50 dark:bg-surface-950 flex items-center justify-center min-h-screen min-w-[100vw] overflow-hidden"
+    >
+      <div class="flex flex-col items-center justify-center">
+        <div
+          style="border-radius: 56px; padding: 0.3rem; background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%)"
+        >
+          <div
+            class="w-full bg-surface-0 dark:bg-surface-900 py-20 px-8 sm:px-20"
+            style="border-radius: 53px"
+          >
+            <div class="text-center mb-8">
+              <svg
                 viewBox="0 0 54 40"
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
@@ -66,276 +73,345 @@ import Swal from 'sweetalert2';
                   />
                 </g>
               </svg>
-                            <h2 class="text-2xl font-semibold">Formulaire d'inscription</h2>
-                            <span
-    class="font-medium no-underline ml-2 mt-2 text-right cursor-pointer text-primary"
-    routerLink="/auth/login"
->Se connecter</span>
-                        </div>
-       <!-- Étape 0 -->
-       <div id="step0" class="step" [ngClass]="{'hidden': currentStep !== 0}">
-                            <form #step1Form="ngForm">
-                                   
-                            <div class="mb-4">
-                                    <label for="nom" class="block text-sm font-medium">Nom</label>
-                                    <input type="text" 
-                                           id="nom" 
-                                           name="nom"
-                                           [(ngModel)]="nom"
-                                           class="mt-1 block w-full px-3 py-2 md:w-[30rem] border border-gray-300 rounded-md" 
-                                           placeholder="Entrez votre nom"
-                                           required />
-                                           <small class="text-red-500" *ngIf="errors?.nom">
-    {{ errors.nom }}
-  </small>
-                                </div>
-                               
-                                <div class="mb-4">
-                                    <label for="prenom" class="block text-sm font-medium">Prénoms</label>
-                                    <input type="text" 
-                                           id="prenom" 
-                                           name="prenom"
-                                           [(ngModel)]="prenom"
-                                           class="mt-1 block w-full px-3 py-2 md:w-[30rem] border border-gray-300 rounded-md" 
-                                           placeholder="Entrez vos prénoms"
-                                           required />
-                                           <small class="text-red-500" *ngIf="errors?.prenom">
-    {{ errors.prenom }}
-  </small>
-                                </div>
-                                <button type="button" 
-                                        pButton 
-                                        label="Suivant" 
-                                        (click)="nextStep(0)"
-                                        [disabled]="!step1Form.valid"
-                                        class="bg-primary-color text-white px-4 py-2 rounded-md mt-2"></button>
-                            </form>
-                        </div>
-                        <!-- Étape 1 -->
-                        <div id="step1" class="step" [ngClass]="{'hidden': currentStep !== 1}">
-                            <form #step1Form="ngForm">
-                                <div class="mb-4">
-                                    <label for="date_naissance" class="block text-sm font-medium">Date de naissance</label>
-                                    <input type="date" 
-                                           id="date_naissance" 
-                                           name="date_naissance"
-                                           [(ngModel)]="dateNaissance"
-                                           class="mt-1 block w-full px-3 py-2 md:w-[30rem] border border-gray-300 rounded-md" 
-                                           required />
-                                           <small class="text-red-500" *ngIf="errors?.date_de_naissance">
-    {{ errors.date_de_naissance }}
-  </small>
-                                </div>
-                                <div class="mb-4">
-                                    <label for="genre" class="block text-sm font-medium">Genre</label>
-                                    <select id="genre" 
-                                            name="genre"
-                                            [(ngModel)]="genre"
-                                            class="mt-1 block w-full px-3 py-2 md:w-[30rem] border border-gray-300 rounded-md"
-                                            required>
-                                        <option value="Homme">Homme</option>
-                                        <option value="Femme">Femme</option>
-                                    </select>
-                                    <small class="text-red-500" *ngIf="errors?.genre">
-    {{ errors.genre }}
-  </small>
-                                </div>
-                                <div class="mb-4">
-                                    <label for="adresse" class="block text-sm font-medium">Adresse</label>
-                                    <input type="text" 
-                                           id="adresse" 
-                                           name="adresse"
-                                           [(ngModel)]="adresse"
-                                           class="mt-1 block w-full px-3 py-2 md:w-[30rem] border border-gray-300 rounded-md" 
-                                           placeholder="Entrez votre adresse"
-                                           required />
-                                           <small class="text-red-500" *ngIf="errors?.adresse">
-    {{ errors.adresse }}
-  </small>
-                                </div>
-                                <button pButton 
-                                            type="button" 
-                                            label="Précédent" 
-                                            (click)="prevStep(1)"
-                                            class="bg-gray-500 text-white px-4 py-2 rounded-md"></button>
-                                <button type="button" 
-                                        pButton 
-                                        label="Suivant" 
-                                        (click)="nextStep(1)"
-                                        [disabled]="!step1Form.valid"
-                                        class="bg-primary-color text-white px-4 py-2 rounded-md mt-2 ml-2"></button>
-                            </form>
-                        </div>
-
-                        <!-- Étape 2 -->
-                        <div id="step2" class="step" [ngClass]="{'hidden': currentStep !== 2}">
-                            <form #step2Form="ngForm" (ngSubmit)="register()">
-                                <div class="mb-4">
-                                    <label for="email" class="block text-sm font-medium">Email</label>
-                                    <input pInputText 
-                                           id="email" 
-                                           name="email"
-                                           [(ngModel)]="email"
-                                            placeholder="Confirmer votre email"
-                                           type="email"
-                                           class="mt-1 block w-full md:w-[30rem]"
-                                           required 
-                                           email />
-                                           <small class="text-red-500" *ngIf="errors?.email">
-    {{ errors.email }}
-  </small>
-                                </div>
-                                <div class="mb-4">
-                                    <label for="password" class="block text-sm font-medium">Mot de passe</label>
-                                    <p-password id="password" 
-                                               name="password"
-                                               [(ngModel)]="password"
-                                                placeholder="Entrer votre mot de passe"
-                                               [toggleMask]="true"
-                                               class="mt-1 block w-full md:w-[30rem]"
-                                               promptLabel="Entrer votre mot de passe"
-                                               weakLabel="Faible"
-                                               mediumLabel="Moyen"
-                                               strongLabel="Parfait"
-                                               required [style]="{'width': '100%'}"
-                [inputStyle]="{'width': '100%'}"
-                                               ></p-password>
-                                               <small class="text-red-500" *ngIf="errors?.mot_de_passe">
-    {{ errors.mot_de_passe }}
-  </small>
-                                </div>
-                                <div class="mb-4">
-                                    <label for="confirmPassword" class="block text-sm font-medium">Confirmer mot de passe</label>
-                                    <p-password id="confirmPassword" 
-                                               name="confirmPassword"
-                                               [(ngModel)]="confirmPassword"
-                                                placeholder="Confirmer votre mot de passe"
-                                               [toggleMask]="true"
-                                               class="mb-8 border w-[70%]"
-                                               promptLabel="Entrer votre mot de passe"
-                                               weakLabel="Faible"
-                                               mediumLabel="Moyen"
-                                               strongLabel="Parfait"
-                                               required [style]="{'width': '100%'}"
-                                               [inputStyle]="{'width': '100%'}">
-                                            </p-password>
-                                </div>
-                                <div class="mb-_linear-gradient(90deg, rgba(33, 150, 243, 1) 0%, rgba(33, 150, 243, 0.4) 100%)4 flex items-center">
-                                    <p-checkbox [(ngModel)]="checked" 
-                                               name="checked"
-                                               [binary]="true" 
-                                               inputId="conditions"
-                                               required></p-checkbox>
-                                    <label for="conditions" class="ml-2">J'accepte les conditions</label>
-                                </div>
-                                <div class="flex gap-2 mt-2">
-                                    <button pButton 
-                                            type="button" 
-                                            label="Précédent" 
-                                            (click)="prevStep(2)"
-                                            class="bg-gray-500 text-white px-4 py-2 rounded-md"></button>
-                                    <button pButton 
-                                            type="submit" 
-                                            label="Soumettre"
-                                            [disabled]="!step2Form.valid || password !== confirmPassword || !checked"
-                                            class="bg-primary-color text-white px-4 py-2 rounded-md"></button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
+              <h2 class="text-2xl font-semibold">Formulaire d'inscription</h2>
+              <span
+                class="font-medium no-underline ml-2 mt-2 text-right cursor-pointer text-primary"
+                routerLink="/auth/login"
+                >Se connecter</span
+              >
             </div>
+            <!-- Étape 0 -->
+            <div
+              id="step0"
+              class="step"
+              [ngClass]="{ hidden: currentStep !== 0 }"
+            >
+              <form #step1Form="ngForm">
+                <div class="mb-4">
+                  <label for="nom" class="block text-sm font-medium">Nom</label>
+                  <input
+                    type="text"
+                    id="nom"
+                    name="nom"
+                    [(ngModel)]="nom"
+                    class="mt-1 block w-full px-3 py-2 md:w-[30rem] border border-gray-300 rounded-md"
+                    placeholder="Entrez votre nom"
+                    required
+                  />
+                  <small class="text-red-500" *ngIf="errors?.nom">
+                    {{ errors.nom }}
+                  </small>
+                </div>
+
+                <div class="mb-4">
+                  <label for="prenom" class="block text-sm font-medium"
+                    >Prénoms</label
+                  >
+                  <input
+                    type="text"
+                    id="prenom"
+                    name="prenom"
+                    [(ngModel)]="prenom"
+                    class="mt-1 block w-full px-3 py-2 md:w-[30rem] border border-gray-300 rounded-md"
+                    placeholder="Entrez vos prénoms"
+                    required
+                  />
+                  <small class="text-red-500" *ngIf="errors?.prenom">
+                    {{ errors.prenom }}
+                  </small>
+                </div>
+                <button
+                  type="button"
+                  pButton
+                  label="Suivant"
+                  (click)="nextStep(0)"
+                  [disabled]="!step1Form.valid"
+                  class="bg-primary-color text-white px-4 py-2 rounded-md mt-2"
+                ></button>
+              </form>
+            </div>
+            <!-- Étape 1 -->
+            <div
+              id="step1"
+              class="step"
+              [ngClass]="{ hidden: currentStep !== 1 }"
+            >
+              <form #step1Form="ngForm">
+                <div class="mb-4">
+                  <label for="date_naissance" class="block text-sm font-medium"
+                    >Date de naissance</label
+                  >
+                  <input
+                    type="date"
+                    id="date_naissance"
+                    name="date_naissance"
+                    [(ngModel)]="dateNaissance"
+                    class="mt-1 block w-full px-3 py-2 md:w-[30rem] border border-gray-300 rounded-md"
+                    required
+                  />
+                  <small class="text-red-500" *ngIf="errors?.date_de_naissance">
+                    {{ errors.date_de_naissance }}
+                  </small>
+                </div>
+                <div class="mb-4">
+                  <label for="genre" class="block text-sm font-medium"
+                    >Genre</label
+                  >
+                  <select
+                    id="genre"
+                    name="genre"
+                    [(ngModel)]="genre"
+                    class="mt-1 block w-full px-3 py-2 md:w-[30rem] border border-gray-300 rounded-md"
+                    required
+                  >
+                    <option value="Homme">Homme</option>
+                    <option value="Femme">Femme</option>
+                  </select>
+                  <small class="text-red-500" *ngIf="errors?.genre">
+                    {{ errors.genre }}
+                  </small>
+                </div>
+                <div class="mb-4">
+                  <label for="adresse" class="block text-sm font-medium"
+                    >Adresse</label
+                  >
+                  <input
+                    type="text"
+                    id="adresse"
+                    name="adresse"
+                    [(ngModel)]="adresse"
+                    class="mt-1 block w-full px-3 py-2 md:w-[30rem] border border-gray-300 rounded-md"
+                    placeholder="Entrez votre adresse"
+                    required
+                  />
+                  <small class="text-red-500" *ngIf="errors?.adresse">
+                    {{ errors.adresse }}
+                  </small>
+                </div>
+                <button
+                  pButton
+                  type="button"
+                  label="Précédent"
+                  (click)="prevStep(1)"
+                  class="bg-gray-500 text-white px-4 py-2 rounded-md"
+                ></button>
+                <button
+                  type="button"
+                  pButton
+                  label="Suivant"
+                  (click)="nextStep(1)"
+                  [disabled]="!step1Form.valid"
+                  class="bg-primary-color text-white px-4 py-2 rounded-md mt-2 ml-2"
+                ></button>
+              </form>
+            </div>
+
+            <!-- Étape 2 -->
+            <div
+              id="step2"
+              class="step"
+              [ngClass]="{ hidden: currentStep !== 2 }"
+            >
+              <form #step2Form="ngForm" (ngSubmit)="register()">
+                <div class="mb-4">
+                  <label for="email" class="block text-sm font-medium"
+                    >Email</label
+                  >
+                  <input
+                    pInputText
+                    id="email"
+                    name="email"
+                    [(ngModel)]="email"
+                    placeholder="Confirmer votre email"
+                    type="email"
+                    class="mt-1 block w-full md:w-[30rem]"
+                    required
+                    email
+                  />
+                  <small class="text-red-500" *ngIf="errors?.email">
+                    {{ errors.email }}
+                  </small>
+                </div>
+                <div class="mb-4">
+                  <label for="password" class="block text-sm font-medium"
+                    >Mot de passe</label
+                  >
+                  <p-password
+                    id="password"
+                    name="password"
+                    [(ngModel)]="password"
+                    placeholder="Entrer votre mot de passe"
+                    [toggleMask]="true"
+                    class="mt-1 block w-full md:w-[30rem]"
+                    promptLabel="Entrer votre mot de passe"
+                    weakLabel="Faible"
+                    mediumLabel="Moyen"
+                    strongLabel="Parfait"
+                    required
+                    [style]="{ width: '100%' }"
+                    [inputStyle]="{ width: '100%' }"
+                  ></p-password>
+                  <small class="text-red-500" *ngIf="errors?.mot_de_passe">
+                    {{ errors.mot_de_passe }}
+                  </small>
+                </div>
+                <div class="mb-4">
+                  <label for="confirmPassword" class="block text-sm font-medium"
+                    >Confirmer mot de passe</label
+                  >
+                  <p-password
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    [(ngModel)]="confirmPassword"
+                    placeholder="Confirmer votre mot de passe"
+                    [toggleMask]="true"
+                    class="mb-8 border w-[70%]"
+                    promptLabel="Entrer votre mot de passe"
+                    weakLabel="Faible"
+                    mediumLabel="Moyen"
+                    strongLabel="Parfait"
+                    required
+                    [style]="{ width: '100%' }"
+                    [inputStyle]="{ width: '100%' }"
+                  >
+                  </p-password>
+                </div>
+                <div
+                  class="mb-_linear-gradient(90deg, rgba(33, 150, 243, 1) 0%, rgba(33, 150, 243, 0.4) 100%)4 flex items-center"
+                >
+                  <p-checkbox
+                    [(ngModel)]="checked"
+                    name="checked"
+                    [binary]="true"
+                    inputId="conditions"
+                    required
+                  ></p-checkbox>
+                  <label for="conditions" class="ml-2"
+                    >J'accepte les conditions</label
+                  >
+                </div>
+                <div class="flex gap-2 mt-2">
+                  <button
+                    pButton
+                    type="button"
+                    label="Précédent"
+                    (click)="prevStep(2)"
+                    class="bg-gray-500 text-white px-4 py-2 rounded-md"
+                  ></button>
+                  <button
+                    pButton
+                    type="submit"
+                    label="Soumettre"
+                    [disabled]="
+                      !step2Form.valid ||
+                      password !== confirmPassword ||
+                      !checked
+                    "
+                    class="bg-primary-color text-white px-4 py-2 rounded-md"
+                  ></button>
+                </div>
+              </form>
+            </div>
+          </div>
         </div>
-    `
+      </div>
+    </div>
+  `,
 })
 export class Register {
-     constructor(
-        private authService: AuthService,
-        private router: Router
-      ) {}
-    
-    errors: any = {};
-    // Propriétés pour l'étape 0
-    nom:string = '';
-    prenom:string = '';
-    // Propriétés pour l'étape 1
-    dateNaissance: string = '';
-    genre: string = '';
-    adresse: string = '';
+  constructor(
+    private authService: AuthService,
+    private router: Router
+  ) {}
 
-    // Propriétés pour l'étape 2
-    email: string = '';
-    password: string = '';
-    confirmPassword: string = '';
-    checked: boolean = false;
+  errors: any = {};
+  // Propriétés pour l'étape 0
+  nom: string = "";
+  prenom: string = "";
+  // Propriétés pour l'étape 1
+  dateNaissance: string = "";
+  genre: string = "";
+  adresse: string = "";
 
-    currentStep: number = 1;
+  // Propriétés pour l'étape 2
+  email: string = "";
+  password: string = "";
+  confirmPassword: string = "";
+  checked: boolean = false;
 
-    nextStep(step:number) {
-        this.currentStep = step+1;
+  currentStep: number = 1;
+
+  nextStep(step: number) {
+    this.currentStep = step + 1;
+  }
+
+  prevStep(step: number) {
+    this.currentStep = step - 1;
+  }
+
+  register() {
+    if (this.password !== this.confirmPassword) {
+      console.error("Les mots de passe ne correspondent pas");
+      return;
+    }
+    if (!this.checked) {
+      console.error("Veuillez accepter les conditions");
+      return;
     }
 
-    prevStep(step:number) {
-        this.currentStep = step-1;
-    }
+    const registrationData: CreateUser = {
+      nom: this.nom,
+      prenom: this.prenom,
+      date_de_naissance: this.dateNaissance,
+      genre: this.genre,
+      adresse: this.adresse,
+      email: this.email,
+      mot_de_passe: this.password,
+    };
 
-    register() {
-        if (this.password !== this.confirmPassword) {
-            console.error('Les mots de passe ne correspondent pas');
-            return;
+    console.log("Inscription réussie :", registrationData);
+    this.authService.register(registrationData).subscribe({
+      next: () => {
+        this.authService.login(this.email, this.password).subscribe({
+          next: () => this.router.navigate(["/"]),
+          error: (err) => {
+            const errorMessage =
+              err.error?.error ||
+              "Une erreur est survenue lors de la connexion.";
+            Swal.fire({
+              icon: "error", // Icône d'erreur
+              title: "Erreur de connexion",
+              text: errorMessage,
+              confirmButtonText: "OK",
+              timer: 5000, // Ferme automatiquement après 5 secondes
+              timerProgressBar: true, // Barre de progression
+            });
+          },
+        });
+      },
+      error: (err: any) => {
+        if (err.error && Array.isArray(err.error.errors)) {
+          // Si le backend renvoie plusieurs erreurs dans un tableau
+          err.error.errors.forEach(
+            (error: { field: string; message: string }) => {
+              // Mappe l'erreur en fonction du champ renvoyé par le backend
+              this.errors[error.field] = error.message;
+            }
+          );
+          console.log(this.errors);
         }
-        if (!this.checked) {
-            console.error('Veuillez accepter les conditions');
-            return;
-        }
-
-        const registrationData: CreateUser = {
-            nom:this.nom,
-            prenom:this.prenom,
-            date_de_naissance: this.dateNaissance,
-            genre: this.genre,
-            adresse: this.adresse,
-            email: this.email,
-            mot_de_passe: this.password
-        };
-
-        console.log('Inscription réussie :', registrationData);
-        this.authService.register(registrationData).subscribe({
-               next: () => {
-                this.authService.login(this.email, this.password).subscribe({
-                        next: () => this.router.navigate(['/']),
-                        error: (err) => {
-                            const errorMessage = err.error?.error || 'Une erreur est survenue lors de la connexion.';
-                            Swal.fire({
-                                icon: 'error', // Icône d'erreur
-                                title: 'Erreur de connexion',
-                                text: errorMessage,
-                                confirmButtonText: 'OK',
-                                timer: 5000, // Ferme automatiquement après 5 secondes
-                                timerProgressBar: true // Barre de progression
-                            });
-                        }
-                    });
-               },
-               error: (err:any) => {
-                if (err.error && Array.isArray(err.error.errors)) {
-                    // Si le backend renvoie plusieurs erreurs dans un tableau
-                    err.error.errors.forEach((error: { field: string, message: string }) => {
-                      // Mappe l'erreur en fonction du champ renvoyé par le backend
-                      this.errors[error.field] = error.message;
-                    });
-                    console.log(this.errors)
-                  }
-                   const errorMessage = err.error?.error || 'Une erreur est survenue lors de l\'enregistrement.';
-                   Swal.fire({
-                       icon: 'error', // Icône d'erreur
-                       title: 'Erreur d\'enregistrement',
-                       text: errorMessage,
-                       confirmButtonText: 'OK',
-                       timer: 5000, // Ferme automatiquement après 5 secondes
-                       timerProgressBar: true // Barre de progression
-                   });
-               }
-           });
-    }
+        const errorMessage =
+          err.error?.error ||
+          "Une erreur est survenue lors de l'enregistrement.";
+        Swal.fire({
+          icon: "error", // Icône d'erreur
+          title: "Erreur d'enregistrement",
+          text: errorMessage,
+          confirmButtonText: "OK",
+          timer: 5000, // Ferme automatiquement après 5 secondes
+          timerProgressBar: true, // Barre de progression
+        });
+      },
+    });
+  }
 }

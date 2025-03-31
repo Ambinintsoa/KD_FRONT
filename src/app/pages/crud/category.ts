@@ -120,8 +120,8 @@ import { Subject } from "rxjs";
         </div>
       </ng-template>
       <ng-template #footer>
-        <p-button label="Cancel" icon="pi pi-times" text (click)="hideDialog()" />
-        <p-button label="Save" icon="pi pi-check" (click)="saveProduct()" />
+        <p-button label="Annuler" icon="pi pi-times" text (click)="hideDialog()" />
+        <p-button label="Enregistrer" icon="pi pi-check" (click)="saveProduct()" />
       </ng-template>
     </p-dialog>
     <p-confirmdialog [style]="{ width: '450px' }" />

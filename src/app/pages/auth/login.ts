@@ -124,9 +124,9 @@ import Swal from 'sweetalert2';
                     <label for="rememberme1">Se souvenir de moi</label>
                   </div>
                   <span
-                    class="font-medium no-underline ml-2 text-right cursor-pointer text-primary"
-                    >Mot de passe oublié?</span
-                  >
+    class="font-medium no-underline ml-2 text-right cursor-pointer text-primary"
+    routerLink="/auth/register"
+>Créer un compte</span>
                 </div>
                 <p-button
                   label="Connexion"
@@ -155,7 +155,7 @@ export class Login {
     this.authService.login(this.email, this.password).subscribe({
         next: () => this.router.navigate(['/']),
         error: (err) => {
-            const errorMessage = err.error?.message || 'Une erreur est survenue lors de la connexion.';
+            const errorMessage = err.error?.error || 'Une erreur est survenue lors de la connexion.';
             Swal.fire({
                 icon: 'error', // Icône d'erreur
                 title: 'Erreur de connexion',

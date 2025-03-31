@@ -5,10 +5,12 @@ import { User } from '../models/user';
 import { environment } from '../../environments/environment';
 import { CookieService } from 'ngx-cookie-service';
 import { Router } from '@angular/router';
+import { CreateUser } from '../models/CreateUser';
 
 @Injectable({
     providedIn: 'root'
 })
+
 export class AuthService {
     private currentUser = signal<User | null>(null);
     private router = inject(Router);
@@ -66,10 +68,8 @@ export class AuthService {
         }
     }
 
-    register(username: string, password: string): Observable<User> {
-        return this.http.post<User>(`${environment.apiUrl}/user/register`, { username, password }).pipe(
-            catchError(this.handleError)
-        );
+    register(user:CreateUser): Observable<User> {
+        return this.http.post<User>(`${environment.apiUrl}/user/register`, user);
     }
 
     logout(): void {

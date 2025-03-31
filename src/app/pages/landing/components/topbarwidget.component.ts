@@ -10,7 +10,6 @@ import {
   AutoCompleteCompleteEvent,
   AutoCompleteModule,
 } from "primeng/autocomplete";
-import { CountryService } from "../../service/country.service";
 import { NodeService } from "../../service/node.service";
 import { FormsModule } from "@angular/forms";
 import { MultiSelectModule } from "primeng/multiselect";
@@ -226,7 +225,7 @@ import { CommonModule } from "@angular/common";
         ></button>
       </div>
     </div> `,
-  providers: [CountryService, NodeService],
+  providers: [ NodeService],
 })
 export class TopbarWidget implements OnInit {
   showInvoice: boolean = false;
@@ -255,14 +254,10 @@ export class TopbarWidget implements OnInit {
   selectedNode: any = null;
   selectedAutoValue: any = null;
   autoFilteredValue: any[] = [];
-  countryService = inject(CountryService);
 
   nodeService = inject(NodeService);
   autoValue: any[] | undefined;
   ngOnInit() {
-    this.countryService.getCountries().then((countries) => {
-      this.autoValue = countries;
-    });
     this.nodeService.getFiles().then((data) => (this.treeSelectNodes = data));
   }
   filterCountry(event: AutoCompleteCompleteEvent) {

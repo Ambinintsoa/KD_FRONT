@@ -35,7 +35,7 @@ import {
   CategoryResponse,
   CategoryService,
 } from "../service/category.service ";
-
+import { FileUploadModule } from "primeng/fileupload";
 interface Column {
   field: string;
   header: string;
@@ -69,10 +69,33 @@ interface ExportColumn {
     InputIconModule,
     IconFieldModule,
     ConfirmDialogModule,
+    FileUploadModule,
   ],
   template: `
     <p-toolbar styleClass="mb-6">
       <ng-template #start>
+      <p-fileupload
+          #fu
+          mode="basic"
+          chooseLabel="Choisir"
+          chooseIcon="pi pi-upload"
+          accept=".xlsx, .xls"
+          maxFileSize="1000000"
+          (onSelect)="onFileSelected($event)"
+           class="mr-2"
+        />
+        <p-button
+          label="télécharger"
+          (onClick)="uploadFile()"
+          severity="secondary"
+           class="mr-2"
+        />
+        <p>{{ message }}</p>
+        <ul *ngIf="errorMessages.length > 0">
+          <li *ngFor="let error of errorMessages" style="color: red;">
+            {{ error }}
+          </li>
+        </ul>
         <p-button
           label="Ajouter"
           icon="pi pi-plus"
@@ -95,7 +118,7 @@ interface ExportColumn {
           label="Exporter"
           icon="pi pi-upload"
           severity="secondary"
-          (onClick)="exportCSV()"
+          (onClick)="exportToExcel()"
         />
       </ng-template>
     </p-toolbar>
@@ -452,10 +475,6 @@ export class Service implements OnInit {
       });
   }
 
-  exportCSV() {
-    this.dt.exportCSV();
-  }
-
   ngOnInit() {
     this.cols = [{ field: "nom_service", header: "Nom" }];
     this.exportColumns = this.cols.map((col) => ({
@@ -774,4 +793,53 @@ resetPromotion() {
       });
     }
   }
+   //importation et exportation
+   selectedFile: File | null = null;
+   message: string = "";
+   errorMessages: string[] = [];
+ 
+   onFileSelected(event: any): void {
+     if (event.files?.length) {
+       this.selectedFile = event.files[0];
+     }
+   }
+ 
+   uploadFile(): void {
+     this.errorMessages = []; // Réinitialiser les erreurs
+     this.message = ""; // Réinitialiser le message
+ 
+     if (!this.selectedFile) {
+       this.message = "Veuillez sélectionner un fichier";
+       return;
+     }
+ 
+     this.ServiceService.uploadFile(this.selectedFile).subscribe({
+       next: (response: any) => {
+         this.triggerLoadData() ;
+         this.message = response.message;
+       },
+       error: (err) => {
+         if (err.error.errors && Array.isArray(err.error.errors)) {
+           this.errorMessages = err.error.errors; // Afficher toutes les erreurs
+         } else {
+           this.message = err.error.error || "Erreur lors de l'upload";
+         }
+       },
+     });
+   }
+ 
+   exportToExcel(): void {
+     this.message = ""; // Réinitialiser le message
+     this.errorMessages = []; // Réinitialiser les erreurs
+ 
+     this.ServiceService.exportToExcel().subscribe({
+       next: (blob: Blob) => {
+         this.categoryService.downloadFile(blob, "services.xlsx");
+         this.message = "Exportation réussie !";
+       },
+       error: (err: any) => {
+         this.message = "Erreur lors de l'exportation : " + err.message;
+       },
+     });
+   }
 }

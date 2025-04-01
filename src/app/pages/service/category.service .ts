@@ -1,64 +1,92 @@
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { environment } from '../../../environments/environment';
-import { Observable } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
-import { ListParams } from './Params';
+import { HttpClient } from "@angular/common/http";
+import { Injectable } from "@angular/core";
+import { environment } from "../../../environments/environment";
+import { Observable } from "rxjs";
+import { map, tap } from "rxjs/operators";
+import { ListParams } from "./Params";
 
 export interface CategoryObject {
-    _id?: string;
-    nom_categorie?: string;
+  _id?: string;
+  nom_categorie?: string;
 }
 export interface CategoryResponse {
-    categories:CategoryObject[],
-    currentPage:number,
-    totalItems:number,
-    totalPages:number
+  categories: CategoryObject[];
+  currentPage: number;
+  totalItems: number;
+  totalPages: number;
 }
-@Injectable({providedIn: 'root'})
+@Injectable({ providedIn: "root" })
 export class CategoryService {
-    private apiUrl = `${environment.apiUrl}/categorie`
-      constructor(private http: HttpClient) {}
-    createCategory(categoryObject: CategoryObject): Observable<any> {
-        return this.http.post(`${this.apiUrl}/save`, {"nom_categorie":categoryObject.nom_categorie});
+  private apiUrl = `${environment.apiUrl}/categorie`;
+  constructor(private http: HttpClient) {}
+  createCategory(categoryObject: CategoryObject): Observable<any> {
+    return this.http.post(`${this.apiUrl}/save`, {
+      nom_categorie: categoryObject.nom_categorie,
+    });
+  }
+
+  getCategories(params: ListParams): Observable<CategoryResponse> {
+    return this.http
+      .get<CategoryResponse>(
+        `${this.apiUrl}?page=${params.page}&limit=${params.limit}&search=${params.search}&sortBy=${params.sortBy}&orderBy=${params.orderBy}`
+      )
+      .pipe(
+        tap((data) => console.log("Données brutes reçues de l'API :", data)), // Vérification
+        map((data) => ({
+          categories: data.categories.map((item: any) => ({
+            _id: item._id,
+            nom_categorie: item.nom_categorie,
+          })),
+          currentPage: data.currentPage,
+          totalItems: data.totalItems,
+          totalPages: data.totalPages,
+        }))
+      );
+  }
+  getAllCategories(): Observable<CategoryResponse> {
+    return this.http.get<CategoryResponse>(`${this.apiUrl}/getAll`).pipe(
+      tap((data) => console.log("Données brutes reçues de l'API :", data)), // Vérification
+      map((data) => ({
+        categories: data.categories.map((item: any) => ({
+          _id: item._id,
+          nom_categorie: item.nom_categorie,
+        })),
+        currentPage: data.currentPage,
+        totalItems: data.totalItems,
+        totalPages: data.totalPages,
+      }))
+    );
+  }
+  updateCategorie(product: CategoryObject): Observable<any> {
+    return this.http.put(`${this.apiUrl}/update`, product);
+  }
+  deleteCategorie(ids: string[]): Observable<any> {
+    return this.http.delete(`${this.apiUrl}`, {
+      body: ids,
+    });
+  }
+  uploadFile(selectedFile: File): Observable<any> {
+    if (!selectedFile) {
+      throw new Error("Veuillez sélectionner un fichier");
     }
-      
-      getCategories(params:ListParams): Observable<CategoryResponse> {
-        return this.http.get<CategoryResponse>(`${this.apiUrl}?page=${params.page}&limit=${params.limit}&search=${params.search}&sortBy=${params.sortBy}&orderBy=${params.orderBy}`).pipe(
-            tap(data => console.log("Données brutes reçues de l'API :", data)), // Vérification
-            map(data => ({
-                categories: data.categories.map((item: any) => ({
-                    _id: item._id,
-                    nom_categorie: item.nom_categorie
-                })),
-                currentPage: data.currentPage,
-                totalItems: data.totalItems,
-                totalPages: data.totalPages
-            }))
-        );
-    }
-    getAllCategories(): Observable<CategoryResponse> {
-        return this.http.get<CategoryResponse>(`${this.apiUrl}/getAll`).pipe(
-            tap(data => console.log("Données brutes reçues de l'API :", data)), // Vérification
-            map(data => ({
-                categories: data.categories.map((item: any) => ({
-                    _id: item._id,
-                    nom_categorie: item.nom_categorie
-                })),
-                currentPage: data.currentPage,
-                totalItems: data.totalItems,
-                totalPages: data.totalPages
-            }))
-        );
-    }
-    updateCategorie(product: CategoryObject): Observable<any> {
-        return this.http.put(`${this.apiUrl}/update`, product);
-    }
-    deleteCategorie(ids: string[]): Observable<any> {
-        return this.http.delete(`${this.apiUrl}`, {
-          body: ids
-        });
-      }
-      
-    
+
+    const formData = new FormData();
+    formData.append("file", selectedFile);
+
+    return this.http.post(`${this.apiUrl}/import`, formData);
+  }
+
+  exportToExcel(): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/export`, { responseType: "blob" });
+  }
+
+  // Méthode utilitaire pour télécharger le fichier
+  downloadFile(blob: Blob, fileName: string): void {
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = fileName;
+    link.click();
+    window.URL.revokeObjectURL(url);
+  }
 }

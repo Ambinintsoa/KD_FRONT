@@ -81,5 +81,29 @@ export class ServiceService {
   getPromotions(){
     return this.http.get(`${this.apiUrl}/promotions`);
   }
+  uploadFile(selectedFile: File): Observable<any> {
+    if (!selectedFile) {
+      throw new Error("Veuillez sélectionner un fichier");
+    }
+
+    const formData = new FormData();
+    formData.append("file", selectedFile);
+
+    return this.http.post(`${this.apiUrl}/import`, formData);
+  }
+
+  exportToExcel(): Observable<Blob> {
+    return this.http.get(`${this.apiUrl}/export`, { responseType: "blob" });
+  }
+
+  // Méthode utilitaire pour télécharger le fichier
+  downloadFile(blob: Blob, fileName: string): void {
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = fileName;
+    link.click();
+    window.URL.revokeObjectURL(url);
+  }
 }
 

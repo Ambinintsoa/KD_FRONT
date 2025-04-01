@@ -1,9 +1,9 @@
 import { Routes } from '@angular/router';
+import { authGuard } from './app/auth/auth.guard';
 import { AppLayout } from './app/layout/component/app.layout';
 import { Dashboard } from './app/pages/dashboard/dashboard';
 import { Landing } from './app/pages/landing/landing';
 import { Notfound } from './app/pages/notfound/notfound';
-import { authGuard } from './app/auth/auth.guard';
 
 export const appRoutes: Routes = [
     {

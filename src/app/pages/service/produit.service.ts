@@ -1,10 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { environment } from '../../../environments/environment';
 import { map, Observable, tap } from 'rxjs';
+import { environment } from '../../../environments/environment';
 import { ListParams } from './Params';
-
-
 
 export interface ProduitObject {
     _id?: string;

@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { map, Observable, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
+import { CategoryObject } from './category.service ';
 import { ListParams } from './Params';
 
 
@@ -10,7 +11,8 @@ export interface ServiceObject {
     nom_service?: string;
     duree?:number,
     prix?:number,
-    categorie?:any
+    categorie?:any,
+    checked?:boolean;
 }
 export interface ServiceResponse {
     services:ServiceObject[],
@@ -18,6 +20,10 @@ export interface ServiceResponse {
     totalItems:number,
     totalPages:number
 }
+export interface ServiceCategoriesObject{
+   categorie_objet:CategoryObject,
+   service_objects:ServiceObject[]
+};
 
 @Injectable()
 export class ServiceService {
@@ -40,6 +46,30 @@ export class ServiceService {
                }))
            );
        }
+     
+      getServiceCategories(): Observable<ServiceCategoriesObject[]> {
+        return this.http.get<{ resultat: any }>(`${this.apiUrl}/serviceCategorie`).pipe( tap(response=> console.log(response)),
+            map((response) =>
+                response.resultat.map((data:any) => ({
+                    categorie_objet: {
+                        _id: data.categorie_service._id,
+                        nom_categorie: data.categorie_service.nom_categorie,
+                    },
+                    service_objects: data.service_object.map((service:any) => ({
+                        _id: service._id,
+                        nom_service: service.nom_service,
+                        duree: service.duree,
+                        prix: service.prix,
+                        categorie: service.categorie_service,
+                        checked: false, // Initialisation par défaut    
+                    })),
+                }))
+            )
+        );
+    }
+    
+        
+       
        
       createService(serviceObject: ServiceObject): Observable<any> {
           return this.http.post(`${this.apiUrl}/save`, {"nom_service":serviceObject.nom_service

@@ -1,26 +1,29 @@
-import { Service } from "./../../crud/service";
-import { Component, inject, OnInit } from "@angular/core";
-import { StyleClassModule } from "primeng/styleclass";
-import { Router, RouterModule } from "@angular/router";
-import { RippleModule } from "primeng/ripple";
-import { ButtonModule } from "primeng/button";
-import { MegaMenuModule } from "primeng/megamenu";
-import { DrawerModule } from "primeng/drawer";
-import {
-  AutoCompleteCompleteEvent,
-  AutoCompleteModule,
-} from "primeng/autocomplete";
-import { CountryService } from "../../service/country.service";
-import { NodeService } from "../../service/node.service";
-import { FormsModule } from "@angular/forms";
-import { MultiSelectModule } from "primeng/multiselect";
-import { Country } from "../../service/customer.service";
-import { TreeNode } from "primeng/api";
-import { TreeSelectModule } from "primeng/treeselect";
 import { CommonModule } from "@angular/common";
+import { Component, inject, OnInit } from "@angular/core";
+import { FormsModule } from "@angular/forms";
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations'; // Nécessaire pour PrimeNG
+import { Router, RouterModule } from "@angular/router";
+import {
+  AutoCompleteModule
+} from "primeng/autocomplete";
+import { ButtonModule } from "primeng/button";
+import { DrawerModule } from "primeng/drawer";
+import { DropdownModule } from 'primeng/dropdown'; // Import du module Dropdown
+import { MegaMenuModule } from "primeng/megamenu";
+import { MultiSelectModule } from "primeng/multiselect";
+import { RippleModule } from "primeng/ripple";
+import { SelectButtonModule } from "primeng/selectbutton";
+import { StyleClassModule } from "primeng/styleclass";
+import { TreeSelectModule } from "primeng/treeselect";
+import { CategorieVoitureResponse, CategorievoitureService } from "../../service/categorievoiture.service";
+import { CountryService } from "../../service/country.service";
+import { MarqueResponse, MarqueService } from "../../service/marque.service";
+import { NodeService } from "../../service/node.service";
+
 @Component({
   selector: "topbar-widget",
   imports: [
+    CommonModule,
     MegaMenuModule,
     RouterModule,
     DrawerModule,
@@ -31,7 +34,9 @@ import { CommonModule } from "@angular/common";
     FormsModule,
     MultiSelectModule,
     TreeSelectModule,
-    CommonModule,
+    DropdownModule, // Import du module Dropdown
+    BrowserAnimationsModule, // Obligatoire pour les animations PrimeNG,
+    SelectButtonModule
   ],
   template: `<a class="flex items-center" href="#">
       <svg
@@ -101,15 +106,55 @@ import { CommonModule } from "@angular/common";
         <div class="p-4 flex flex-col gap-6">
           <!-- Section Voiture -->
           <div class="flex flex-col gap-2">
-            <label class="font-semibold text-xl text-gray-700">Voiture</label>
-            <p-treeselect
-              [(ngModel)]="selectedNode"
-              [options]="treeSelectNodes"
-              placeholder="Sélectionner un service"
-              [style]="{ width: '100%' }"
-              class="w-full"
-            />
-          </div>
+            <h3 class="font-semibold text-xl text-gray-700">Voiture</h3>
+            <div class="flex flex-col gap-2">
+                    <label class="text-md text-gray-700">Immatriculation</label>
+                    <input
+                    pInputText
+                    id="immatriculation"
+                    type="text"
+                    placeholder="Numero d'immatriculation"
+                    class="w-full md:w-[30rem] mb-8 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    [(ngModel)]="voiture_immatriculation"
+                    name="voiture_immatriculation"
+                  />
+              </div>
+
+              <div class="flex flex-col gap-2">
+                    <label class="text-md text-gray-700">Immatriculation</label>
+                    <input
+                    pInputText
+                    id="kilommetrage"
+                    type="text"
+                    placeholder="Kilommetrage"
+                    class="w-full md:w-[30rem] mb-8 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    [(ngModel)]="voiture_kilometrage"
+                    name="voiture_kilometrage"
+                  />
+              </div>
+
+              <div class="flex flex-col gap-2">
+                <label class="text-md text-gray-700">Marque</label>
+                <p-selectButton
+                  [options]="liste_marques"
+                  [(ngModel)]="voiture_marque"
+                  placeholder="Sélectionnez une marque"
+                  class="w-full md:w-[30rem] mb-4"
+                ></p-selectButton>
+            </div>
+
+            <div class="flex flex-col gap-2">
+                <label class="text-md text-gray-700">Catégorie de la voiture</label>
+                <p-selectButton 
+                  [options]="liste_categories" 
+                  [(ngModel)]="voiture_categorie" 
+                  optionLabel="label"
+                  class="w-full md:w-[30rem] mb-4">
+                </p-selectButton>
+            </div>
+
+
+            </div>
           <!-- Section Services -->
           <div class="flex flex-col gap-2">
             <label class="font-semibold text-xl text-gray-700">Services</label>
@@ -231,6 +276,40 @@ import { CommonModule } from "@angular/common";
 export class TopbarWidget implements OnInit {
   showInvoice: boolean = false;
   today: Date = new Date();
+  voiture_immatriculation:string='';
+  voiture_kilometrage:number=0;
+
+  voiture_marque:string='';
+  voiture_categorie:string='';
+
+  liste_marques:{label:string,value:string}[]=[];
+  liste_categories:{label:string,value:string}[]=[];
+  liste_services: { service: string; avec_produit: boolean }[] = [];
+  // private messageService: MessageService;
+  constructor(private MarqueService: MarqueService,private CategorieVoitureService: CategorievoitureService,public router: Router){}
+
+  //ajoute un service dans la liste
+  addServices(service_value:string,avec_produit:boolean){
+    this.liste_services.push({service:service_value,avec_produit:avec_produit});
+  }
+
+  //donnée a propos de la voiture
+  get voiture_data() {
+    return {
+      immatriculation: this.voiture_immatriculation,
+      kilometrage:this.voiture_kilometrage,
+      marque: this.voiture_marque,
+      catgeorie: this.voiture_categorie,
+    };
+  }
+  //les données utilisées pour generer le nouveau devis
+  get nouveau_devis() {
+    return {
+      voiture: this.voiture_data,
+      services: this.liste_services,
+    };
+  }
+
   calculate() {
     this.showInvoice = true; // Affiche la facture
     console.log("Facture générée :", {
@@ -238,19 +317,7 @@ export class TopbarWidget implements OnInit {
       selectedService: this.selectedNode,
     });
   }
-  multiselectCountries: Country[] = [
-    { name: "Australia", code: "AU" },
-    { name: "Brazil", code: "BR" },
-    { name: "China", code: "CN" },
-    { name: "Egypt", code: "EG" },
-    { name: "France", code: "FR" },
-    { name: "Germany", code: "DE" },
-    { name: "India", code: "IN" },
-    { name: "Japan", code: "JP" },
-    { name: "Spain", code: "ES" },
-    { name: "United States", code: "US" },
-  ];
-  treeSelectNodes!: TreeNode[];
+
 
   selectedNode: any = null;
   selectedAutoValue: any = null;
@@ -259,24 +326,61 @@ export class TopbarWidget implements OnInit {
 
   nodeService = inject(NodeService);
   autoValue: any[] | undefined;
+
+
   ngOnInit() {
-    this.countryService.getCountries().then((countries) => {
-      this.autoValue = countries;
-    });
-    this.nodeService.getFiles().then((data) => (this.treeSelectNodes = data));
-  }
-  filterCountry(event: AutoCompleteCompleteEvent) {
-    const filtered: any[] = [];
-    const query = event.query;
+    
+    // donne la liste des categories de voitures
+    this.CategorieVoitureService.getAllCategorieVoitures().subscribe({
+        next:(resultat:CategorieVoitureResponse)=>{
+          this.liste_categories = resultat.categories.map((categorie) => {
+            return {
+              label: categorie.nom_categorie,
+              value: categorie._id
+            };
+          });
+        },error: (error) => {
+          console.error("Erreur lors du chargement :", error);
+          // this.messageService.add({
+          //   severity: "error",
+          //   summary: "Erreur",
+          //   detail: "Échec du chargement des données",
+          //   life: 3000,
+          // });
+        },
+        complete: () => {
+          console.log('Requête terminée');
+        }
+      });
 
-    for (let i = 0; i < (this.autoValue as any[]).length; i++) {
-      const country = (this.autoValue as any[])[i];
-      if (country.name.toLowerCase().indexOf(query.toLowerCase()) == 0) {
-        filtered.push(country);
+      // donne la liste des marques
+      this.MarqueService.getAllMarques().subscribe({
+        next:(resultat:MarqueResponse)=>{
+          this.liste_marques = resultat.marques.map((marque) => {
+            return {
+              label: marque.nom_marque,
+              value: marque._id
+            };
+          });
+        },error: (error) => {
+          console.error("Erreur lors du chargement :", error);
+          // this.messageService.add({
+          //   severity: "error",
+          //   summary: "Erreur",
+          //   detail: "Échec du chargement des données",
+          //   life: 3000,
+          // });
+        },
+        complete: () => {
+          console.log('Requête terminée');
+        }
+      });
       }
-    }
-
-    this.autoFilteredValue = filtered;
+    
+    
+  filterCountry(event:AutoCompleteModule) {
+    const filtered: any[] = [];
+   
   }
   megaMenuItems = [
     {
@@ -401,5 +505,5 @@ export class TopbarWidget implements OnInit {
   hideDrawer() {
     this.visible = false; // Ferme le drawer
   }
-  constructor(public router: Router) {}
+  // constructor(public router: Router) {}
 }

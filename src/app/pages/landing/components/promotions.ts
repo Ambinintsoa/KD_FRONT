@@ -8,63 +8,110 @@ import { ButtonModule } from "primeng/button";
   selector: 'app-promotions',
   standalone: true,
    imports: [CommonModule, CardModule, ButtonModule, CarouselModule],
-  template: `
-<div class="container mx-auto p-4">
-  <h1 class="text-2xl font-bold mb-6 text-center">Promotions en cours</h1>
+  template: `<div class="container mx-auto px-4 py-12">
+  <!-- Titre stylisé -->
+  <h1 class="text-4xl font-extrabold text-gray-800 dark:text-gray-100 mb-12 text-center tracking-tight">
+    Nos Promotions en Cours
+  </h1>
 
-  <!-- Carousel pour afficher les cards -->
-  <p-carousel [value]="services" 
-              [numVisible]="3" 
-              [numScroll]="1" 
-              [circular]="false" 
-              [responsiveOptions]="responsiveOptions"
-              [showIndicators]="true"
-              [showNavigators]="true"
-              [autoplayInterval]="3000"
-              >
+  <!-- Carousel -->
+  <p-carousel 
+    [value]="services" 
+    [numVisible]="3" 
+    [numScroll]="1" 
+    [circular]="false" 
+    [responsiveOptions]="responsiveOptions"
+    [showIndicators]="true"
+    [showNavigators]="true"
+    [autoplayInterval]="3000"
+    class="custom-carousel"
+  >
     <ng-template let-service pTemplate="item">
-      <p-card class="shadow-lg hover:shadow-xl transition-shadow duration-300 m-2 ">
-        <!-- Header avec le nom du service -->
-        <ng-template pTemplate="header">
-          <div class="text-white p-4 rounded-t-lg">
-            <h2 class="text-xl font-semibold">{{ service.nom_service }}</h2>
+      <div class="p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700 overflow-hidden">
+          <!-- Header -->
+          <div class=" text-white p-6">
+            <h2 class="text-xl font-semibold tracking-wide">
+              {{ service.nom_service }}
+            </h2>
           </div>
-        </ng-template>
 
-        <!-- Contenu principal -->
-        <div class="p-4">
-          <p><strong>Prix :</strong> {{ service.prix || 'N/A' }} Ar</p>
-          <p><strong>Catégorie :</strong> {{ service.categorie_service?.nom_categorie || 'Non spécifiée' }}</p>
-          
-          <!-- Promotion active -->
-          <div class="mt-4 p-3 bg-yellow-100 rounded-lg">
-            <h3 class="text-lg font-medium text-yellow-800">Promotion active</h3>
-            <p *ngIf="getPromotionActive(service) as promo; else noPromo">
-              <strong>Réduction :</strong> {{ promo.pourcentage_reduction }}%<br>
-              <strong>Description :</strong> {{ promo.description || 'Sans description' }}<br>
-              <strong>Valide :</strong> {{ promo.date_debut | date:'dd/MM/yyyy' }} - {{ promo.date_fin | date:'dd/MM/yyyy' }}
+          <!-- Contenu -->
+          <div class="p-6">
+            <p class="text-gray-700 dark:text-gray-300">
+              <strong class="text-gray-900 dark:text-gray-100">Prix :</strong> 
+              {{ service.prix || 'N/A' }} Ar
             </p>
-            <ng-template #noPromo>
-              <p class="text-gray-500">Aucune promotion active</p>
-            </ng-template>
+            <p class="text-gray-700 dark:text-gray-300 mt-2">
+              <strong class="text-gray-900 dark:text-gray-100">Catégorie :</strong> 
+              {{ service.categorie_service?.nom_categorie || 'Non spécifiée' }}
+            </p>
+
+            <!-- Promotion active -->
+            <div class="mt-4 p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border border-yellow-200 dark:border-yellow-800">
+              <h3 class="text-lg font-medium text-yellow-800 dark:text-yellow-300">
+                Promotion Active
+              </h3>
+              <p *ngIf="getPromotionActive(service) as promo; else noPromo" class="text-gray-700 dark:text-gray-300">
+                <strong>Réduction :</strong> {{ promo.pourcentage_reduction }}%<br>
+                <strong>Description :</strong> {{ promo.description || 'Sans description' }}<br>
+                <strong>Valide :</strong> {{ promo.date_debut | date:'dd MMM yyyy' }} - {{ promo.date_fin | date:'dd MMM yyyy' }}
+              </p>
+              <ng-template #noPromo>
+                <p class="text-gray-500 dark:text-gray-400">Aucune promotion active</p>
+              </ng-template>
+            </div>
+          </div>
+
+          <!-- Footer -->
+          <div class="p-6">
+            <button 
+              pButton 
+              type="button" 
+              label="Réserver" 
+              class="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-3 rounded-lg transition-colors duration-200"
+            ></button>
           </div>
         </div>
-
-        <!-- Footer avec un bouton -->
-        <ng-template pTemplate="footer">
-          <div class="p-4">
-            <button pButton type="button" label="Réserver" class="p-button-warning w-full"></button>
-          </div>
-        </ng-template>
-      </p-card>
+      </div>
     </ng-template>
   </p-carousel>
 
   <!-- Message si aucun service -->
-  <div *ngIf="services.length === 0" class="text-center mt-6">
-    <p class="text-gray-500">Aucune promotion disponible pour le moment.</p>
+  <div *ngIf="services.length === 0" class="text-center mt-12">
+    <p class="text-gray-500 dark:text-gray-400 text-lg">
+      Aucune promotion disponible pour le moment.
+    </p>
   </div>
 </div>
+
+<!-- Styles personnalisés -->
+<style>
+  :host ::ng-deep .custom-carousel .p-carousel {
+    @apply overflow-hidden;
+  }
+
+  :host ::ng-deep .custom-carousel .p-carousel-indicators {
+    @apply mt-6;
+  }
+
+  :host ::ng-deep .custom-carousel .p-carousel-indicator > button {
+    @apply w-3 h-3 bg-gray-300 dark:bg-gray-600 rounded-full transition-colors duration-200;
+  }
+
+  :host ::ng-deep .custom-carousel .p-carousel-indicator.p-highlight > button {
+    @apply bg-indigo-600 dark:bg-indigo-400;
+  }
+
+  :host ::ng-deep .custom-carousel .p-carousel-prev,
+  :host ::ng-deep .custom-carousel .p-carousel-next {
+    @apply bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 w-12 h-12 rounded-full shadow-md hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200;
+  }
+
+  :host ::ng-deep .p-button {
+    @apply shadow-none; /* Supprime l'ombre par défaut de PrimeNG */
+  }
+</style>
   `
 })
 export class PromotionsComponent implements OnInit {

@@ -74,6 +74,11 @@ export class AppMenu {
                                     routerLink: ['/pages/produit']
                                 },
                                 {
+                                    label: 'Avis Client',
+                                    icon: 'pi pi-fw pi-sign-in',
+                                    routerLink: ['/pages/avis']
+                                },
+                                {
                                     label: 'Utilisateurs',
                                     icon: 'pi pi-fw pi-sign-in',
                                     routerLink: ['/pages/utilisateur']

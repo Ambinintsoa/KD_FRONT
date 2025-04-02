@@ -10,7 +10,6 @@ import {
   AutoCompleteCompleteEvent,
   AutoCompleteModule,
 } from "primeng/autocomplete";
-import { CountryService } from "../../service/country.service";
 import { NodeService } from "../../service/node.service";
 import { FormsModule } from "@angular/forms";
 import { MultiSelectModule } from "primeng/multiselect";
@@ -221,12 +220,12 @@ import { CommonModule } from "@angular/common";
           pButton
           pRipple
           label="Création de compte"
-          routerLink="/auth/login"
+          routerLink="/auth/register"
           [rounded]="true"
         ></button>
       </div>
     </div> `,
-  providers: [CountryService, NodeService],
+  providers: [ NodeService],
 })
 export class TopbarWidget implements OnInit {
   showInvoice: boolean = false;
@@ -255,14 +254,10 @@ export class TopbarWidget implements OnInit {
   selectedNode: any = null;
   selectedAutoValue: any = null;
   autoFilteredValue: any[] = [];
-  countryService = inject(CountryService);
 
   nodeService = inject(NodeService);
   autoValue: any[] | undefined;
   ngOnInit() {
-    this.countryService.getCountries().then((countries) => {
-      this.autoValue = countries;
-    });
     this.nodeService.getFiles().then((data) => (this.treeSelectNodes = data));
   }
   filterCountry(event: AutoCompleteCompleteEvent) {
@@ -324,43 +319,6 @@ export class TopbarWidget implements OnInit {
           {
             label: "Sports.7",
             items: [{ label: "Sports.7.1" }, { label: "Sports.7.2" }],
-          },
-        ],
-      ],
-    },
-    {
-      label: "Promotion",
-      icon: "pi pi-fw pi-gift",
-      items: [
-        [
-          {
-            label: "Living Room",
-            items: [
-              { label: "Living Room Item" },
-              { label: "Living Room Item" },
-            ],
-          },
-          {
-            label: "Kitchen",
-            items: [
-              { label: "Kitchen Item" },
-              { label: "Kitchen Item" },
-              { label: "Kitchen Item" },
-            ],
-          },
-        ],
-        [
-          {
-            label: "Bedroom",
-            items: [{ label: "Bedroom Item" }, { label: "Bedroom Item" }],
-          },
-          {
-            label: "Outdoor",
-            items: [
-              { label: "Outdoor Item" },
-              { label: "Outdoor Item" },
-              { label: "Outdoor Item" },
-            ],
           },
         ],
       ],

@@ -1,6 +1,5 @@
-import { HttpClient } from '@angular/common/http';
+
 import { Injectable } from '@angular/core';
-import { CategoryObject } from './category.service ';
 
 
 
@@ -17,6 +16,7 @@ export interface UtilisateurObject {
 
 
 }
+
 
 @Injectable()
 export class UtilisateurService {

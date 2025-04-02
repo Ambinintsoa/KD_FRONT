@@ -15,3 +15,16 @@ pre.app-code {
         font-family: monaco, Consolas, monospace;
     }
 }
+/* Supprimez ou commentez ceci */
+form, input, button, textarea, select {
+    margin: 0;
+    padding: 0;
+    border: none;
+    background: none;
+    font: inherit;
+    color: inherit;
+    outline: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}

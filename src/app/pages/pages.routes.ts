@@ -1,14 +1,17 @@
 import { Routes } from '@angular/router';
-import { Crud } from './crud/crud';
-import { Category } from './crud/category';
+import { Category } from "./crud/category";
 import { Service } from './crud/service';
 import { Produit } from './crud/produit';
 import { Utilisateur } from './crud/utilisateur';
+import { CalendarComponent } from './uikit/calendar';
+import { authGuard } from '../auth/auth.guard';
+import { StockManagement } from './crud/StockManagement';
 export default [
-    { path: 'crud', component: Crud },
-    { path: 'category', component: Category },
-    { path: 'service', component: Service },
-    { path: 'produit', component: Produit },
-    { path: 'utilisateur', component: Utilisateur },
+    { path: 'category', component: Category , canActivate: [authGuard], data: { profile: 'admin' }},
+    { path: 'service', component: Service , canActivate: [authGuard], data: { profile: 'admin' }},
+    { path: 'produit', component: Produit , canActivate: [authGuard], data: { profile: 'admin' }},
+    { path: 'utilisateur', component: Utilisateur , canActivate: [authGuard], data: { profile: 'admin' }},
+    { path: 'calendrier', component: CalendarComponent },
+    {path:'stock', canActivate: [authGuard], component:StockManagement},
     { path: '**', redirectTo: '/notfound' }
 ] as Routes;

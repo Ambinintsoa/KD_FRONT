@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
 import { StyleClassModule } from 'primeng/styleclass';
 import { AppConfigurator } from './app.configurator';
 import { LayoutService } from '../service/layout.service';
+import { AuthService } from '../../auth/auth.service';
 
 @Component({
     selector: 'app-topbar',
@@ -33,7 +34,7 @@ import { LayoutService } from '../service/layout.service';
                         />
                     </g>
                 </svg>
-                <span>SAKAI</span>
+                <span class="text-xs"> m1p12mean-Fy-Isabelle</span>
             </a>
         </div>
 
@@ -72,10 +73,11 @@ import { LayoutService } from '../service/layout.service';
                         <i class="pi pi-inbox"></i>
                         <span>Messages</span>
                     </button>
-                    <button type="button" class="layout-topbar-action">
-                        <i class="pi pi-user"></i>
-                        <span>Profile</span>
-                    </button>
+                    <button type="button" class="layout-topbar-action flex items-center space-x-2" aria-label="Déconnexion" (click)="logout()">
+    <i class="pi pi-sign-out"></i>
+    <span >Déconnexion</span>
+</button>
+
                 </div>
             </div>
         </div>
@@ -84,9 +86,12 @@ import { LayoutService } from '../service/layout.service';
 export class AppTopbar {
     items!: MenuItem[];
 
-    constructor(public layoutService: LayoutService) {}
+    constructor(public layoutService: LayoutService, private utilisateurService:AuthService) {}
 
     toggleDarkMode() {
         this.layoutService.layoutConfig.update((state) => ({ ...state, darkTheme: !state.darkTheme }));
+    }
+    logout(){
+        this.utilisateurService.logout();
     }
 }

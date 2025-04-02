@@ -43,6 +43,7 @@
                             class="w-full mb-8 border-2 border-gray-500 bg-white rounded-lg h-12 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 px-4 !important"
                             style="border:solid 1px gray" [(ngModel)]="voiture_immatriculation"
                             name="voiture_immatriculation" autofocus />
+                            <p id="voiture_immatriculation_error"></p>
                     </div>
 
                     <div class="flex flex-col gap-2">
@@ -51,6 +52,8 @@
                             class="w-full mb-8 border-2 border-gray-500 bg-white rounded-lg h-12 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 px-4 !important"
                             style="border:solid 1px gray" [(ngModel)]="voiture_kilometrage"
                             name="voiture_kilometrage" />
+                            <p id="voiture_kilometrage_error"></p>
+
                     </div>
 
                     <div class="flex flex-col gap-2">
@@ -62,6 +65,8 @@
                             <option *ngFor="let marque of liste_marques" [value]="marque.value"> {{ marque.label }}
                             </option>
                         </select>
+                        <p id="voiture_marque_error"></p>
+
                     </div>
 
                     <div class="flex flex-col gap-2">
@@ -74,6 +79,8 @@
                                 categorie.label
                                 }}</option>
                         </select>
+                        <p id="voiture_categorie_error" style="margin-top: -30px;"></p>
+
                     </div>
                 </div>
                 <!-- </div> -->
@@ -82,6 +89,8 @@
                 <!-- Section Services -->
                 <div class="flex flex-col gap-2">
                     <label class="font-semibold text-xl text-gray-700">Services</label>
+                    <p id="services_error"  style="margin-top: -10px;"></p>
+                    
                     <hr>
                     <div *ngFor="let categorie_service_obj of liste_categorie_service">
                         <h6>{{ categorie_service_obj.categorie_objet.nom_categorie}}</h6>
@@ -113,11 +122,13 @@
                                 <tr *ngFor="let service of liste_services" class="text-center">
                                     <td class="px-4 py-2  justify-center items-center">{{service.nom_service}}</td>
                                     <td class="px-4 py-2  justify-center items-center">
-                                        <p-checkbox [binary]="true" (onChange)="reset_avec_produit(service.service)"></p-checkbox>
+                                        <p-checkbox [binary]="true"
+                                            (onChange)="reset_avec_produit(service.service)"></p-checkbox>
 
                                     </td>
                                     <td class="px-4 py-2  justify-center items-center">
-                                        <p-checkbox [binary]="true" (onChange)="remove(service.service)" class=""></p-checkbox>
+                                        <p-checkbox [binary]="true" (onChange)="remove(service.service)"
+                                            class=""></p-checkbox>
 
                                     </td>
                                 </tr>
@@ -135,7 +146,6 @@
 
             <!-- Section Facture (affichée après calcul) -->
             <div *ngIf="showInvoice">
-                <button type="button" pButton class="p-button-default" (click)="retour()" label="Retour"></button>
                 <div class="mt-4 p-4 bg-white border border-gray-300 rounded-lg shadow-md">
                     <!-- En-tête de la facture -->
                     <div class="border-b border-gray-300 pb-2 mb-4">
@@ -149,28 +159,38 @@
                     <table class="w-full text-sm text-gray-700">
                         <thead>
                             <tr class="bg-gray-100 border-b border-gray-300">
-                                <th class="py-2 px-3 text-left font-semibold">Service</th>
-                                <th class="py-2 px-3 text-right font-semibold">Produit Inclus</th>
+                                <th class="py-2 px-3 text-left font-semibold">Désignation</th>
+                                <th class="py-2 px-3 text-right font-semibold">Montant</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <!-- Ligne pour la voiture -->
-                            <tr *ngIf="selectedNode" class="border-b border-gray-200">
-                                <td class="py-2 px-3">Voiture sélectionnée</td>
-                                <td class="py-2 px-3 text-right">{{ voiture_kilometrage }}</td>
-                            </tr>
-                            <!-- Ligne pour les services -->
-                            <tr *ngIf="selectedAutoValue?.length > 0" class="border-b border-gray-200">
-                                <td class="py-2 px-3">Services sélectionnés</td>
-                                <td class="py-2 px-3 text-right">
-                                    <span *ngFor="let country of selectedAutoValue; let last = last">
-                                        {{ country.name }}{{ last ? "" : ", " }}
-                                    </span>
-                                </td>
-                            </tr>
-
-                            <!-- Message si rien n'est sélectionné -->
-                            <tr *ngIf="!selectedAutoValue?.length && !selectedNode">
+                            <!-- Vérifier si devis_details existe et contient des éléments -->
+                            <ng-container *ngIf="devis_object && devis_object.devis_details && devis_object.devis_details.length > 0">
+                                <ng-container *ngFor="let devis_detail of devis_object.devis_details">
+                                    <!-- Ligne du service -->
+                                    <tr class="border-b border-gray-200">
+                                        <td class="py-2 px-3 text-left">
+                                            {{ devis_detail.service_details?.service?.nom_service || 'Service inconnu' }}
+                                        </td>
+                                        <td class="py-2 px-3 text-right">
+                                            {{ devis_detail.service_details?.prix ?? 0 }} Ar
+                                        </td>
+                                    </tr>
+                    
+                                    <!-- Lignes des produits associés au service -->
+                                    <tr *ngFor="let produit of devis_detail.produits" class="border-b border-gray-200">
+                                        <td class="py-2 px-3 text-left pl-6">
+                                            ⮩ {{ produit.produit?.nom_produit || 'Produit inconnu' }}
+                                        </td>
+                                        <td class="py-2 px-3 text-right">
+                                            {{ produit.prix ?? 0 }} Ar
+                                        </td>
+                                    </tr>
+                                </ng-container>
+                            </ng-container>
+                    
+                            <!-- Message si aucun élément n'est sélectionné -->
+                            <tr *ngIf="!devis_object?.devis_details?.length">
                                 <td colspan="2" class="py-2 px-3 text-center text-gray-500 italic">
                                     Aucun élément sélectionné
                                 </td>
@@ -180,21 +200,29 @@
                             <tr class="border-t border-gray-300 bg-gray-50">
                                 <td class="py-3 px-3 font-bold text-gray-800">Total</td>
                                 <td class="py-3 px-3 text-right font-bold text-gray-800">
-                                    {{
-                                    (selectedAutoValue?.length || 0) * 10 +
-                                    (selectedNode ? 50 : 0)
-                                    }}
-                                    €
+                                    {{ devis_object.total_devis ?? 0 }} Ar
                                 </td>
                             </tr>
                         </tfoot>
                     </table>
+                    
+                    <button type="button" pButton class="p-button-default bg-gray-500 text-white" (click)="retour()" label="Retour"></button>
+                    <button type="button" pButton class="p-button-default m-10" (click)="RendezVousForm()" label="Prendre Rendez-vous"></button>
+
+
                 </div>
+            </div>
+            <div *ngIf="showRendezVousForm">
+                <label for="">Date de rendez-vous souhaité</label>
+                <input type="date" name="date" class="w-full mb-8 border-2 border-gray-500 bg-white rounded-lg h-12 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 px-4 !important"
+                style="border:solid 1px gray" [(ngModel)]="date_rendez_vous">
+                <button  type="button" pButton class="p-button-default bg-gray-500 text-white" (click)="SaveRendezVous()" label="Soumettre"></button>
             </div>
         </div>
     </p-drawer>
-    <div class="flex border-t lg:border-t-0 border-surface py-4 lg:py-0 mt-4 lg:mt-0 gap-2">
+    <!-- <div class="flex border-t lg:border-t-0 border-surface py-4 lg:py-0 mt-4 lg:mt-0 gap-2">
         <button pButton pRipple label="Connexion" routerLink="/auth/login" [rounded]="true" [text]="true"></button>
         <button pButton pRipple label="Création de compte" routerLink="/auth/register" [rounded]="true"></button>
-    </div>
+    </div> -->
+    
 </div>

@@ -9,12 +9,32 @@ export interface ProduitObject {
   nom_produit?: string;
   unite?: string;
   statut?: string;
+  stock?:number;
+  demande?:number;
 }
 export interface ProduitResponse {
   produits: ProduitObject[];
   currentPage: number;
   totalItems: number;
   totalPages: number;
+}
+export interface ReassortRequest {
+  _id?: string;
+  produitId: string;
+  produitNom: string;
+  quantity: number;
+  date: string;
+  user: string;
+}
+
+export interface StockEntryRecord {
+  _id?: string;
+  produitId: string;
+  produitNom: string;
+  quantity: number;
+  date: string;
+  user: string;
+  invoiceUrl?: string; // URL ou chemin de la facture
 }
 @Injectable()
 export class ProduitService {
@@ -39,7 +59,9 @@ export class ProduitService {
             _id: item._id,
             nom_produit: item.nom_produit,
             unite: item.unite,
-            statut: item.statut === 0 ? "Disponible" : "Non-Disponible",
+            stock: item.stock,
+            demande: item.demande,
+            statut: item.est_disponible === 0 ? "Disponible" : "Non-Disponible",
           })),
           currentPage: data.currentPage,
           totalItems: data.totalItems,
@@ -79,5 +101,42 @@ export class ProduitService {
     link.download = fileName;
     link.click();
     window.URL.revokeObjectURL(url);
+  }
+  
+    // Demande de réassort
+    requestReassort(entries: { produitId: string, quantity: number }[]): Observable<any> {
+      return this.http.post(`${this.apiUrl}/reassort`, { entries });
+    }
+  
+    // Entrée de stock avec facture
+    addStockEntry(entries: { produitId: string, quantity: number, prix:number }[], invoice: File): Observable<any> {
+      const formData = new FormData();
+      entries.forEach((entry, index) => {
+        formData.append(`entries[${index}][produitId]`, entry.produitId);
+        formData.append(`entries[${index}][quantity]`, entry.quantity.toString());
+        formData.append(`entries[${index}][prix]`, entry.prix.toString());
+      });
+      formData.append('invoice', invoice);
+      return this.http.post(`${this.apiUrl}/stock-entry`, formData);
+    }
+    
+      // Récupérer la liste des demandes de réassort
+  getReassortRequests(params: ListParams): Observable<{ entries: ReassortRequest[], totalItems: number }> {
+    return this.http.get<{ entries: ReassortRequest[], totalItems: number }>(
+      `${this.apiUrl}/reassort-requests?page=${params.page}&limit=${params.limit}&search=${params.search}&sortBy=${params.sortBy}&orderBy=${params.orderBy}`
+    );
+  }
+
+  // Récupérer la liste des entrées de stock
+  getStockEntries(params: ListParams): Observable<{ entries: StockEntryRecord[], totalItems: number }> {
+    return this.http.get<{ entries: StockEntryRecord[], totalItems: number }>(
+      `${this.apiUrl}/stock-entries?page=${params.page}&limit=${params.limit}&search=${params.search}&sortBy=${params.sortBy}&orderBy=${params.orderBy}`
+    );
+  }
+  deleteStockEntry(entryId: string): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/stock-entry/${entryId}`);
+  }
+  deleteReassort(entryId: string): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/reassort/${entryId}`);
   }
 }

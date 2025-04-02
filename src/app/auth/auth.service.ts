@@ -170,4 +170,7 @@ export class AuthService {
       isAdmin(): boolean {
         return this.getUserProfile() === 'admin';
       }
+      isPersonal():boolean{
+        return this.getUserProfile() === 'admin' || this.getUserProfile()== 'mécanicien';
+      }
 }

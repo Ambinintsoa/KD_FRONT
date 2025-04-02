@@ -1,3 +1,24 @@
+<<<<<<< HEAD:src/app/pages/landing/components/topbarwidget.component.ts.txt
+=======
+import { Service } from "./../../crud/service";
+import { Component, inject, OnInit } from "@angular/core";
+import { StyleClassModule } from "primeng/styleclass";
+import { Router, RouterModule } from "@angular/router";
+import { RippleModule } from "primeng/ripple";
+import { ButtonModule } from "primeng/button";
+import { MegaMenuModule } from "primeng/megamenu";
+import { DrawerModule } from "primeng/drawer";
+import {
+  AutoCompleteCompleteEvent,
+  AutoCompleteModule,
+} from "primeng/autocomplete";
+import { NodeService } from "../../service/node.service";
+import { FormsModule } from "@angular/forms";
+import { MultiSelectModule } from "primeng/multiselect";
+import { Country } from "../../service/customer.service";
+import { TreeNode } from "primeng/api";
+import { TreeSelectModule } from "primeng/treeselect";
+>>>>>>> 3075603cf5b0a72e1137f24b6e7570def8407f53:src/app/pages/landing/components/topbarwidget.component.ts
 import { CommonModule } from "@angular/common";
 import { Component, inject, OnInit } from "@angular/core";
 import { FormsModule } from "@angular/forms";
@@ -271,7 +292,7 @@ import { NodeService } from "../../service/node.service";
         ></button>
       </div>
     </div> `,
-  providers: [CountryService, NodeService],
+  providers: [ NodeService],
 })
 export class TopbarWidget implements OnInit {
   showInvoice: boolean = false;
@@ -322,13 +343,13 @@ export class TopbarWidget implements OnInit {
   selectedNode: any = null;
   selectedAutoValue: any = null;
   autoFilteredValue: any[] = [];
-  countryService = inject(CountryService);
 
   nodeService = inject(NodeService);
   autoValue: any[] | undefined;
 
 
   ngOnInit() {
+<<<<<<< HEAD:src/app/pages/landing/components/topbarwidget.component.ts.txt
     
     // donne la liste des categories de voitures
     this.CategorieVoitureService.getAllCategorieVoitures().subscribe({
@@ -352,6 +373,13 @@ export class TopbarWidget implements OnInit {
           console.log('Requête terminée');
         }
       });
+=======
+    this.nodeService.getFiles().then((data) => (this.treeSelectNodes = data));
+  }
+  filterCountry(event: AutoCompleteCompleteEvent) {
+    const filtered: any[] = [];
+    const query = event.query;
+>>>>>>> 3075603cf5b0a72e1137f24b6e7570def8407f53:src/app/pages/landing/components/topbarwidget.component.ts
 
       // donne la liste des marques
       this.MarqueService.getAllMarques().subscribe({
@@ -428,43 +456,6 @@ export class TopbarWidget implements OnInit {
           {
             label: "Sports.7",
             items: [{ label: "Sports.7.1" }, { label: "Sports.7.2" }],
-          },
-        ],
-      ],
-    },
-    {
-      label: "Promotion",
-      icon: "pi pi-fw pi-gift",
-      items: [
-        [
-          {
-            label: "Living Room",
-            items: [
-              { label: "Living Room Item" },
-              { label: "Living Room Item" },
-            ],
-          },
-          {
-            label: "Kitchen",
-            items: [
-              { label: "Kitchen Item" },
-              { label: "Kitchen Item" },
-              { label: "Kitchen Item" },
-            ],
-          },
-        ],
-        [
-          {
-            label: "Bedroom",
-            items: [{ label: "Bedroom Item" }, { label: "Bedroom Item" }],
-          },
-          {
-            label: "Outdoor",
-            items: [
-              { label: "Outdoor Item" },
-              { label: "Outdoor Item" },
-              { label: "Outdoor Item" },
-            ],
           },
         ],
       ],

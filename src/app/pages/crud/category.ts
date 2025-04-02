@@ -18,10 +18,15 @@ import { TagModule } from "primeng/tag";
 import { InputIconModule } from "primeng/inputicon";
 import { IconFieldModule } from "primeng/iconfield";
 import { ConfirmDialogModule } from "primeng/confirmdialog";
-import { CategoryObject, CategoryResponse, CategoryService } from "../service/category.service ";
+import {
+  CategoryObject,
+  CategoryResponse,
+  CategoryService,
+} from "../service/category.service ";
 import { ListParams } from "../service/Params";
 import { debounceTime, distinctUntilChanged } from "rxjs/operators";
 import { Subject } from "rxjs";
+import { FileUploadModule } from "primeng/fileupload";
 
 @Component({
   selector: "app-crud",
@@ -44,16 +49,57 @@ import { Subject } from "rxjs";
     TagModule,
     InputIconModule,
     IconFieldModule,
-    ConfirmDialogModule
+    ConfirmDialogModule,
+    FileUploadModule,
   ],
   template: `
     <p-toolbar styleClass="mb-6">
       <ng-template #start>
-        <p-button label="Ajouter" icon="pi pi-plus" severity="secondary" class="mr-2" (onClick)="openNew()" />
-        <p-button severity="secondary" label="Supprimer" icon="pi pi-trash" outlined (onClick)="deleteSelectedProducts()" [disabled]="!selectedProducts || !selectedProducts.length" />
+      <p-fileupload
+          #fu
+          mode="basic"
+          chooseLabel="Choisir"
+          chooseIcon="pi pi-upload"
+          accept=".xlsx, .xls"
+          maxFileSize="1000000"
+          (onSelect)="onFileSelected($event)"
+           class="mr-2"
+        />
+        <p-button
+          label="télécharger"
+          (onClick)="uploadFile()"
+          severity="secondary"
+           class="mr-2"
+        />
+        <p>{{ message }}</p>
+        <ul *ngIf="errorMessages.length > 0">
+          <li *ngFor="let error of errorMessages" style="color: red;">
+            {{ error }}
+          </li>
+        </ul>
+        <p-button
+          label="Ajouter"
+          icon="pi pi-plus"
+          severity="secondary"
+          class="mr-2"
+          (onClick)="openNew()"
+        />
+        <p-button
+          severity="secondary"
+          label="Supprimer"
+          icon="pi pi-trash"
+          outlined
+          (onClick)="deleteSelectedProducts()"
+          [disabled]="!selectedProducts || !selectedProducts.length"
+        />
       </ng-template>
       <ng-template #end>
-        <p-button label="Exporter" icon="pi pi-upload" severity="secondary" (onClick)="exportCSV()" />
+        <p-button
+          label="Exporter"
+          icon="pi pi-upload"
+          severity="secondary"
+          (onClick)="exportToExcel()"
+        />
       </ng-template>
     </p-toolbar>
 
@@ -84,14 +130,21 @@ import { Subject } from "rxjs";
           <h5 class="m-0">Gestion des Catégories</h5>
           <p-iconfield>
             <p-inputicon styleClass="pi pi-search" />
-            <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Recherche..." />
+            <input
+              pInputText
+              type="text"
+              (input)="onGlobalFilter(dt, $event)"
+              placeholder="Recherche..."
+            />
           </p-iconfield>
         </div>
       </ng-template>
       <ng-template #header>
         <tr>
           <th style="width: 3rem"><p-tableHeaderCheckbox /></th>
-          <th pSortableColumn="nom_categorie" style="min-width:16rem">Catégorie <p-sortIcon field="nom_categorie" /></th>
+          <th pSortableColumn="nom_categorie" style="min-width:16rem">
+            Catégorie <p-sortIcon field="nom_categorie" />
+          </th>
           <th style="min-width: 12rem"></th>
         </tr>
       </ng-template>
@@ -100,33 +153,71 @@ import { Subject } from "rxjs";
           <td style="width: 3rem"><p-tableCheckbox [value]="product" /></td>
           <td style="min-width: 16rem">{{ product.nom_categorie }}</td>
           <td>
-            <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true" (click)="editProduct(product)" />
-            <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true" (click)="deleteProduct(product)" />
+            <p-button
+              icon="pi pi-pencil"
+              class="mr-2"
+              [rounded]="true"
+              [outlined]="true"
+              (click)="editProduct(product)"
+            />
+            <p-button
+              icon="pi pi-trash"
+              severity="danger"
+              [rounded]="true"
+              [outlined]="true"
+              (click)="deleteProduct(product)"
+            />
           </td>
         </tr>
       </ng-template>
     </p-table>
-    <p-dialog [(visible)]="productDialog" [style]="{ width: '450px' }" header="Product Details" [modal]="true">
+    <p-dialog
+      [(visible)]="productDialog"
+      [style]="{ width: '450px' }"
+      header="Product Details"
+      [modal]="true"
+    >
       <ng-template #content>
         <div class="flex flex-col gap-6">
           <div>
-            <label for="name" class="block font-bold mb-3">Nom de la catégorie</label>
-            <input type="text" pInputText id="name" [(ngModel)]="CategoryObject.nom_categorie" required autofocus fluid />
-            <small class="text-red-500" *ngIf="submitted && !CategoryObject.nom_categorie">Nom est requis.</small>
-  <small class="text-red-500" *ngIf="errors?.nom_categorie">
-    {{ errors.nom_categorie }}
-  </small>
+            <label for="name" class="block font-bold mb-3"
+              >Nom de la catégorie</label
+            >
+            <input
+              type="text"
+              pInputText
+              id="name"
+              [(ngModel)]="CategoryObject.nom_categorie"
+              required
+              autofocus
+              fluid
+            />
+            <small
+              class="text-red-500"
+              *ngIf="submitted && !CategoryObject.nom_categorie"
+              >Nom est requis.</small
+            >
+            <small class="text-red-500" *ngIf="errors?.nom_categorie">
+              {{ errors.nom_categorie }}
+            </small>
           </div>
         </div>
       </ng-template>
       <ng-template #footer>
-        <p-button label="Cancel" icon="pi pi-times" text (click)="hideDialog()" />
-        <p-button label="Save" icon="pi pi-check" (click)="saveProduct()" />
+        <p-button
+          label="Annuler"
+          icon="pi pi-times"
+          text
+          (click)="hideDialog()"
+        />
+        <p-button
+          label="Enregistrer"
+          icon="pi pi-check"
+          (click)="saveProduct()"
+        />
       </ng-template>
     </p-dialog>
     <p-confirmdialog [style]="{ width: '450px' }" />
-
-
   `,
   providers: [MessageService, CategoryService, ConfirmationService],
 })
@@ -162,7 +253,13 @@ export class Category implements OnInit {
     this.loadDataSubject
       .pipe(debounceTime(300), distinctUntilChanged())
       .subscribe((params) => {
-        this.loadDemoData(params.page, params.limit, params.search, params.sortBy, params.orderBy);
+        this.loadDemoData(
+          params.page,
+          params.limit,
+          params.search,
+          params.sortBy,
+          params.orderBy
+        );
       });
   }
 
@@ -172,11 +269,13 @@ export class Category implements OnInit {
       title: col.header,
       dataKey: col.field,
     }));
-    this.loadDemoData(this.page, this.limit, this.search, this.sortBy, this.orderBy); // Chargement initial direct
-  }
-
-  exportCSV() {
-    this.dt.exportCSV();
+    this.loadDemoData(
+      this.page,
+      this.limit,
+      this.search,
+      this.sortBy,
+      this.orderBy
+    ); // Chargement initial direct
   }
 
   onGlobalFilter(dt: any, event: any) {
@@ -214,29 +313,40 @@ export class Category implements OnInit {
     });
   }
 
-  loadDemoData(page: number, limit: number, search: string, sortBy: string, orderBy: string) {
-    this.categoryService.getCategories({ page, limit, search, sortBy, orderBy }).subscribe({
-      next: (data: CategoryResponse) => {
-        console.log("Réponse complète du backend :", data);
-        this.CategoryObjects = data.categories || [];
-        this.totalRecords = data.totalItems || 0;
-        this.totalPages = data.totalPages || 0;
-        this.page = data.currentPage || 1;
-        this.first = (this.page - 1) * this.limit;
-        this.cdr.detectChanges();
-        console.log("CategoryObjects après mise à jour :", this.CategoryObjects);
-        console.log("totalRecords après mise à jour :", this.totalRecords);
-      },
-      error: (err: Error) => {
-        console.error("Erreur lors du chargement :", err);
-        this.messageService.add({
-          severity: "error",
-          summary: "Erreur",
-          detail: "Échec du chargement des données",
-          life: 3000,
-        });
-      },
-    });
+  loadDemoData(
+    page: number,
+    limit: number,
+    search: string,
+    sortBy: string,
+    orderBy: string
+  ) {
+    this.categoryService
+      .getCategories({ page, limit, search, sortBy, orderBy })
+      .subscribe({
+        next: (data: CategoryResponse) => {
+          console.log("Réponse complète du backend :", data);
+          this.CategoryObjects = data.categories || [];
+          this.totalRecords = data.totalItems || 0;
+          this.totalPages = data.totalPages || 0;
+          this.page = data.currentPage || 1;
+          this.first = (this.page - 1) * this.limit;
+          this.cdr.detectChanges();
+          console.log(
+            "CategoryObjects après mise à jour :",
+            this.CategoryObjects
+          );
+          console.log("totalRecords après mise à jour :", this.totalRecords);
+        },
+        error: (err: Error) => {
+          console.error("Erreur lors du chargement :", err);
+          this.messageService.add({
+            severity: "error",
+            summary: "Erreur",
+            detail: "Échec du chargement des données",
+            life: 3000,
+          });
+        },
+      });
   }
 
   openNew() {
@@ -256,9 +366,10 @@ export class Category implements OnInit {
       header: "Confirmer",
       icon: "pi pi-exclamation-triangle",
       accept: () => {
-        const ids: string[] = this.selectedProducts
-        ?.filter(cat => !!cat._id)
-        .map(cat => String(cat._id)) ?? [];
+        const ids: string[] =
+          this.selectedProducts
+            ?.filter((cat) => !!cat._id)
+            .map((cat) => String(cat._id)) ?? [];
         this.categoryService.deleteCategorie(ids).subscribe({
           next: () => {
             this.CategoryObjects = this.CategoryObjects.filter(
@@ -272,7 +383,7 @@ export class Category implements OnInit {
             });
             this.triggerLoadData();
           },
-          error: (err:Error) => {
+          error: (err: Error) => {
             console.error("Erreur lors de la suppression :", err);
             this.messageService.add({
               severity: "error",
@@ -290,18 +401,21 @@ export class Category implements OnInit {
   hideDialog() {
     this.productDialog = false;
     this.submitted = false;
-    this.errors= {};
+    this.errors = {};
   }
 
   deleteProduct(product: CategoryObject) {
     this.confirmationService.confirm({
-      message: "Êtes-vous sûr de vouloir supprimer " + product.nom_categorie + " ?",
+      message:
+        "Êtes-vous sûr de vouloir supprimer " + product.nom_categorie + " ?",
       header: "Confirmer",
       icon: "pi pi-exclamation-triangle",
       accept: () => {
-        this.categoryService.deleteCategorie([product._id||'']).subscribe({
+        this.categoryService.deleteCategorie([product._id || ""]).subscribe({
           next: () => {
-            this.CategoryObjects = this.CategoryObjects.filter((item) => item._id !== product._id);
+            this.CategoryObjects = this.CategoryObjects.filter(
+              (item) => item._id !== product._id
+            );
             this.messageService.add({
               severity: "success",
               summary: "Succès",
@@ -310,7 +424,7 @@ export class Category implements OnInit {
             });
             this.triggerLoadData();
           },
-          error: (err:Error) => {
+          error: (err: Error) => {
             console.error("Erreur lors de la suppression :", err);
             this.messageService.add({
               severity: "error",
@@ -328,7 +442,6 @@ export class Category implements OnInit {
   findIndexById(id: string): number {
     return this.CategoryObjects.findIndex((item) => item._id === id);
   }
-
 
   saveProduct() {
     this.submitted = true;
@@ -351,7 +464,7 @@ export class Category implements OnInit {
           this.CategoryObject = {};
           this.triggerLoadData();
         },
-        error: (err:any) => {
+        error: (err: any) => {
           if (err.error && err.error.field) {
             // Mappe l'erreur en fonction du champ renvoyé par le backend
             this.errors[err.error.field] = err.error.message;
@@ -372,7 +485,7 @@ export class Category implements OnInit {
           this.CategoryObject = {};
           this.triggerLoadData();
         },
-        error: (err:any) => {
+        error: (err: any) => {
           if (err.error && err.error.field) {
             // Mappe l'erreur en fonction du champ renvoyé par le backend
             this.errors[err.error.field] = err.error.message;
@@ -380,6 +493,56 @@ export class Category implements OnInit {
         },
       });
     }
+  }
+
+  //importation et exportation
+  selectedFile: File | null = null;
+  message: string = "";
+  errorMessages: string[] = [];
+
+  onFileSelected(event: any): void {
+    if (event.files?.length) {
+      this.selectedFile = event.files[0];
+    }
+  }
+
+  uploadFile(): void {
+    this.errorMessages = []; // Réinitialiser les erreurs
+    this.message = ""; // Réinitialiser le message
+
+    if (!this.selectedFile) {
+      this.message = "Veuillez sélectionner un fichier";
+      return;
+    }
+
+    this.categoryService.uploadFile(this.selectedFile).subscribe({
+      next: (response: any) => {
+        this.triggerLoadData() ;
+        this.message = response.message;
+      },
+      error: (err) => {
+        if (err.error.errors && Array.isArray(err.error.errors)) {
+          this.errorMessages = err.error.errors; // Afficher toutes les erreurs
+        } else {
+          this.message = err.error.error || "Erreur lors de l'upload";
+        }
+      },
+    });
+  }
+
+  exportToExcel(): void {
+    this.message = ""; // Réinitialiser le message
+    this.errorMessages = []; // Réinitialiser les erreurs
+
+    this.categoryService.exportToExcel().subscribe({
+      next: (blob: Blob) => {
+        this.categoryService.downloadFile(blob, "catégories.xlsx");
+        this.message = "Exportation réussie !";
+      },
+      error: (err: any) => {
+        this.message = "Erreur lors de l'exportation : " + err.message;
+      },
+    });
   }
 }
 

@@ -24,6 +24,7 @@ export class AppMenu {
     ngOnInit() {
         // Vérification du rôle admin
         const isAdmin = this.authService.isAdmin(); // Cette méthode retournera true si l'utilisateur est un admin
+        const isPersonal = this.authService.isPersonal(); // Cette méthode retournera true si l'utilisateur est un admin
 
         // Définition du modèle du menu
         this.model = [
@@ -47,27 +48,11 @@ export class AppMenu {
                         icon: 'pi pi-fw pi-globe',
                         routerLink: ['/landing']
                     },
-                    {
-                        label: 'Auth',
-                        icon: 'pi pi-fw pi-user',
-                        items: [
-                            {
-                                label: 'Login',
-                                icon: 'pi pi-fw pi-sign-in',
-                                routerLink: ['/auth/login']
-                            },
-                            {
-                                label: 'Error',
-                                icon: 'pi pi-fw pi-times-circle',
-                                routerLink: ['/auth/error']
-                            },
-                            {
-                                label: 'Access Denied',
-                                icon: 'pi pi-fw pi-lock',
-                                routerLink: ['/auth/access']
-                            }
-                        ]
-                    },
+                    ...(isPersonal ? [  {
+                        label: 'Stock',
+                        icon: 'pi pi-fw pi-cog',
+                        routerLink: ['/pages/stock']
+                    }]:[]),
                     // Filtrage du menu "Paramétrages" selon le rôle
                     ...(isAdmin ? [
                         {
@@ -87,6 +72,11 @@ export class AppMenu {
                                     label: 'Produits',
                                     icon: 'pi pi-fw pi-sign-in',
                                     routerLink: ['/pages/produit']
+                                },
+                                {
+                                    label: 'Avis Client',
+                                    icon: 'pi pi-fw pi-sign-in',
+                                    routerLink: ['/pages/avis']
                                 },
                                 {
                                     label: 'Utilisateurs',

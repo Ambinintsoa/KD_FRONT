@@ -242,7 +242,8 @@ convert_to_tache(liste_service:{ service: string; nom_service: string, avec_prod
         this.rendez_vous_service.sendRendezVousRequest(liste_tache, this.date_rendez_vous, voiture,devis_object)
             .subscribe({
                 next: (response) => {
-                    console.log("Rendez-vous envoyé avec succès :", response);
+                    alert("Rendez-vous envoyé avec succès");
+                    window.location.href="/landing";
                 },
                 error: (error) => {
                     console.error("Erreur lors de l'envoi du rendez-vous :", error);

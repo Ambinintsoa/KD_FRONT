@@ -113,10 +113,6 @@ import Swal from 'sweetalert2';
                 ></p-password>
 
                 <div class="flex items-center justify-between mt-2 mb-8 gap-8">
-                  <span
-    class="font-medium no-underline ml-2 text-right cursor-pointer text-primary"
-    routerLink="/auth/register"
->Créer un compte</span>
                 </div>
                 <p-button
                   label="Connexion"
@@ -131,8 +127,8 @@ import Swal from 'sweetalert2';
     </div>
   `,
 })
-export class Login {
-  email: string = "my_email2@gmail.com";
+export class LoginMecano {
+  email: string = "mecanicien@gmail.com";
 
   password: string = "password";
 

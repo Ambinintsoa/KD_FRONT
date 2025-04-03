@@ -1,8 +1,8 @@
-import { HttpClient } from "@angular/common/http";
-import { Injectable } from "@angular/core";
-import { environment } from "../../../environments/environment";
-import { map, Observable, tap } from "rxjs";
-import { ListParams } from "./Params";
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { map, Observable, tap } from 'rxjs';
+import { environment } from '../../../environments/environment';
+import { ListParams } from './Params';
 
 export interface ProduitObject {
   _id?: string;
@@ -35,6 +35,19 @@ export interface StockEntryRecord {
   date: string;
   user: string;
   invoiceUrl?: string; // URL ou chemin de la facture
+}
+export interface Produit {
+  _id?: string;
+  nom_produit: string;
+  prix: number;
+  stock: number;
+}
+
+export interface UsageProduitService {
+  _id?: string;
+  service: string;
+  produit: Produit;
+  quantite: number;
 }
 @Injectable()
 export class ProduitService {
@@ -139,4 +152,21 @@ export class ProduitService {
   deleteReassort(entryId: string): Observable<any> {
     return this.http.delete(`${this.apiUrl}/reassort/${entryId}`);
   }
+  getAllProduits(): Observable<Produit[]> {
+    return this.http.get<Produit[]>(`${this.apiUrl}/all`);
+}
+
+getProduitsByService(serviceId: string): Observable<UsageProduitService[]> {
+    return this.http.get<UsageProduitService[]>(`${this.apiUrl}/service/${serviceId}`);
+}
+
+addProduitToService(serviceId: string, produitId: string, quantite: number): Observable<any> {
+    return this.http.post(`${this.apiUrl}/service/${serviceId}`, { produitId, quantite });
+}
+
+removeProduitFromService(serviceId: string, produitId: string): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/service/${serviceId}`, { 
+        body: { produitId } 
+    });
+}
 }

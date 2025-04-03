@@ -28,10 +28,12 @@ export class AppMenu {
 
         // Définition du modèle du menu
         this.model = [
+            ...(isAdmin ? [
             {
                 label: 'Home',
                 items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home', routerLink: ['/'] }]
             },
+        ] : []),
             {
                 label: 'UI Components',
                 items: [
@@ -72,6 +74,11 @@ export class AppMenu {
                                     label: 'Produits',
                                     icon: 'pi pi-fw pi-sign-in',
                                     routerLink: ['/pages/produit']
+                                },
+                                {
+                                    label: 'Avis Client',
+                                    icon: 'pi pi-fw pi-sign-in',
+                                    routerLink: ['/pages/avis']
                                 },
                                 {
                                     label: 'Utilisateurs',

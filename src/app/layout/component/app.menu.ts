@@ -28,10 +28,12 @@ export class AppMenu {
 
         // Définition du modèle du menu
         this.model = [
+            ...(isAdmin ? [
             {
                 label: 'Home',
                 items: [{ label: 'Dashboard', icon: 'pi pi-fw pi-home', routerLink: ['/'] }]
             },
+        ] : []),
             {
                 label: 'UI Components',
                 items: [

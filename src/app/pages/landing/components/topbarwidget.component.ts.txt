@@ -1,5 +1,4 @@
-<<<<<<< HEAD:src/app/pages/landing/components/topbarwidget.component.ts.txt
-=======
+
 import { Service } from "./../../crud/service";
 import { Component, inject, OnInit } from "@angular/core";
 import { StyleClassModule } from "primeng/styleclass";
@@ -18,7 +17,6 @@ import { MultiSelectModule } from "primeng/multiselect";
 import { Country } from "../../service/customer.service";
 import { TreeNode } from "primeng/api";
 import { TreeSelectModule } from "primeng/treeselect";
->>>>>>> 3075603cf5b0a72e1137f24b6e7570def8407f53:src/app/pages/landing/components/topbarwidget.component.ts
 import { CommonModule } from "@angular/common";
 import { Component, inject, OnInit } from "@angular/core";
 import { FormsModule } from "@angular/forms";

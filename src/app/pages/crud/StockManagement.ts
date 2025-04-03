@@ -135,7 +135,7 @@ interface StockEntry {
       <div class="flex flex-col gap-6">
         <div *ngFor="let entry of reassortEntries; let i = index">
           <label class="block font-bold mb-3">{{ entry.produit.nom_produit }}</label>
-          <p-inputnumber [(ngModel)]="entry.quantity" [min]="1" placeholder="Quantité" />
+          <p-inputnumber [(ngModel)]="entry.quantity" [min]="1" placeholder="Quantité" class="w-full p-2  rounded-md"/>
         </div>
       </div>
       <ng-template #footer>
@@ -150,9 +150,10 @@ interface StockEntry {
         <div *ngFor="let entry of stockEntries; let i = index">
           <h6>{{ entry.produit.nom_produit }}</h6>
           <label class="block font-bold mb-3">Quantité</label>
-          <p-inputnumber [(ngModel)]="entry.quantity" [min]="0" placeholder="Quantité" />
+          <p-inputnumber [(ngModel)]="entry.quantity" [min]="0" placeholder="Quantité"
+          class="w-full p-2  rounded-md" />
           <label class="block font-bold mb-3">Prix</label>
-          <p-inputnumber [(ngModel)]="entry.prix" [min]="0" placeholder="Prix" />
+          <p-inputnumber [(ngModel)]="entry.prix" [min]="0" placeholder="Prix" class="w-full p-2  rounded-md" />
         </div>
         <div>
           <label class="block font-bold mb-3">Facture (obligatoire)</label>

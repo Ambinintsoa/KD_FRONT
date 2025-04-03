@@ -171,6 +171,6 @@ export class AuthService {
         return this.getUserProfile() === 'admin';
       }
       isPersonal():boolean{
-        return this.getUserProfile() === 'admin' || this.getUserProfile()== 'mécanicien';
+        return this.getUserProfile() === 'admin' || this.getUserProfile()== 'mecanicien';
       }
 }

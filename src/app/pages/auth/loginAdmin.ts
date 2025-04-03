@@ -131,7 +131,7 @@ import Swal from 'sweetalert2';
     </div>
   `,
 })
-export class Login {
+export class LoginAdmin {
   email: string = "my_email2@gmail.com";
 
   password: string = "password";

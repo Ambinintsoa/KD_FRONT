@@ -11,11 +11,12 @@ import { HighlightsWidget } from './components/highlightswidget';
 import { TopbarwidgetComponent } from './components/topbarwidgets/topbarwidget/topbarwidget.component';
 import {PromotionsComponent} from './components/promotions';
 import { AvisValidesComponent } from "./components/AvisValidesComponent";
+// import { TopbarwidgetComponent } from './components/topbarwidget/topbarwidget.component';
+
 
 @Component({
     selector: 'app-landing',
     standalone: true,
-
     imports: [RouterModule, TopbarwidgetComponent, HeroWidget, FeaturesWidget, HighlightsWidget, FooterWidget, RippleModule, StyleClassModule, ButtonModule, DividerModule, PromotionsComponent, AvisValidesComponent],
     template: `
         <div class="bg-surface-0 dark:bg-surface-900">

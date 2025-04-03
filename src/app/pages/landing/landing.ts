@@ -9,9 +9,10 @@ import { FooterWidget } from './components/footerwidget';
 import { HeroWidget } from './components/herowidget';
 import { HighlightsWidget } from './components/highlightswidget';
 import { TopbarwidgetComponent } from './components/topbarwidgets/topbarwidget/topbarwidget.component';
-// import { TopbarwidgetComponent } from './components/topbarwidget/topbarwidget.component';
+import {PromotionsComponent} from './components/promotions';
 import { AvisValidesComponent } from "./components/AvisValidesComponent";
-import { PromotionsComponent } from './components/promotions';
+// import { TopbarwidgetComponent } from './components/topbarwidget/topbarwidget.component';
+
 
 @Component({
     selector: 'app-landing',

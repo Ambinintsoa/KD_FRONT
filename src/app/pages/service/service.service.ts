@@ -1,9 +1,11 @@
-import { HttpClient } from "@angular/common/http";
-import { Injectable } from "@angular/core";
-import { map, Observable, tap } from "rxjs";
-import { environment } from "../../../environments/environment";
+
+
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { map, Observable, tap } from 'rxjs';
+import { environment } from '../../../environments/environment';
 import { CategoryObject } from './category.service ';
-import { ListParams } from "./Params";
+import { ListParams } from './Params';
 
 export interface Promotion {
   pourcentage_reduction: null;

@@ -1,9 +1,9 @@
-import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { MenuItem } from 'primeng/api';
-import { AppMenuitem } from './app.menuitem';
 import { AuthService } from '../../auth/auth.service'; // Assurez-vous d'avoir ce service d'authentification
+import { AppMenuitem } from './app.menuitem';
 
 @Component({
     selector: 'app-menu',
@@ -25,6 +25,8 @@ export class AppMenu {
         // Vérification du rôle admin
         const isAdmin = this.authService.isAdmin(); // Cette méthode retournera true si l'utilisateur est un admin
         const isPersonal = this.authService.isPersonal(); // Cette méthode retournera true si l'utilisateur est un admin
+        const isMecanicien =this.authService.isMecanicien();
+        const isClient =this.authService.isClient();
 
         // Définition du modèle du menu
         this.model = [
@@ -85,7 +87,61 @@ export class AppMenu {
                                 },
                             ]
                         }
-                    ] : []),  // Ne pas inclure "Paramétrages" si l'utilisateur n'est pas admin
+                    ] : []),
+                     ...( isAdmin? [
+                        {
+                            label: 'Rendez vous',
+                            icon: 'pi pi-fw pi-clock',
+                            items:[
+                                {
+                                    label: 'Vue sur les rendez Vous',
+                                    icon: 'pi pi-calendar',
+                                    routerLink: ['/pages/calendrier_manager']
+                                },
+                                {
+                                    label: 'Demande de rendez Vous',
+                                    icon: 'pi pi-bell',
+                                    routerLink: ['/pages/liste_rdv_manager']
+                                },
+                                {
+                                    label: 'Historique de services',
+                                    icon: 'pi pi-book',
+                                    routerLink: ['/pages/taches']
+                                },
+                            ]}]:[]), 
+                            ...( isClient? [
+                                {
+                                    label: 'Rendez vous',
+                                    icon: 'pi pi-fw pi-clock',
+                                    items:[
+                                        {
+                                            label: 'Liste des rendez Vous',
+                                            icon: 'pi pi-calendar',
+                                            routerLink: ['/pages/calendrier_client']
+                                        },
+                                        {
+                                            label: 'Historique de services',
+                                            icon: 'pi pi-book',
+                                            routerLink: ['/pages/taches']
+                                        },
+                                    ]}]:[]),
+                                    ...( isMecanicien? [
+                                        {
+                                            label: 'Rendez vous',
+                                            icon: 'pi pi-fw pi-clock',
+                                            items:[
+                                                {
+                                                    label: 'Emploi du temps',
+                                                    icon: 'pi pi-calendar',
+                                                    routerLink: ['/pages/calendrier_mecanicien']
+                                                },
+                                                {
+                                                    label: 'Liste des rendez-vous',
+                                                    icon: 'pi pi-book',
+                                                    routerLink: ['/pages/taches']
+                                                },
+                                            ]}]:[]),
+                                     // Ne pas inclure "Paramétrages" si l'utilisateur n'est pas admin
                     {
                         label: 'Not Found',
                         icon: 'pi pi-fw pi-exclamation-circle',

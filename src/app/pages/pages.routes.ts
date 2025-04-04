@@ -1,12 +1,16 @@
 import { Routes } from '@angular/router';
-import { Category } from "./crud/category";
-import { Service } from './crud/service';
-import { Produit } from './crud/produit';
-import { UtilisateurCrudComponent } from './crud/utilisateur';
-import { CalendarComponent } from './uikit/calendar';
 import { authGuard } from '../auth/auth.guard';
-import { StockManagement } from './crud/StockManagement';
 import { AvisClientComponent } from './crud/AvisClient';
+import { StockManagement } from './crud/StockManagement';
+import { Category } from "./crud/category";
+import { Produit } from './crud/produit';
+import { Service } from './crud/service';
+import { UtilisateurCrudComponent } from './crud/utilisateur';
+import { ClientRendezVousComponent } from './rendez_vous/client-rendez-vous/client-rendez-vous.component';
+import { ManagerRendezVousComponent } from './rendez_vous/manager-rendez-vous/manager-rendez-vous.component';
+import { MecanicienRendezVousComponent } from './rendez_vous/mecanicien-rendez-vous/mecanicien-rendez-vous.component';
+import { RDVManager } from './rendez_vous/rendez_vous_list/RDVManager';
+import { CalendarComponent } from './uikit/calendar';
 export default [
     { path: 'category', component: Category , canActivate: [authGuard], data: { profile: 'admin' }},
     { path: 'service', component: Service , canActivate: [authGuard], data: { profile: 'admin' }},
@@ -15,5 +19,10 @@ export default [
     { path: 'avis', component: AvisClientComponent , canActivate: [authGuard], data: { profile: 'admin' }},
     { path: 'calendrier', component: CalendarComponent },
     {path:'stock', canActivate: [authGuard], component:StockManagement},
-    { path: '**', redirectTo: '/notfound' }
+    { path: 'calendrier_manager', component:  ManagerRendezVousComponent,data:{profile:'admin'} },
+    { path: 'calendrier_client', component:  ClientRendezVousComponent,data:{profile:'client'} },
+    { path: 'calendrier_mecanicien', component:  MecanicienRendezVousComponent,data:{profile:'mecanicien'} },
+    { path: 'liste_rdv_manager', component:  RDVManager,data:{profile:'admin'} },
+    
+    { path: '**', redirectTo: '/notfound' },
 ] as Routes;

@@ -1,4 +1,4 @@
 export const environment = {
     production: false,
-    apiUrl: 'http://localhost:3000' // URL pour le développement
+    apiUrl: 'https://kd-back-mei7.onrender.com' // URL pour le développement
     };

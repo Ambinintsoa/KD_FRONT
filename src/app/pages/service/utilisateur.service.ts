@@ -34,13 +34,14 @@ export class UtilisateurService {
 
   constructor(private http: HttpClient) {}
 
-  getUtilisateurs(page: number = 1, limit: number = 10, search: string = '', sortBy: string = 'nom', orderBy: string = 'asc'): Observable<PaginatedResponse> {
+  getUtilisateurs(page: number = 1, limit: number = 10, search: string = '', sortBy: string = 'nom', orderBy: string = 'asc', filters:any): Observable<PaginatedResponse> {
     let params = new HttpParams()
       .set('page', page.toString())
       .set('limit', limit.toString())
       .set('search', search)
       .set('sortBy', sortBy)
-      .set('orderBy', orderBy);
+      .set('orderBy', orderBy)
+      .set('filters', filters);
     return this.http.get<PaginatedResponse>(this.apiUrl, { params });
   }
 

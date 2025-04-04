@@ -13,8 +13,10 @@ import { ManagerRendezVousComponent } from './rendez_vous/manager-rendez-vous/ma
 import { MecanicienRendezVousComponent } from './rendez_vous/mecanicien-rendez-vous/mecanicien-rendez-vous.component';
 import { RDVManager } from './rendez_vous/rendez_vous_list/RDVManager';
 import { CalendarComponent } from './uikit/calendar';
+import { Marque } from './crud/marque';
 export default [
     { path: 'category', component: Category , canActivate: [authGuard], data: { profile: 'admin' }},
+    { path: 'marque', component: Marque , canActivate: [authGuard], data: { profile: 'admin' }},
     { path: 'service', component: Service , canActivate: [authGuard], data: { profile: 'admin' }},
     { path: 'produit', component: Produit , canActivate: [authGuard], data: { profile: 'admin' }},
     { path: 'utilisateur', component: UtilisateurCrudComponent , canActivate: [authGuard], data: { profile: 'admin' }},

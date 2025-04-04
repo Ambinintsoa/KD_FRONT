@@ -11,6 +11,9 @@ export interface RestockRequest {
     requestedBy: string;
     createdAt: string | Date;
 }
+export interface CommentRequest {
+    _id: string;
+}
 
 @Injectable({
     providedIn: 'root'
@@ -55,7 +58,21 @@ export class NotificationService {
             };
         });
     }
+    onNewComment(): Observable<CommentRequest> {
+        return new Observable(observer => {
+            if (!this.isConnected) {
+                this.connect();
+            }
 
+            this.socket.on('newComment', (data: CommentRequest) => {
+                observer.next(data);
+            });
+
+            return () => {
+                this.socket.off('newComment');
+            };
+        });
+    }
     disconnect(): void {
         if (this.socket && this.isConnected) {
             this.socket.disconnect();

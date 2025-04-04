@@ -301,8 +301,8 @@ convert_to_tache(liste_service:{ service: string; nom_service: string, avec_prod
       next: (resultat: MarqueResponse) => {
         this.liste_marques = resultat.marques.map((marque) => {
           return {
-            label: marque.nom_marque,
-            value: marque._id
+            label: marque.nom_marque?? 'Aucune marque',
+            value: marque._id ?? '-1'
           };
         });
       }, error: (error) => {

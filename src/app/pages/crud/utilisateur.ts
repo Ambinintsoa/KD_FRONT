@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmationService, FilterMetadata, MessageService } from 'primeng/api';
 import { Table } from 'primeng/table';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -14,6 +14,8 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TableModule } from 'primeng/table';
 import { DropdownModule } from 'primeng/dropdown';
 import { UtilisateurObject, UtilisateurService, PaginatedResponse } from '../service/utilisateur.service';
+import { table } from 'console';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-utilisateur-crud',
@@ -56,8 +58,8 @@ import { UtilisateurObject, UtilisateurService, PaginatedResponse } from '../ser
       [showCurrentPageReport]="true"
       [rowsPerPageOptions]="[10, 20, 30]"
     >
-      <ng-template pTemplate="caption">
-        <div class="flex items-center justify-between">
+    <ng-template pTemplate="caption">
+    <div class="flex items-center justify-between">
           <h5 class="m-0">Gestion des Utilisateurs</h5>
           <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Recherche..." />
         </div>
@@ -68,7 +70,8 @@ import { UtilisateurObject, UtilisateurService, PaginatedResponse } from '../ser
           <th pSortableColumn="nom">Nom <p-sortIcon field="nom" /></th>
           <th pSortableColumn="prenom">Prénom <p-sortIcon field="prenom" /></th>
           <th pSortableColumn="email">Email <p-sortIcon field="email" /></th>
-          <th pSortableColumn="role">Rôle <p-sortIcon field="role" /></th>
+          <th pSortableColumn="role">Rôle <p-sortIcon field="role" />
+        </th>
           <th pSortableColumn="poste">Poste <p-sortIcon field="poste" /></th>
           <th pSortableColumn="genre">Genre <p-sortIcon field="genre" /></th>
           <th pSortableColumn="date_de_naissance">Date de naissance <p-sortIcon field="date_de_naissance" /></th>
@@ -187,6 +190,7 @@ export class UtilisateurCrudComponent implements OnInit {
   ];
 
   @ViewChild('dt') dt!: Table;
+representatives: any;
 
   constructor(
     private utilisateurService: UtilisateurService,
@@ -204,8 +208,8 @@ export class UtilisateurCrudComponent implements OnInit {
     const search = event.globalFilter || '';
     const sortBy = event.sortField || 'nom';
     const orderBy = event.sortOrder === 1 ? 'asc' : 'desc';
-
-    this.utilisateurService.getUtilisateurs(page, limit, search, sortBy, orderBy).subscribe({
+    const filters = event.filters;
+    this.utilisateurService.getUtilisateurs(page, limit, search, sortBy, orderBy, JSON.stringify(filters)).subscribe({
       next: (response: PaginatedResponse) => {
         this.utilisateurs = response.utilisateurs;
         this.totalItems = response.totalItems;
@@ -326,4 +330,6 @@ export class UtilisateurCrudComponent implements OnInit {
   onGlobalFilter(table: Table, event: Event) {
     table.filterGlobal((event.target as HTMLInputElement).value, 'contains');
   }
+
+
 }

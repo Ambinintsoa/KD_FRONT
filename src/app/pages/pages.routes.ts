@@ -3,6 +3,8 @@ import { authGuard } from '../auth/auth.guard';
 import { AvisClientComponent } from './crud/AvisClient';
 import { StockManagement } from './crud/StockManagement';
 import { Category } from "./crud/category";
+import { FactureComponent } from './crud/facture-list';
+import { FactureClientComponent } from './crud/facture-list-client';
 import { Produit } from './crud/produit';
 import { Service } from './crud/service';
 import { UtilisateurCrudComponent } from './crud/utilisateur';
@@ -17,6 +19,8 @@ export default [
     { path: 'produit', component: Produit , canActivate: [authGuard], data: { profile: 'admin' }},
     { path: 'utilisateur', component: UtilisateurCrudComponent , canActivate: [authGuard], data: { profile: 'admin' }},
     { path: 'avis', component: AvisClientComponent , canActivate: [authGuard], data: { profile: 'admin' }},
+    { path: 'facture', component: FactureComponent , canActivate: [authGuard], data: { profile: 'admin' }},
+    { path: 'factureClient', component: FactureClientComponent , canActivate: [authGuard]},
     { path: 'calendrier', component: CalendarComponent },
     {path:'stock', canActivate: [authGuard], component:StockManagement},
     { path: 'calendrier_manager', component:  ManagerRendezVousComponent,data:{profile:'admin'} },

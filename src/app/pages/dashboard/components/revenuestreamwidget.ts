@@ -1,70 +1,85 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ChartModule } from 'primeng/chart';
 import { debounceTime, Subscription } from 'rxjs';
 import { LayoutService } from '../../../layout/service/layout.service';
+import { GraphService } from '../../service/graph.service';
 
 @Component({
     standalone: true,
     selector: 'app-revenue-stream-widget',
     imports: [ChartModule],
     template: `<div class="card !mb-8">
-        <div class="font-semibold text-xl mb-4">Revenue de ce mois</div>
+        <div class="font-semibold text-xl mb-4">Revenus et paiements par mois ({{ currentYear }})</div>
         <p-chart type="bar" [data]="chartData" [options]="chartOptions" class="h-80" />
     </div>`
 })
-export class RevenueStreamWidget {
+export class RevenueStreamWidget implements OnInit, OnDestroy {
     chartData: any;
-
     chartOptions: any;
-
     subscription!: Subscription;
+    currentYear: number = new Date().getFullYear();
 
-    constructor(public layoutService: LayoutService) {
-        this.subscription = this.layoutService.configUpdate$.pipe(debounceTime(25)).subscribe(() => {
-            this.initChart();
-        });
+    constructor(
+        public layoutService: LayoutService,
+        private graphService: GraphService
+    ) {
+        this.subscription = this.layoutService.configUpdate$
+            .pipe(debounceTime(25))
+            .subscribe(() => this.initChart());
     }
 
     ngOnInit() {
-        this.initChart();
+        this.loadPaiementsData();
     }
 
-    initChart() {
+    loadPaiementsData() {
+        this.graphService.getPaiementsParMois().subscribe({
+            next: (response) => {
+                if (response.success) {
+                    this.initChart(response.data);
+                } else {
+                    this.initChart([]);
+                }
+            },
+            error: (err) => {
+                console.error('Erreur:', err);
+                this.initChart([]);
+            }
+        });
+    }
+
+    initChart(paiementData: any[] = []) {
         const documentStyle = getComputedStyle(document.documentElement);
         const textColor = documentStyle.getPropertyValue('--text-color');
         const borderColor = documentStyle.getPropertyValue('--surface-border');
         const textMutedColor = documentStyle.getPropertyValue('--text-color-secondary');
 
+        const labels = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Août', 'Sep', 'Oct', 'Nov', 'Déc'];
+        const montants = paiementData.map(data => data.totalMontant || 0);
+        const nombrePaiements = paiementData.map(data => data.nombrePaiements || 0);
+
         this.chartData = {
-            labels: ['SEMAINE1', 'SEMAINE2', 'SEMAINE3', 'SEMAINE4'],
+            labels: labels,
             datasets: [
                 {
                     type: 'bar',
-                    label: 'Moteur',
+                    label: 'Revenus mensuels (€)',
                     backgroundColor: documentStyle.getPropertyValue('--p-primary-400'),
-                    data: [4000, 10000, 15000, 4000],
-                    barThickness: 32
-                },
-                {
-                    type: 'bar',
-                    label: 'Carosserie',
-                    backgroundColor: documentStyle.getPropertyValue('--p-primary-300'),
-                    data: [2100, 8400, 2400, 7500],
-                    barThickness: 32
-                },
-                {
-                    type: 'bar',
-                    label: 'Pneus',
-                    backgroundColor: documentStyle.getPropertyValue('--p-primary-200'),
-                    data: [4100, 5200, 3400, 7400],
-                    borderRadius: {
-                        topLeft: 8,
-                        topRight: 8,
-                        bottomLeft: 0,
-                        bottomRight: 0
-                    },
+                    data: montants,
+                    barThickness: 32,
+                    borderRadius: { topLeft: 8, topRight: 8, bottomLeft: 0, bottomRight: 0 },
                     borderSkipped: false,
-                    barThickness: 32
+                    yAxisID: 'yMontant' // Associer à l'échelle des montants
+                },
+                {
+                    type: 'bar',
+                    label: 'Nombre de paiements',
+                    backgroundColor: documentStyle.getPropertyValue('--p-primary-200'),
+                    data: nombrePaiements,
+                    barThickness: 32,
+                    borderRadius: { topLeft: 8, topRight: 8, bottomLeft: 0, bottomRight: 0 },
+                    borderSkipped: false,
+                    yAxisID: 'yPaiements' // Associer à l'échelle des paiements
                 }
             ]
         };
@@ -74,31 +89,38 @@ export class RevenueStreamWidget {
             aspectRatio: 0.8,
             plugins: {
                 legend: {
-                    labels: {
-                        color: textColor
-                    }
+                    labels: { color: textColor }
                 }
             },
             scales: {
                 x: {
-                    stacked: true,
+                    ticks: { color: textMutedColor },
+                    grid: { color: 'transparent', borderColor: 'transparent' }
+                },
+                yMontant: { // Échelle pour les montants (à gauche)
+                    position: 'left',
                     ticks: {
-                        color: textMutedColor
+                        color: textMutedColor,
+                        callback: (value: number) => `${value} €`
                     },
-                    grid: {
-                        color: 'transparent',
-                        borderColor: 'transparent'
+                    grid: { color: borderColor, borderColor: 'transparent', drawTicks: false },
+                    title: {
+                        display: true,
+                        text: 'Montant (€)',
+                        color: textColor
                     }
                 },
-                y: {
-                    stacked: true,
+                yPaiements: { // Échelle pour le nombre de paiements (à droite)
+                    position: 'right',
                     ticks: {
-                        color: textMutedColor
+                        color: textMutedColor,
+                        stepSize: 1 // Pas de 1 pour les nombres entiers
                     },
-                    grid: {
-                        color: borderColor,
-                        borderColor: 'transparent',
-                        drawTicks: false
+                    grid: { display: false }, // Pas de grille pour cette échelle
+                    title: {
+                        display: true,
+                        text: 'Nb Paiements',
+                        color: textColor
                     }
                 }
             }

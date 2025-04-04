@@ -23,6 +23,7 @@ import { TagModule } from "primeng/tag";
 import { InputIconModule } from "primeng/inputicon";
 import { IconFieldModule } from "primeng/iconfield";
 import { ConfirmDialogModule } from "primeng/confirmdialog";
+import { ProduitService, Produit, UsageProduitService } from '../service/produit.service';
 import {
   Promotion,
   ServiceObject,
@@ -36,6 +37,8 @@ import {
   CategoryService,
 } from "../service/category.service ";
 import { FileUploadModule } from "primeng/fileupload";
+import { DropdownModule } from "primeng/dropdown";
+import { layoutConfig } from '../../layout/service/layout.service';
 interface Column {
   field: string;
   header: string;
@@ -70,6 +73,7 @@ interface ExportColumn {
     IconFieldModule,
     ConfirmDialogModule,
     FileUploadModule,
+    DropdownModule
   ],
   template: `
     <p-toolbar styleClass="mb-6">
@@ -397,6 +401,60 @@ interface ExportColumn {
     </li>
   </ul>
 </div>
+<!-- Section pour ajouter des produits -->
+<div class="mt-4">
+    <label class="block font-bold mb-3">Ajouter des produits utilisés</label>
+    
+    <div class="mb-4">
+        <label for="produit" class="block mb-1">Produit</label>
+        <p-dropdown
+            [options]="produits"
+            [(ngModel)]="selectedProduit"
+            optionLabel="nom_produit"
+            optionValue="_id"
+            placeholder="Sélectionner un produit"
+            class="w-full"
+        ></p-dropdown>
+    </div>
+
+    <div class="mb-4">
+        <label for="quantite" class="block mb-1">Quantité</label>
+        <input
+            type="number"
+            pInputText
+            id="quantite"
+            [(ngModel)]="quantiteProduit"
+            min="1"
+            class="w-full"
+        />
+    </div>
+
+    <button 
+        pButton 
+        type="button" 
+        label="Ajouter le produit" 
+        (click)="addProduitToService()"
+        class="mt-2"
+        [disabled]="!selectedProduit"
+    ></button>
+
+    <!-- Liste des produits utilisés -->
+    <div class="mt-4" *ngIf="produitsUtilises.length > 0">
+        <label class="block font-bold mb-3">Produits utilisés</label>
+        <ul>
+            <li *ngFor="let produitUtilise of produitsUtilises">
+                {{ produitUtilise.produit.nom_produit }} - Quantité: {{ produitUtilise.quantite }}
+                <button 
+                    pButton 
+                    type="button" 
+                    label="Supprimer" 
+                    (click)="removeProduitUtilise(produitUtilise)" 
+                    class="ml-2 p-button-danger"
+                ></button>
+            </li>
+        </ul>
+    </div>
+</div>
   </div>
         </div>
       </ng-template>
@@ -418,7 +476,7 @@ interface ExportColumn {
 
     <p-confirmdialog [style]="{ width: '450px' }" />
   `,
-  providers: [MessageService, ServiceService, ConfirmationService],
+  providers: [MessageService, ServiceService, ConfirmationService, ProduitService],
 })
 export class Service implements OnInit {
   promotion: Promotion = {
@@ -447,7 +505,10 @@ export class Service implements OnInit {
   search: string = "";
   sortBy: string = "nom_service";
   orderBy: string = "asc";
-
+  produits: Produit[] = [];
+  selectedProduit: string | null = null;
+  produitsUtilises: UsageProduitService[] = [];
+  quantiteProduit: number = 1;
   @ViewChild("dt") dt!: Table;
 
   exportColumns!: ExportColumn[];
@@ -459,7 +520,8 @@ export class Service implements OnInit {
     private messageService: MessageService,
     private confirmationService: ConfirmationService,
     private cdr: ChangeDetectorRef,
-    private categoryService: CategoryService
+    private categoryService: CategoryService,
+    private produitService: ProduitService
   ) {
     this.loadCategories();
     this.loadDataSubject
@@ -488,6 +550,7 @@ export class Service implements OnInit {
       this.sortBy,
       this.orderBy
     );
+    this.loadProduits();
   }
 
   getPromotionActive(product: any): any {
@@ -524,7 +587,6 @@ export class Service implements OnInit {
     // Si aucune erreur, ajouter au tableau
     if (Object.keys(this.errors).length === 0 ) {
       this.ServiceObject.promotions?.push({ ...this.promotion });
-      console.log(this.ServiceObject)
       this.resetPromotion(); // Réinitialiser les champs
     }
   }
@@ -586,15 +648,12 @@ resetPromotion() {
       orderBy,
     }).subscribe({
       next: (data: ServiceResponse) => {
-        console.log("Réponse complète du backend :", data);
         this.ServiceObjects = data.services || [];
         this.totalRecords = data.totalItems || 0;
         this.totalPages = data.totalPages || 0;
         this.page = data.currentPage || 1;
         this.first = (this.page - 1) * this.limit;
         this.cdr.detectChanges();
-        console.log("CategoryObjects après mise à jour :", this.ServiceObjects);
-        console.log("totalRecords après mise à jour :", this.totalRecords);
       },
       error: (err: Error) => {
         console.error("Erreur lors du chargement :", err);
@@ -610,7 +669,6 @@ resetPromotion() {
   loadCategories() {
     this.categoryService.getAllCategories().subscribe({
       next: (data: CategoryResponse) => {
-        console.log("Réponse complète du backend :", data);
         this.categories = data.categories || [];
       },
       error: (err: Error) => {
@@ -631,23 +689,6 @@ resetPromotion() {
     this.triggerLoadData();
   }
 
-  openNew() {
-    this.ServiceObject = {
-      nom_service: "", // Valeur par défaut
-      duree: 0, // Valeur par défaut
-      prix: 0, // Valeur par défaut
-      categorie: { _id: null },
-      promotions:[]
-    };
-    this.submitted = false;
-    this.productDialog = true;
-  }
-
-  editProduct(product: ServiceObject) {
-    console.log(product);
-    this.ServiceObject = { ...product };
-    this.productDialog = true;
-  }
 
   deleteSelectedProducts() {
     this.confirmationService.confirm({
@@ -787,7 +828,6 @@ resetPromotion() {
                 this.errors[error.field] = error.message;
               }
             );
-            console.log(this.errors);
           }
         },
       });
@@ -842,4 +882,90 @@ resetPromotion() {
        },
      });
    }
+   // Nouvelles méthodes
+   loadProduits() {
+    this.produitService.getAllProduits().subscribe({
+        next: (produits) => {
+            this.produits = produits;
+        },
+        error: (err) => {
+            this.messageService.add({
+                severity: 'error',
+                summary: 'Erreur',
+                detail: 'Échec du chargement des produits'
+            });
+        }
+    });
+}
+
+loadProduitsUtilises(serviceId: string) {
+    this.produitService.getProduitsByService(serviceId).subscribe({
+        next: (produitsUtilises) => {
+            this.produitsUtilises = produitsUtilises;
+        }
+    });
+}
+
+addProduitToService() {
+    if (!this.selectedProduit || !this.ServiceObject._id) return;
+    this.produitService.addProduitToService(
+        this.ServiceObject._id,
+        this.selectedProduit,
+        this.quantiteProduit
+    ).subscribe({
+        next: () => {
+            this.loadProduitsUtilises(this.ServiceObject._id!);
+            this.selectedProduit = null;
+            this.quantiteProduit = 1;
+            this.messageService.add({
+                severity: 'success',
+                summary: 'Succès',
+                detail: 'Produit ajouté au service'
+            });
+        },
+        error: (err) => {
+            this.messageService.add({
+                severity: 'error',
+                summary: 'Erreur',
+                detail: 'Échec de l\'ajout du produit'
+            });
+        }
+    });
+}
+
+removeProduitUtilise(produitUtilise: UsageProduitService) {
+    this.produitService.removeProduitFromService(
+        this.ServiceObject._id!,
+        produitUtilise.produit._id!
+    ).subscribe({
+        next: () => {
+            this.loadProduitsUtilises(this.ServiceObject._id!);
+            this.messageService.add({
+                severity: 'success',
+                summary: 'Succès',
+                detail: 'Produit retiré du service'
+            });
+        }
+    });
+}
+
+// Modifier openNew et editProduct pour charger les produits utilisés
+openNew() {
+    this.ServiceObject = {
+        nom_service: "",
+        duree: 0,
+        prix: 0,
+        categorie: { _id: null },
+        promotions: []
+    };
+    this.produitsUtilises = [];
+    this.submitted = false;
+    this.productDialog = true;
+}
+
+editProduct(product: ServiceObject) {
+    this.ServiceObject = { ...product };
+    this.loadProduitsUtilises(product._id!);
+    this.productDialog = true;
+}
 }

@@ -14,7 +14,6 @@ export const authGuard: CanActivateFn = (route, state) => {
   }
 
   const userProfile = authService.getUserProfile();
-  console.log(userProfile)
   if (requiredProfile && userProfile !== requiredProfile) {
     router.navigate(['/auth/access']); // Page pour accès non autorisé
     return false;

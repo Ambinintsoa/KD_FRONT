@@ -25,7 +25,6 @@ export class NotificationService {
         if (this.isConnected) return;
 
         const token = this.authService.getToken();
-        console.log('Token récupéré:', token);
         this.socket = io(environment.apiUrl, {
             withCredentials: true,
             auth: { token }
@@ -33,7 +32,6 @@ export class NotificationService {
 
         this.socket.on('connect', () => {
             this.isConnected = true;
-            console.log('Connecté au serveur Socket.IO avec SID:', this.socket.id);
         });
 
         this.socket.on('connect_error', (err) => {

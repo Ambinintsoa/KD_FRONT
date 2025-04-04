@@ -1,0 +1,37 @@
+::host ::ng-deep .fc {
+    background-color: white !important;
+}
+
+:host ::ng-deep .fc-view-container {
+    background-color: white !important;
+    margin: 20px;
+}
+
+.fc {
+    margin: 20px !important;
+    padding: 10px !important;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+    .fc-daygrid-day {
+        padding: 5px !important;
+    }
+
+    .fc-col-header-cell {
+        background-color: #f8f9fa;
+        color: #333;
+        font-weight: bold;
+    }
+
+    .fc-event {
+        background-color: #007bff !important;
+        color: white !important;
+        border: none !important;
+        border-radius: 5px;
+        padding: 5px;
+    }
+
+    .fc-event:hover {
+        background-color: #0056b3 !important;
+    }
+}

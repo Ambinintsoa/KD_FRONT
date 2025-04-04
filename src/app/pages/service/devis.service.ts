@@ -18,7 +18,6 @@ export class DevisService {
 
   getDevis(nouveau_devis: any): Observable<any> {
     const url = `${this.apiUrl}/`;
-    console.log("Calling API with:", nouveau_devis, "URL:", url);
   
     return this.http.post<any>(url, { "nouveau_devis": nouveau_devis }).pipe(
       tap((data: any) => console.log("Données brutes reçues de l'API :", data)),

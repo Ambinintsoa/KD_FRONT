@@ -324,18 +324,12 @@ export class Category implements OnInit {
       .getCategories({ page, limit, search, sortBy, orderBy })
       .subscribe({
         next: (data: CategoryResponse) => {
-          console.log("Réponse complète du backend :", data);
           this.CategoryObjects = data.categories || [];
           this.totalRecords = data.totalItems || 0;
           this.totalPages = data.totalPages || 0;
           this.page = data.currentPage || 1;
           this.first = (this.page - 1) * this.limit;
           this.cdr.detectChanges();
-          console.log(
-            "CategoryObjects après mise à jour :",
-            this.CategoryObjects
-          );
-          console.log("totalRecords après mise à jour :", this.totalRecords);
         },
         error: (err: Error) => {
           console.error("Erreur lors du chargement :", err);

@@ -73,7 +73,6 @@ export class AuthService {
     }
 
     logout(): void {
-        console.log("logout");
         this.cookieService.delete('access_token', '/');
         this.cookieService.delete('refresh_token', '/');
         this.currentUser.set(null);

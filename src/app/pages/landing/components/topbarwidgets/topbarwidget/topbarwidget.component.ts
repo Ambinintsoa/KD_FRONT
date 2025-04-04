@@ -71,7 +71,6 @@ export class TopbarwidgetComponent implements OnInit {
 
   //ajoute un service dans la liste
   addServices(service_value: string = '', nom_service: string = '', avec_produit: boolean = false) {
-      console.log(service_value);
       // const service = this.liste_services.find(value => value.service === service_value);
       
     if (!this.liste_services.some(value => value.nom_service === nom_service)) {
@@ -80,7 +79,6 @@ export class TopbarwidgetComponent implements OnInit {
   }
   reset_avec_produit(service_value: string) {
     const service = this.liste_services.find(value => value.service === service_value);
-    console.log(this.liste_services);
 
     if (service) {
       service.avec_produit = !service.avec_produit;

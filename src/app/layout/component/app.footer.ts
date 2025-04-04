@@ -37,7 +37,6 @@ export class AppFooter implements OnInit, OnDestroy {
         this.notificationService.connect();
         this.subscription = this.notificationService.onNewRestockRequest().subscribe(
             (request: RestockRequest) => {
-                console.log('Notification reçue dans AppFooter:', request);
                 this.requests = [request, ...this.requests];
 
                 const timeoutId = setTimeout(() => {

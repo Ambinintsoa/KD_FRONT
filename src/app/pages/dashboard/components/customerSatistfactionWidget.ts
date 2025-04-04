@@ -34,7 +34,6 @@ export class CustomerSatisfactionWidget implements OnInit, OnDestroy {
     loadScoreDistribution() {
         this.graphService.getAvis().subscribe({
             next: (response) => {
-                console.log('Données combinées reçues:', response);
                 if (response.success) {
                     this.initChart(response.data);
                 } else {

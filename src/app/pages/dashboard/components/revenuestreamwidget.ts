@@ -35,7 +35,6 @@ export class RevenueStreamWidget implements OnInit, OnDestroy {
     loadPaiementsData() {
         this.graphService.getPaiementsParMois().subscribe({
             next: (response) => {
-                console.log('Données reçues:', response);
                 if (response.success) {
                     this.initChart(response.data);
                 } else {

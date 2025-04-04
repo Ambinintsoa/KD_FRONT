@@ -587,7 +587,6 @@ export class Service implements OnInit {
     // Si aucune erreur, ajouter au tableau
     if (Object.keys(this.errors).length === 0 ) {
       this.ServiceObject.promotions?.push({ ...this.promotion });
-      console.log(this.ServiceObject)
       this.resetPromotion(); // Réinitialiser les champs
     }
   }
@@ -649,15 +648,12 @@ resetPromotion() {
       orderBy,
     }).subscribe({
       next: (data: ServiceResponse) => {
-        console.log("Réponse complète du backend :", data);
         this.ServiceObjects = data.services || [];
         this.totalRecords = data.totalItems || 0;
         this.totalPages = data.totalPages || 0;
         this.page = data.currentPage || 1;
         this.first = (this.page - 1) * this.limit;
         this.cdr.detectChanges();
-        console.log("CategoryObjects après mise à jour :", this.ServiceObjects);
-        console.log("totalRecords après mise à jour :", this.totalRecords);
       },
       error: (err: Error) => {
         console.error("Erreur lors du chargement :", err);
@@ -673,7 +669,6 @@ resetPromotion() {
   loadCategories() {
     this.categoryService.getAllCategories().subscribe({
       next: (data: CategoryResponse) => {
-        console.log("Réponse complète du backend :", data);
         this.categories = data.categories || [];
       },
       error: (err: Error) => {
@@ -833,7 +828,6 @@ resetPromotion() {
                 this.errors[error.field] = error.message;
               }
             );
-            console.log(this.errors);
           }
         },
       });
@@ -914,7 +908,6 @@ loadProduitsUtilises(serviceId: string) {
 
 addProduitToService() {
     if (!this.selectedProduit || !this.ServiceObject._id) return;
-console.log( this.selectedProduit)
     this.produitService.addProduitToService(
         this.ServiceObject._id,
         this.selectedProduit,

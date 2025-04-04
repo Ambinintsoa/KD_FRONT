@@ -369,7 +369,6 @@ export class Register {
       mot_de_passe: this.password,
     };
 
-    console.log("Inscription réussie :", registrationData);
     this.authService.register(registrationData).subscribe({
       next: () => {
         this.authService.login(this.email, this.password).subscribe({
@@ -398,7 +397,6 @@ export class Register {
               this.errors[error.field] = error.message;
             }
           );
-          console.log(this.errors);
         }
         const errorMessage =
           err.error?.error ||

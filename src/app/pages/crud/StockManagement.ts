@@ -188,8 +188,7 @@ interface StockEntry {
             icon="pi pi-trash" 
             severity="danger" 
             (onClick)="deleteReassort(request)" 
-            styleClass="p-button-sm" 
-            label="Supprimer">
+            styleClass="p-button-sm">
           </p-button>
           </tr>
         </ng-template>
@@ -228,8 +227,7 @@ interface StockEntry {
             icon="pi pi-trash" 
             severity="danger" 
             (onClick)="deleteStockEntry(entry)" 
-            styleClass="p-button-sm" 
-            label="Supprimer">
+            styleClass="p-button-sm" >
           </p-button>
         </td>
           </tr>
@@ -311,8 +309,6 @@ export class StockManagement implements OnInit {
     this.produitService.getProduits({ page, limit, search, sortBy, orderBy }).subscribe({
       next: (data: ProduitResponse) => {
         this.produits = data.produits || [];
-        console.log(data.produits)
-        console.log(this.produits)
         this.totalRecords = data.totalItems || 0;
         this.totalPages = data.totalPages || 0;
         this.page = data.currentPage || 1;

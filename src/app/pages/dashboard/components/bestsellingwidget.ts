@@ -65,7 +65,6 @@ export class BestSellingWidget implements OnInit {
     loadTopServices() {
         this.graphService.getTop10().subscribe({
             next: (response) => {
-                console.log('Données combinées reçues:', response);
                 if (response.success) {
                     this.topServices = response.data;
                 } else {

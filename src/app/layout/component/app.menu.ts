@@ -63,28 +63,34 @@ export class AppMenu {
                             items: [
                                 {
                                     label: 'Catégories',
-                                    icon: 'pi pi-fw pi-sign-in',
+                                    icon: 'pi pi-fw pi-objects-column',
                                     routerLink: ['/pages/category']
                                 },  {
                                     label: 'Services',
-                                    icon: 'pi pi-fw pi-sign-in',
+                                    icon: 'pi pi-fw pi-objects-column',
                                     routerLink: ['/pages/service']
                                 },
                                 {
                                     label: 'Produits',
-                                    icon: 'pi pi-fw pi-sign-in',
+                                    icon: 'pi pi-fw pi-objects-column',
                                     routerLink: ['/pages/produit']
                                 },
                                 {
                                     label: 'Avis Client',
-                                    icon: 'pi pi-fw pi-sign-in',
+                                    icon: 'pi pi-fw pi-objects-column',
                                     routerLink: ['/pages/avis']
                                 },
                                 {
                                     label: 'Utilisateurs',
-                                    icon: 'pi pi-fw pi-sign-in',
+                                    icon: 'pi pi-fw pi-objects-column',
                                     routerLink: ['/pages/utilisateur']
                                 },
+                                {
+                                    label: 'Factures',
+                                    icon: 'pi pi-fw pi-receipt',
+                                    routerLink: ['/pages/facture']
+                                },
+                               
                             ]
                         }
                     ] : []),  // Ne pas inclure "Paramétrages" si l'utilisateur n'est pas admin
@@ -92,7 +98,12 @@ export class AppMenu {
                         label: 'Calendrier',
                         icon: 'pi pi-fw pi-exclamation-circle',
                         routerLink: ['/pages/calendrier']
-                    }
+                    },
+                    {
+                        label: 'Factures Client',
+                        icon: 'pi pi-fw pi-receipt',
+                        routerLink: ['/pages/factureClient']
+                    },
                 ]
             }
         ];

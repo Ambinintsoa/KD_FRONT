@@ -7,12 +7,16 @@ import { CalendarComponent } from './uikit/calendar';
 import { authGuard } from '../auth/auth.guard';
 import { StockManagement } from './crud/StockManagement';
 import { AvisClientComponent } from './crud/AvisClient';
+import { FactureComponent } from './crud/facture-list';
+import { FactureClientComponent } from './crud/facture-list-client';
 export default [
     { path: 'category', component: Category , canActivate: [authGuard], data: { profile: 'admin' }},
     { path: 'service', component: Service , canActivate: [authGuard], data: { profile: 'admin' }},
     { path: 'produit', component: Produit , canActivate: [authGuard], data: { profile: 'admin' }},
     { path: 'utilisateur', component: UtilisateurCrudComponent , canActivate: [authGuard], data: { profile: 'admin' }},
     { path: 'avis', component: AvisClientComponent , canActivate: [authGuard], data: { profile: 'admin' }},
+    { path: 'facture', component: FactureComponent , canActivate: [authGuard], data: { profile: 'admin' }},
+    { path: 'factureClient', component: FactureClientComponent , canActivate: [authGuard]},
     { path: 'calendrier', component: CalendarComponent },
     {path:'stock', canActivate: [authGuard], component:StockManagement},
     { path: '**', redirectTo: '/notfound' }

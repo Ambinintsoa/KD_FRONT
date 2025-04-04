@@ -16,8 +16,8 @@ import { RendezVousService } from '../../service/rendez-vous-service.service'; /
 export class ClientRendezVousComponent implements OnInit {
 
   calendarOptions: CalendarOptions = {
-    // initialView: 'dayGridMonth',
-    initialView: 'timeGridWeek',
+    initialView: 'dayGridMonth',
+    // initialView: 'timeGridWeek',
     locale: frLocale,
     selectable: true,
     editable: true,

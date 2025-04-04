@@ -13,10 +13,10 @@ import { DropdownModule } from 'primeng/dropdown';
 @Component({
     selector: 'app-list-demo',
     standalone: true,
-    imports:  [CommonModule, DataViewModule, DropdownModule,FormsModule, SelectButtonModule, OrderListModule, TagModule, ButtonModule, DialogModule],
+    imports: [CommonModule, DataViewModule, DropdownModule, FormsModule, SelectButtonModule, OrderListModule, TagModule, ButtonModule, DialogModule],
     template: `<div class="flex flex-col">
     <div class="card">
-        <div class="font-semibold text-xl">Liste des services</div>
+        <div class="font-semibold text-xl">Liste des demandes de rendez vous</div>
         <p-dataview [value]="rdv_obj" [layout]="layout">
             <ng-template #header>
                 <div class="flex justify-end">
@@ -91,7 +91,8 @@ import { DropdownModule } from 'primeng/dropdown';
   }"
 >
   <h2 class="text-xl font-semibold text-center">Assigner un mécanicien</h2>
-
+  <p id="error_form"></p>
+   
   <!-- Champ Date -->
   <input 
     type="datetime-local" 
@@ -100,6 +101,7 @@ import { DropdownModule } from 'primeng/dropdown';
     [value]="default_date"
     placeholder="Choisir une date" 
   />
+  <p id="error_date_rendez_vous"></p>
 
   <!-- Dropdown Mécanicien -->
   <p-dropdown 
@@ -109,10 +111,10 @@ import { DropdownModule } from 'primeng/dropdown';
     placeholder="Sélectionner un mécanicien"
     class="w-full"
   ></p-dropdown>
-
+  <p id="error_mecanicien"></p>
   <!-- Boutons -->
   <div class="flex justify-center gap-4 mt-4">
-    <p-button label="Assigner" icon="pi pi-check" (click)="assignerRdv(date_inserer,id_mecanicien)"></p-button>
+    <p-button label="Assigner" icon="pi pi-check" (click)="assignerRdv()"></p-button>
     <p-button label="Annuler" icon="pi pi-times" class="p-button-secondary" (click)="closeModal('modal_form')"></p-button>
   </div>
 </div>
@@ -158,23 +160,23 @@ export class RDVManager implements OnInit {
 
     rdv_obj: any[] = [];
     liste_mecanicien: any[] = [];
-    id_mecanicien:any=null;
+    id_mecanicien: any = null;
     date_inserer: string = '';
     selectedMecanicien: any = null;
     modalVisible: boolean = false; // Contrôle l'affichage du modal
-    selected_rdv:any=null;
-    default_date:any=null;
-    confirm_modal:boolean=false;
-    reponse_modal:boolean=false;
+    selected_rdv: any = null;
+    default_date: any = null;
+    confirm_modal: boolean = false;
+    reponse_modal: boolean = false;
 
-    constructor(private rdvService: RendezVousService) {}
+    constructor(private rdvService: RendezVousService) { }
 
     ngOnInit() {
         this.rdvService.getRendezVousNonAssigné().subscribe(
             (data) => {
                 this.rdv_obj = data.rendezvous;
             },
-            (error:any) => {
+            (error: any) => {
                 console.error('Erreur de récupération des rendez-vous', error);
             }
         );
@@ -185,13 +187,24 @@ export class RDVManager implements OnInit {
         window.location.href = '/details_rdv?id=' + id_rdv;
     }
 
-    Assign(date_heure_debut: string, id_rdv: any) {
+    Assign(date_heure_debut: any, id_rdv: any) {
+        this.date_inserer = date_heure_debut;
+
         this.rdvService.getMecanicienDisponible(date_heure_debut).subscribe(
             (mecaniciens) => {
                 this.liste_mecanicien = mecaniciens;
                 console.log('Liste des mécaniciens disponibles:', this.liste_mecanicien);
             },
-            (error:any) => {
+            (error: any) => {
+                this.liste_mecanicien = [];
+                for (let message_error of error.error.errors) {
+                    let error_p = document.getElementById(`error_${message_error.field}`);
+
+                    if (error_p) {
+                        error_p.innerHTML = message_error.message;
+                        error_p.style.color = "red";
+                    }
+                }
                 console.error('Erreur lors de la récupération des mécaniciens:', error);
             }
         );
@@ -206,58 +219,76 @@ export class RDVManager implements OnInit {
         // );
 
         this.modalVisible = true; // Affiche le modal
-        this.selected_rdv=id_rdv;
-        this.default_date=date_heure_debut;
+        this.selected_rdv = id_rdv;
+        this.default_date = date_heure_debut;
     }
-    
-    
 
-    closeModal(modal_type:string) {
-        if(modal_type==="modal_form"){
+
+
+    closeModal(modal_type: string) {
+        if (modal_type === "modal_form") {
             this.modalVisible = false; // Ferme le modal
-            this.selected_rdv=null;
-            this.default_date=null;
+            this.selected_rdv = null;
+            this.default_date = null;
 
-        }else if(modal_type==="confirm_form"){
-            this.confirm_modal=false;
-            this.reponse_modal=false;
+        } else if (modal_type === "confirm_form") {
+            this.confirm_modal = false;
+            this.reponse_modal = false;
         }
-        
+        this.liste_mecanicien = [];
+
     }
 
-    assignerRdv(date_inserer: string, id_mecanicien: any) {
-        // Appelle la fonction de service pour assigner le rendez-vous
-        this.rdvService.assigner(date_inserer, this.selected_rdv, id_mecanicien).subscribe(
-            (response) => {
-                console.log('Rendez-vous assigné avec succès:', response);
-                this.closeModal('modal_form'); // Ferme le modal après l'assignation
-            },
-            (error:any) => {
-                console.error('Erreur lors de l\'assignation du rendez-vous:', error);
+    assignerRdv() {
+        if (this.date_inserer != null && this.selected_rdv != null && this.id_mecanicien != null) {
+            // Appelle la fonction de service pour assigner le rendez-vous
+            this.rdvService.assigner(this.date_inserer, this.selected_rdv, this.id_mecanicien).subscribe(
+                (response) => {
+                    console.log('Rendez-vous assigné avec succès:', response);
+                    this.closeModal('modal_form'); // Ferme le modal après l'assignation
+                    this.liste_mecanicien = [];
+                },
+                (error: any) => {
+                    this.liste_mecanicien = [];
+                    for (let message_error of error.error.errors) {
+                        let error_p = document.getElementById(`error_${message_error.field}`);
+                        if (error_p) {
+                            error_p.innerHTML = message_error.message;
+                            error_p.style.color = "red";
+                        }
+                    }
+                    console.error('Erreur lors de l\'assignation du rendez-vous:', error);
+                }
+            );
+        } else {
+            let error_p = document.getElementById('error_form');
+            if (error_p) {
+                error_p.innerHTML = "Veuillez remplir tous les champs";
+                error_p.style.color = "red";
             }
-        );
-    }
-    setModalConfirmation(){
-        this.confirm_modal=true;
+        }
+    }        
+    setModalConfirmation() {
+        this.confirm_modal = true;
     }
     id_rdv_temporaire: any = null; // Pour garder en mémoire
 
-Remove(id_rdv: any): void {
-    this.id_rdv_temporaire = id_rdv;
-    console.log(id_rdv,"heyyyyy");
-    this.setModalConfirmation(); // Ouvre le modal
-}
-
-setReponseConfirmation(confirme: boolean) {
-    if (confirme && this.id_rdv_temporaire) {
-        console.log(confirme);
-
-        this.rdvService.updateStatut(this.id_rdv_temporaire, 2);
-        this.rdv_obj = this.rdv_obj.filter(item => item._id !== this.id_rdv_temporaire);
+    Remove(id_rdv: any): void {
+        this.id_rdv_temporaire = id_rdv;
+        console.log(id_rdv, "heyyyyy");
+        this.setModalConfirmation(); // Ouvre le modal
     }
 
-    this.closeModal('confirm_form');
-    this.id_rdv_temporaire = null; // Nettoyer
-}
+    setReponseConfirmation(confirme: boolean) {
+        if (confirme && this.id_rdv_temporaire) {
+            console.log(confirme);
+
+            this.rdvService.updateStatut(this.id_rdv_temporaire, 2);
+            this.rdv_obj = this.rdv_obj.filter(item => item._id !== this.id_rdv_temporaire);
+        }
+
+        this.closeModal('confirm_form');
+        this.id_rdv_temporaire = null; // Nettoyer
+    }
 
 }

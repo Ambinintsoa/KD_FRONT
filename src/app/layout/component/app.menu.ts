@@ -94,10 +94,7 @@ export class AppMenu {
                                 },
                                
                             ]
-                        }
-                    ] : []),
-                     ...( isAdmin? [
-                        {
+                        }, {
                             label: 'Rendez vous',
                             icon: 'pi pi-fw pi-clock',
                             items:[
@@ -116,7 +113,9 @@ export class AppMenu {
                                     icon: 'pi pi-book',
                                     routerLink: ['/pages/taches']
                                 },
-                            ]}]:[]), 
+                            ]}
+                    ] : []),
+                     
                             ...( isClient? [
                                 {
                                     label: 'Rendez vous',

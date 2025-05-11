@@ -37,21 +37,16 @@ export class AppMenu {
             },
         ] : []),
             {
-                label: 'UI Components',
-                items: [
-                    { label: 'Espace client', icon: 'pi pi-fw pi-list', routerLink: ['/uikit/list'] },
-                ]
-            },
-            {
                 label: 'Pages',
                 icon: 'pi pi-fw pi-briefcase',
                 routerLink: ['/pages'],
                 items: [
+                    ...(!isPersonal ? [ 
                     {
                         label: 'Landing',
                         icon: 'pi pi-fw pi-globe',
                         routerLink: ['/landing']
-                    },
+                    }]:[]),
                     ...(isPersonal ? [  {
                         label: 'Stock',
                         icon: 'pi pi-fw pi-cog',
@@ -67,7 +62,13 @@ export class AppMenu {
                                     label: 'Catégories',
                                     icon: 'pi pi-fw pi-objects-column',
                                     routerLink: ['/pages/category']
-                                },  {
+                                },
+                                {
+                                    label: 'Marques',
+                                    icon: 'pi pi-fw pi-objects-column',
+                                    routerLink: ['/pages/marque']
+                                },
+                                  {
                                     label: 'Services',
                                     icon: 'pi pi-fw pi-objects-column',
                                     routerLink: ['/pages/service']

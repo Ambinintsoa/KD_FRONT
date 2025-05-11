@@ -1,9 +1,9 @@
-import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { MenuItem } from 'primeng/api';
-import { AppMenuitem } from './app.menuitem';
 import { AuthService } from '../../auth/auth.service'; // Assurez-vous d'avoir ce service d'authentification
+import { AppMenuitem } from './app.menuitem';
 
 @Component({
     selector: 'app-menu',
@@ -25,6 +25,8 @@ export class AppMenu {
         // Vérification du rôle admin
         const isAdmin = this.authService.isAdmin(); // Cette méthode retournera true si l'utilisateur est un admin
         const isPersonal = this.authService.isPersonal(); // Cette méthode retournera true si l'utilisateur est un admin
+        const isMecanicien =this.authService.isMecanicien();
+        const isClient =this.authService.isClient();
 
         // Définition du modèle du menu
         this.model = [
@@ -35,21 +37,16 @@ export class AppMenu {
             },
         ] : []),
             {
-                label: 'UI Components',
-                items: [
-                    { label: 'Espace client', icon: 'pi pi-fw pi-list', routerLink: ['/uikit/list'] },
-                ]
-            },
-            {
                 label: 'Pages',
                 icon: 'pi pi-fw pi-briefcase',
                 routerLink: ['/pages'],
                 items: [
+                    ...(!isPersonal ? [ 
                     {
                         label: 'Landing',
                         icon: 'pi pi-fw pi-globe',
                         routerLink: ['/landing']
-                    },
+                    }]:[]),
                     ...(isPersonal ? [  {
                         label: 'Stock',
                         icon: 'pi pi-fw pi-cog',
@@ -63,41 +60,106 @@ export class AppMenu {
                             items: [
                                 {
                                     label: 'Catégories',
-                                    icon: 'pi pi-fw pi-sign-in',
+                                    icon: 'pi pi-fw pi-objects-column',
                                     routerLink: ['/pages/category']
-                                },  {
+                                },
+                                {
+                                    label: 'Marques',
+                                    icon: 'pi pi-fw pi-objects-column',
+                                    routerLink: ['/pages/marque']
+                                },
+                                  {
                                     label: 'Services',
-                                    icon: 'pi pi-fw pi-sign-in',
+                                    icon: 'pi pi-fw pi-objects-column',
                                     routerLink: ['/pages/service']
                                 },
                                 {
                                     label: 'Produits',
-                                    icon: 'pi pi-fw pi-sign-in',
+                                    icon: 'pi pi-fw pi-objects-column',
                                     routerLink: ['/pages/produit']
                                 },
                                 {
                                     label: 'Avis Client',
-                                    icon: 'pi pi-fw pi-sign-in',
+                                    icon: 'pi pi-fw pi-objects-column',
                                     routerLink: ['/pages/avis']
                                 },
                                 {
                                     label: 'Utilisateurs',
-                                    icon: 'pi pi-fw pi-sign-in',
+                                    icon: 'pi pi-fw pi-objects-column',
                                     routerLink: ['/pages/utilisateur']
                                 },
+                                {
+                                    label: 'Factures',
+                                    icon: 'pi pi-fw pi-receipt',
+                                    routerLink: ['/pages/facture']
+                                },
+                               
                             ]
-                        }
-                    ] : []),  // Ne pas inclure "Paramétrages" si l'utilisateur n'est pas admin
-                    {
-                        label: 'Not Found',
-                        icon: 'pi pi-fw pi-exclamation-circle',
-                        routerLink: ['/pages/notfound']
-                    },
+                        }, {
+                            label: 'Rendez vous',
+                            icon: 'pi pi-fw pi-clock',
+                            items:[
+                                {
+                                    label: 'Vue sur les rendez Vous',
+                                    icon: 'pi pi-calendar',
+                                    routerLink: ['/pages/calendrier_manager']
+                                },
+                                {
+                                    label: 'Demande de rendez Vous',
+                                    icon: 'pi pi-bell',
+                                    routerLink: ['/pages/liste_rdv_manager']
+                                },
+                                {
+                                    label: 'Historique de services',
+                                    icon: 'pi pi-book',
+                                    routerLink: ['/pages/taches']
+                                },
+                            ]}
+                    ] : []),
+                     
+                            ...( isClient? [
+                                {
+                                    label: 'Rendez vous',
+                                    icon: 'pi pi-fw pi-clock',
+                                    items:[
+                                        {
+                                            label: 'Liste des rendez Vous',
+                                            icon: 'pi pi-calendar',
+                                            routerLink: ['/pages/calendrier_client']
+                                        },
+                                        {
+                                            label: 'Historique de services',
+                                            icon: 'pi pi-book',
+                                            routerLink: ['/pages/taches']
+                                        },
+                                    ]}]:[]),
+                                    ...( isMecanicien? [
+                                        {
+                                            label: 'Rendez vous',
+                                            icon: 'pi pi-fw pi-clock',
+                                            items:[
+                                                {
+                                                    label: 'Emploi du temps',
+                                                    icon: 'pi pi-calendar',
+                                                    routerLink: ['/pages/calendrier_mecanicien']
+                                                },
+                                                {
+                                                    label: 'Liste des rendez-vous',
+                                                    icon: 'pi pi-book',
+                                                    routerLink: ['/pages/taches']
+                                                },
+                                            ]}]:[]),
+                                     // Ne pas inclure "Paramétrages" si l'utilisateur n'est pas admin
                     {
                         label: 'Calendrier',
                         icon: 'pi pi-fw pi-exclamation-circle',
                         routerLink: ['/pages/calendrier']
-                    }
+                    },
+                    {
+                        label: 'Factures Client',
+                        icon: 'pi pi-fw pi-receipt',
+                        routerLink: ['/pages/factureClient']
+                    },
                 ]
             }
         ];

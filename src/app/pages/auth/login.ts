@@ -143,7 +143,7 @@ export class Login {
   ) {}
   login(): void {
     this.authService.login(this.email, this.password).subscribe({
-        next: () => this.router.navigate(['/']),
+        next: () => this.router.navigate(['/pages/calendrier_client']),
         error: (err) => {
             const errorMessage = err.error?.error || 'Une erreur est survenue lors de la connexion.';
             Swal.fire({

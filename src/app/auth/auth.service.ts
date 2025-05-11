@@ -1,11 +1,11 @@
-import { inject, Injectable, signal } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, tap, catchError, throwError } from 'rxjs';
-import { User } from '../models/user';
-import { environment } from '../../environments/environment';
-import { CookieService } from 'ngx-cookie-service';
+import { Injectable, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
+import { CookieService } from 'ngx-cookie-service';
+import { Observable, catchError, tap, throwError } from 'rxjs';
+import { environment } from '../../environments/environment';
 import { CreateUser } from '../models/CreateUser';
+import { User } from '../models/user';
 
 @Injectable({
     providedIn: 'root'
@@ -73,7 +73,6 @@ export class AuthService {
     }
 
     logout(): void {
-        console.log("logout");
         this.cookieService.delete('access_token', '/');
         this.cookieService.delete('refresh_token', '/');
         this.currentUser.set(null);
@@ -172,5 +171,11 @@ export class AuthService {
       }
       isPersonal():boolean{
         return this.getUserProfile() === 'admin' || this.getUserProfile()== 'mecanicien';
+      }
+      isMecanicien():boolean{
+        return this.getUserProfile()== 'mecanicien';
+      }
+      isClient():boolean{
+        return this.getUserProfile()== 'client';
       }
 }

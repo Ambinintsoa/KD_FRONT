@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RestockRequest } from '../service/notification.service';
 
 @Component({
-    selector: 'app-admin-notifications',
+    selector: 'app-reassort-notifications',
     standalone: true,
     imports: [CommonModule],
     template: `
@@ -30,6 +30,6 @@ import { RestockRequest } from '../service/notification.service';
         </div>
     `
 })
-export class AdminNotificationsComponent {
+export class ReassortNotificationsComponent {
     @Input() requests: RestockRequest[] = [];
 }

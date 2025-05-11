@@ -48,7 +48,6 @@ export class TopExpensiveProductsWidget implements OnInit {
     loadTopExpensiveProducts() {
         this.graphService.getExpesiveProduct().subscribe({
             next: (response) => {
-                console.log('Données combinées reçues:', response);
                 if (response.success) {
                     this.products = response.data;
                 } else {

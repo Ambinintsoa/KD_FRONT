@@ -71,7 +71,6 @@ export class TopbarwidgetComponent implements OnInit {
 
   //ajoute un service dans la liste
   addServices(service_value: string = '', nom_service: string = '', avec_produit: boolean = false) {
-      console.log(service_value);
       // const service = this.liste_services.find(value => value.service === service_value);
       
     if (!this.liste_services.some(value => value.nom_service === nom_service)) {
@@ -80,7 +79,6 @@ export class TopbarwidgetComponent implements OnInit {
   }
   reset_avec_produit(service_value: string) {
     const service = this.liste_services.find(value => value.service === service_value);
-    console.log(this.liste_services);
 
     if (service) {
       service.avec_produit = !service.avec_produit;
@@ -202,8 +200,7 @@ RendezVousForm(){
   // RedirectCommand();
 
   //TODO : redirect to login s'il y a pas de token
-  // conserver les données des devis => facture
-  //                                => rendez-vous
+                              
   //TODO : rhf mi-cocher tache => si existe produit => miala stock 
   localStorage.setItem("devis_objet",JSON.stringify(this.devis_object));
   localStorage.setItem("liste_service",JSON.stringify(this.liste_services));
@@ -229,6 +226,7 @@ convert_to_tache(liste_service:{ service: string; nom_service: string, avec_prod
   async SaveRendezVous() {
     try {
         let liste_service = JSON.parse(localStorage.getItem("liste_service") || "[]");
+        let devis_object = JSON.parse(localStorage.getItem("devis_objet") || "[]");
         let voiture = JSON.parse(localStorage.getItem("voiture") || "{}");
 
         if (!liste_service || liste_service.length === 0) {
@@ -239,10 +237,11 @@ convert_to_tache(liste_service:{ service: string; nom_service: string, avec_prod
         let liste_tache = this.convert_to_tache(liste_service);
 
         // Subscribe to the observable
-        this.rendez_vous_service.sendRendezVousRequest(liste_tache, this.date_rendez_vous, voiture)
+        this.rendez_vous_service.sendRendezVousRequest(liste_tache, this.date_rendez_vous, voiture,devis_object)
             .subscribe({
                 next: (response) => {
-                    console.log("Rendez-vous envoyé avec succès :", response);
+                    alert("Rendez-vous envoyé avec succès");
+                    window.location.href="/landing";
                 },
                 error: (error) => {
                     console.error("Erreur lors de l'envoi du rendez-vous :", error);
@@ -302,8 +301,8 @@ convert_to_tache(liste_service:{ service: string; nom_service: string, avec_prod
       next: (resultat: MarqueResponse) => {
         this.liste_marques = resultat.marques.map((marque) => {
           return {
-            label: marque.nom_marque,
-            value: marque._id
+            label: marque.nom_marque?? 'Aucune marque',
+            value: marque._id ?? '-1'
           };
         });
       }, error: (error) => {

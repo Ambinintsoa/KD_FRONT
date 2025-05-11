@@ -74,7 +74,6 @@ export class StatsWidget implements OnInit {
     loadStats() {
         this.graphService.getStat().subscribe({
             next: (response) => {
-                console.log('Données combinées reçues:', response);
                 if (response.success) {
                     this.totalPaiements = response.data.totalMontant;
                     this.totalChiffreAffaire = response.data.totalChiffreAffaire;
@@ -87,7 +86,6 @@ export class StatsWidget implements OnInit {
                 }
             },
             error: (err) => {
-                console.error('Erreur lors du chargement des stats:', err);
                 this.totalPaiements = 0;
                 this.totalRendezVous = 0;
                 this.totalStockValue = 0;

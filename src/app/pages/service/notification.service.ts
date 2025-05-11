@@ -11,6 +11,9 @@ export interface RestockRequest {
     requestedBy: string;
     createdAt: string | Date;
 }
+export interface CommentRequest {
+    _id: string;
+}
 
 @Injectable({
     providedIn: 'root'
@@ -25,7 +28,6 @@ export class NotificationService {
         if (this.isConnected) return;
 
         const token = this.authService.getToken();
-        console.log('Token récupéré:', token);
         this.socket = io(environment.apiUrl, {
             withCredentials: true,
             auth: { token }
@@ -33,7 +35,6 @@ export class NotificationService {
 
         this.socket.on('connect', () => {
             this.isConnected = true;
-            console.log('Connecté au serveur Socket.IO avec SID:', this.socket.id);
         });
 
         this.socket.on('connect_error', (err) => {
@@ -57,7 +58,21 @@ export class NotificationService {
             };
         });
     }
+    onNewComment(): Observable<CommentRequest> {
+        return new Observable(observer => {
+            if (!this.isConnected) {
+                this.connect();
+            }
 
+            this.socket.on('newComment', (data: CommentRequest) => {
+                observer.next(data);
+            });
+
+            return () => {
+                this.socket.off('newComment');
+            };
+        });
+    }
     disconnect(): void {
         if (this.socket && this.isConnected) {
             this.socket.disconnect();

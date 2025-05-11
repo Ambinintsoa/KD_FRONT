@@ -233,15 +233,12 @@ private loadDataSubject = new Subject<ListParams>();
   loadDemoData(page: number, limit: number, search: string, sortBy: string, orderBy: string) {
     this.ProduitService.getProduits({ page, limit, search, sortBy, orderBy }).subscribe({
       next: (data: ProduitResponse) => {
-        console.log("Réponse complète du backend :", data);
         this.ProduitObjects = data.produits || [];
         this.totalRecords = data.totalItems || 0;
         this.totalPages = data.totalPages || 0;
         this.page = data.currentPage || 1;
         this.first = (this.page - 1) * this.limit;
         this.cdr.detectChanges();
-        console.log("Produit après mise à jour :", this.ProduitObjects);
-        console.log("totalRecords après mise à jour :", this.totalRecords);
       },
       error: (err: Error) => {
         console.error("Erreur lors du chargement :", err);

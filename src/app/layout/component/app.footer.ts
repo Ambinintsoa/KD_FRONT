@@ -1,9 +1,11 @@
+
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { AdminNotificationsComponent } from "../../pages/crud/AdminNotificationsComponent";
+import { ReassortNotificationsComponent } from "../../pages/crud/ReassortNotificationsComponent copy";
+import { CommentNotificationsComponent } from '../../pages/crud/CommentNotificationsComponent';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../auth/auth.service';
 import { Subscription } from 'rxjs';
-import { NotificationService, RestockRequest } from '../../pages/service/notification.service';
+import { CommentRequest, NotificationService, RestockRequest } from '../../pages/service/notification.service';
 
 @Component({
     standalone: true,
@@ -16,15 +18,20 @@ import { NotificationService, RestockRequest } from '../../pages/service/notific
                 RANAIVOZAFY Fy Andrianina - RANDRIAMBOLOLONA Ambinintsoa Isabelle
             </a>
         </div>
-        <app-admin-notifications 
+        <app-reassort-notifications 
             *ngIf="authService.getCurrentUser()()?.role === 'admin'"
             [requests]="requests">
-        </app-admin-notifications>
+        </app-reassort-notifications>
+        <app-comment-notifications 
+            *ngIf="authService.getCurrentUser()()?.role === 'admin'"
+            [requests]="commentRequests">
+        </app-comment-notifications>
     `,
-    imports: [AdminNotificationsComponent, CommonModule]
+    imports: [ReassortNotificationsComponent,CommentNotificationsComponent, CommonModule]
 })
 export class AppFooter implements OnInit, OnDestroy {
     requests: RestockRequest[] = [];
+    commentRequests: CommentRequest[] = [];
     private subscription: Subscription | undefined;
     private timeouts: { [key: string]: NodeJS.Timeout } = {};
 
@@ -37,14 +44,27 @@ export class AppFooter implements OnInit, OnDestroy {
         this.notificationService.connect();
         this.subscription = this.notificationService.onNewRestockRequest().subscribe(
             (request: RestockRequest) => {
-                console.log('Notification reçue dans AppFooter:', request);
                 this.requests = [request, ...this.requests];
 
                 const timeoutId = setTimeout(() => {
                     this.removeNotification(request._id);
-                }, 8000); 
+                }, 8000);
 
                 this.timeouts[request._id] = timeoutId;
+            },
+            (error) => {
+                console.error('Erreur dans la souscription:', error);
+            }
+        );
+        this.subscription = this.notificationService.onNewComment().subscribe(
+            (commentRequest: CommentRequest) => {
+                this.commentRequests = [commentRequest, ...this.commentRequests];
+
+                const timeoutId = setTimeout(() => {
+                    this.removeNotification(commentRequest._id);
+                }, 8000);
+
+                this.timeouts[commentRequest._id] = timeoutId;
             },
             (error) => {
                 console.error('Erreur dans la souscription:', error);

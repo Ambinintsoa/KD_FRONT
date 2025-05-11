@@ -18,15 +18,11 @@ import { TagModule } from "primeng/tag";
 import { InputIconModule } from "primeng/inputicon";
 import { IconFieldModule } from "primeng/iconfield";
 import { ConfirmDialogModule } from "primeng/confirmdialog";
-import {
-  CategoryObject,
-  CategoryResponse,
-  CategoryService,
-} from "../service/category.service ";
 import { ListParams } from "../service/Params";
 import { debounceTime, distinctUntilChanged } from "rxjs/operators";
 import { Subject } from "rxjs";
 import { FileUploadModule } from "primeng/fileupload";
+import { MarqueObject, MarqueResponse, MarqueService } from '../service/marque.service';
 
 @Component({
   selector: "app-crud",
@@ -105,12 +101,12 @@ import { FileUploadModule } from "primeng/fileupload";
 
     <p-table
       #dt
-      [value]="CategoryObjects"
+      [value]="MarqueObjects"
       [columns]="cols"
       [lazy]="true"
       [paginator]="true"
       [totalRecords]="totalRecords"
-      [globalFilterFields]="['nom_categorie']"
+      [globalFilterFields]="['nom_marque']"
       [tableStyle]="{ 'min-width': '75rem' }"
       [(selection)]="selectedProducts"
       [rowHover]="true"
@@ -142,8 +138,8 @@ import { FileUploadModule } from "primeng/fileupload";
       <ng-template #header>
         <tr>
           <th style="width: 3rem"><p-tableHeaderCheckbox /></th>
-          <th pSortableColumn="nom_categorie" style="min-width:16rem">
-            Catégorie <p-sortIcon field="nom_categorie" />
+          <th pSortableColumn="nom_marque" style="min-width:16rem">
+            Catégorie <p-sortIcon field="nom_marque" />
           </th>
           <th style="min-width: 12rem"></th>
         </tr>
@@ -151,7 +147,7 @@ import { FileUploadModule } from "primeng/fileupload";
       <ng-template #body let-product>
         <tr>
           <td style="width: 3rem"><p-tableCheckbox [value]="product" /></td>
-          <td style="min-width: 16rem">{{ product.nom_categorie }}</td>
+          <td style="min-width: 16rem">{{ product.nom_marque }}</td>
           <td>
             <p-button
               icon="pi pi-pencil"
@@ -181,24 +177,24 @@ import { FileUploadModule } from "primeng/fileupload";
         <div class="flex flex-col gap-6">
           <div>
             <label for="name" class="block font-bold mb-3"
-              >Nom de la catégorie</label
+              >Nom de la Marque</label
             >
             <input
               type="text"
               pInputText
               id="name"
-              [(ngModel)]="CategoryObject.nom_categorie"
+              [(ngModel)]="MarqueObject.nom_marque"
               required
               autofocus
               fluid
             />
             <small
               class="text-red-500"
-              *ngIf="submitted && !CategoryObject.nom_categorie"
+              *ngIf="submitted && !MarqueObject.nom_marque"
               >Nom est requis.</small
             >
-            <small class="text-red-500" *ngIf="errors?.nom_categorie">
-              {{ errors.nom_categorie }}
+            <small class="text-red-500" *ngIf="errors?.nom_marque">
+              {{ errors.nom_marque }}
             </small>
           </div>
         </div>
@@ -219,9 +215,9 @@ import { FileUploadModule } from "primeng/fileupload";
     </p-dialog>
     <p-confirmdialog [style]="{ width: '450px' }" />
   `,
-  providers: [MessageService, CategoryService, ConfirmationService],
+  providers: [MessageService, MarqueService, ConfirmationService],
 })
-export class Category implements OnInit {
+export class Marque implements OnInit {
   errors: any = {};
   totalRecords: number = 0;
   totalPages: number = 0;
@@ -229,12 +225,12 @@ export class Category implements OnInit {
   limit: number = 10;
   first: number = 0;
   search: string = "";
-  sortBy: string = "nom_categorie";
+  sortBy: string = "nom_marque";
   orderBy: string = "asc";
   productDialog: boolean = false;
-  CategoryObjects: CategoryObject[] = [];
-  CategoryObject!: CategoryObject;
-  selectedProducts!: CategoryObject[] | null;
+  MarqueObjects: MarqueObject[] = [];
+  MarqueObject!: MarqueObject;
+  selectedProducts!: MarqueObject[] | null;
   submitted: boolean = false;
 
   @ViewChild("dt") dt!: Table;
@@ -245,7 +241,7 @@ export class Category implements OnInit {
   private loadDataSubject = new Subject<ListParams>();
 
   constructor(
-    private categoryService: CategoryService,
+    private marqueService: MarqueService,
     private messageService: MessageService,
     private confirmationService: ConfirmationService,
     private cdr: ChangeDetectorRef
@@ -264,7 +260,7 @@ export class Category implements OnInit {
   }
 
   ngOnInit() {
-    this.cols = [{ field: "nom_categorie", header: "Nom" }];
+    this.cols = [{ field: "nom_marque*", header: "Nom" }];
     this.exportColumns = this.cols.map((col) => ({
       title: col.header,
       dataKey: col.field,
@@ -320,11 +316,11 @@ export class Category implements OnInit {
     sortBy: string,
     orderBy: string
   ) {
-    this.categoryService
-      .getCategories({ page, limit, search, sortBy, orderBy })
+    this.marqueService
+      .getMarques({ page, limit, search, sortBy, orderBy })
       .subscribe({
-        next: (data: CategoryResponse) => {
-          this.CategoryObjects = data.categories || [];
+        next: (data: MarqueResponse) => {
+          this.MarqueObjects = data.marques || [];
           this.totalRecords = data.totalItems || 0;
           this.totalPages = data.totalPages || 0;
           this.page = data.currentPage || 1;
@@ -344,19 +340,19 @@ export class Category implements OnInit {
   }
 
   openNew() {
-    this.CategoryObject = {};
+    this.MarqueObject = {};
     this.submitted = false;
     this.productDialog = true;
   }
 
-  editProduct(product: CategoryObject) {
-    this.CategoryObject = { ...product };
+  editProduct(product: MarqueObject) {
+    this.MarqueObject = { ...product };
     this.productDialog = true;
   }
 
   deleteSelectedProducts() {
     this.confirmationService.confirm({
-      message: "Êtes-vous sûr de vouloir supprimer ces catégories ?",
+      message: "Êtes-vous sûr de vouloir supprimer ces marques ?",
       header: "Confirmer",
       icon: "pi pi-exclamation-triangle",
       accept: () => {
@@ -364,15 +360,15 @@ export class Category implements OnInit {
           this.selectedProducts
             ?.filter((cat) => !!cat._id)
             .map((cat) => String(cat._id)) ?? [];
-        this.categoryService.deleteCategorie(ids).subscribe({
+        this.marqueService.deleteMarque(ids).subscribe({
           next: () => {
-            this.CategoryObjects = this.CategoryObjects.filter(
+            this.MarqueObjects = this.MarqueObjects.filter(
               (val) => !this.selectedProducts?.includes(val)
             );
             this.messageService.add({
               severity: "success",
               summary: "Succès",
-              detail: "Catégorie supprimée",
+              detail: "Marque supprimée",
               life: 3000,
             });
             this.triggerLoadData();
@@ -387,7 +383,7 @@ export class Category implements OnInit {
             });
           },
         });
-        this.CategoryObject = {};
+        this.MarqueObject = {};
       },
     });
   }
@@ -398,16 +394,16 @@ export class Category implements OnInit {
     this.errors = {};
   }
 
-  deleteProduct(product: CategoryObject) {
+  deleteProduct(product: MarqueObject) {
     this.confirmationService.confirm({
       message:
-        "Êtes-vous sûr de vouloir supprimer " + product.nom_categorie + " ?",
+        "Êtes-vous sûr de vouloir supprimer " + product.nom_marque + " ?",
       header: "Confirmer",
       icon: "pi pi-exclamation-triangle",
       accept: () => {
-        this.categoryService.deleteCategorie([product._id || ""]).subscribe({
+        this.marqueService.deleteMarque([product._id || ""]).subscribe({
           next: () => {
-            this.CategoryObjects = this.CategoryObjects.filter(
+            this.MarqueObjects = this.MarqueObjects.filter(
               (item) => item._id !== product._id
             );
             this.messageService.add({
@@ -428,25 +424,25 @@ export class Category implements OnInit {
             });
           },
         });
-        this.CategoryObject = {};
+        this.MarqueObject = {};
       },
     });
   }
 
   findIndexById(id: string): number {
-    return this.CategoryObjects.findIndex((item) => item._id === id);
+    return this.MarqueObjects.findIndex((item) => item._id === id);
   }
 
   saveProduct() {
     this.submitted = true;
-    if (!this.CategoryObject.nom_categorie?.trim()) return;
+    if (!this.MarqueObject.nom_marque?.trim()) return;
 
-    if (this.CategoryObject._id) {
-      this.categoryService.updateCategorie(this.CategoryObject).subscribe({
+    if (this.MarqueObject._id) {
+      this.marqueService.updateMarque(this.MarqueObject).subscribe({
         next: () => {
-          const index = this.findIndexById(this.CategoryObject._id ?? "");
+          const index = this.findIndexById(this.MarqueObject._id ?? "");
           if (index !== -1) {
-            this.CategoryObjects[index] = { ...this.CategoryObject };
+            this.MarqueObjects[index] = { ...this.MarqueObject };
           }
           this.messageService.add({
             severity: "success",
@@ -455,7 +451,7 @@ export class Category implements OnInit {
             life: 3000,
           });
           this.productDialog = false;
-          this.CategoryObject = {};
+          this.MarqueObject = {};
           this.triggerLoadData();
         },
         error: (err: any) => {
@@ -466,9 +462,9 @@ export class Category implements OnInit {
         },
       });
     } else {
-      this.categoryService.createCategory(this.CategoryObject).subscribe({
-        next: (newCategory: CategoryObject) => {
-          this.CategoryObjects = [...this.CategoryObjects, newCategory];
+      this.marqueService.createMarque(this.MarqueObject).subscribe({
+        next: (newCategory: MarqueObject) => {
+          this.MarqueObjects = [...this.MarqueObjects, newCategory];
           this.messageService.add({
             severity: "success",
             summary: "Succès",
@@ -476,7 +472,7 @@ export class Category implements OnInit {
             life: 3000,
           });
           this.productDialog = false;
-          this.CategoryObject = {};
+          this.MarqueObject = {};
           this.triggerLoadData();
         },
         error: (err: any) => {
@@ -509,7 +505,7 @@ export class Category implements OnInit {
       return;
     }
 
-    this.categoryService.uploadFile(this.selectedFile).subscribe({
+    this.marqueService.uploadFile(this.selectedFile).subscribe({
       next: (response: any) => {
         this.triggerLoadData() ;
         this.message = response.message;
@@ -528,9 +524,9 @@ export class Category implements OnInit {
     this.message = ""; // Réinitialiser le message
     this.errorMessages = []; // Réinitialiser les erreurs
 
-    this.categoryService.exportToExcel().subscribe({
+    this.marqueService.exportToExcel().subscribe({
       next: (blob: Blob) => {
-        this.categoryService.downloadFile(blob, "catégories.xlsx");
+        this.marqueService.downloadFile(blob, "catégories.xlsx");
         this.message = "Exportation réussie !";
       },
       error: (err: any) => {

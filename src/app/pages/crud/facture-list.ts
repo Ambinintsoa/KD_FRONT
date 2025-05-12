@@ -1,19 +1,19 @@
 // facture.component.ts
-import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ConfirmationService, MessageService } from 'primeng/api';
-import { Table, TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { DialogModule } from 'primeng/dialog';
+import { InputTextModule } from 'primeng/inputtext';
 import { RippleModule } from 'primeng/ripple';
+import { Table, TableModule } from 'primeng/table';
 import { ToastModule } from 'primeng/toast';
 import { ToolbarModule } from 'primeng/toolbar';
-import { InputTextModule } from 'primeng/inputtext';
-import { DialogModule } from 'primeng/dialog';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { FactureService, FactureObject, ListParams, DetailFacture, Paiement } from '../service/facture-list.service';
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
-
+import { PaiementComponent } from '../paiement/paiementComponent.component';
+import { FactureObject, FactureService, ListParams } from '../service/facture-list.service';
 interface Column {
   field: string;
   header: string;
@@ -32,7 +32,8 @@ interface Column {
     ToolbarModule,
     InputTextModule,
     DialogModule,
-    ConfirmDialogModule
+    ConfirmDialogModule,
+    PaiementComponent
   ],
   template: `
 
@@ -76,7 +77,7 @@ interface Column {
         </tr>
       </ng-template>
       <ng-template #body let-facture>
-        <tr>
+        <tr>  
           <td><p-tableCheckbox [value]="facture" /></td>
           <td>{{ facture.numero_facture }}</td>
           <td>{{ facture.date | date }}</td>
@@ -156,6 +157,35 @@ interface Column {
             </p-table>
           </div>
         </div>
+        <div
+                style="
+                  border: solid 1px #ccc;
+                  margin: 20px;
+                  padding: 20px;
+                  border-radius: 8px;
+                  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                  background-color: #f9f9f9;
+                "
+              >
+                <button
+                  style="
+                    background-color:rgb(31, 185, 33);
+                    color: white;
+                    border: none;
+                    padding: 10px 20px;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    font-size: 16px;
+                  "
+                  (click)="payementForm = true" *ngIf="!payementForm"
+                >
+                  Entrer un paiement
+                </button>
+
+                <ng-container *ngIf="payementForm">
+                  <paiementComponent (paiementForm_attr)="setPayementForm($event)"> </paiementComponent>
+                </ng-container>
+              </div>
       </ng-template>
       <ng-template #footer>
         <p-button label="Fermer" icon="pi pi-times" text (click)="detailsDialog = false" />
@@ -182,6 +212,7 @@ export class FactureComponent implements OnInit {
   selectedFacture: FactureObject | null = null;
   selectedFactures!: FactureObject[] | null;
   submitted: boolean = false;
+  payementForm: boolean = false;
   cols!: Column[];
 
   @ViewChild('dt') dt!: Table;
@@ -269,6 +300,10 @@ export class FactureComponent implements OnInit {
   hideDialog() {
     this.factureDialog = false;
     this.submitted = false;
+  }
+
+  setPayementForm(value:boolean){
+    this.payementForm=false; 
   }
 
 }

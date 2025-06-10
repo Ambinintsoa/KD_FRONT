@@ -166,7 +166,7 @@ interface Column {
                   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
                   background-color: #f9f9f9;
                 "
-              >
+              *ngIf="checkStatut()">
                 <button
                   style="
                     background-color:rgb(31, 185, 33);
@@ -181,9 +181,9 @@ interface Column {
                 >
                   Entrer un paiement
                 </button>
-
+             
                 <ng-container *ngIf="payementForm">
-                  <paiementComponent (paiementForm_attr)="setPayementForm($event)"> </paiementComponent>
+                  <paiementComponent (paiementForm_attr)="setPayementForm(true)"  [idfacture]="selectedFacture?._id || 'cc'" > </paiementComponent>
                 </ng-container>
               </div>
       </ng-template>
@@ -290,11 +290,18 @@ export class FactureComponent implements OnInit {
     });
   }
 
+  checkStatut() {
+    if (this.selectedFacture?.statut === 0) {
+      return true;  
+    }
+    return false;
 
+  }
 
   showDetails(facture: FactureObject) {
     this.selectedFacture = facture;
     this.detailsDialog = true;
+    console.log(this.selectedFacture?._id, "in the list");
   }
 
   hideDialog() {
@@ -302,8 +309,8 @@ export class FactureComponent implements OnInit {
     this.submitted = false;
   }
 
-  setPayementForm(value:boolean){
-    this.payementForm=false; 
+  setPayementForm(value: boolean) {
+    this.payementForm = value;
   }
 
 }

@@ -230,255 +230,166 @@ interface ExportColumn {
     </p-table>
 
     <p-dialog
-      [(visible)]="productDialog"
-      [style]="{ width: '450px' }"
-      header="Détails Service"
-      [modal]="true"
-    >
-      <ng-template #content>
-        <div class="flex flex-col gap-6">
-          <div>
-            <label for="name" class="block font-bold mb-3"
-              >Nom du service</label
-            >
-            <input
-              type="text"
-              pInputText
-              id="name"
-              [(ngModel)]="ServiceObject.nom_service"
-              required
-              autofocus
-              fluid
-            />
-            <small
-              class="text-red-500"
-              *ngIf="submitted && !ServiceObject.nom_service"
-              >Nom est requis.</small
-            >
-            <small class="text-red-500" *ngIf="errors?.nom_service">
-              {{ errors.nom_service }}
-            </small>
-          </div>
-          <div>
-            <label for="name" class="block font-bold mb-3"
-              >Durée du service(min)</label
-            >
-            <input
-              type="number"
-              pInputText
-              id="name"
-              [(ngModel)]="ServiceObject.duree"
-              required
-              autofocus
-              fluid
-            />
-            <small
-              class="text-red-500"
-              *ngIf="submitted && !ServiceObject.duree"
-              >Durée est requis.</small
-            >
-            <small class="text-red-500" *ngIf="errors?.duree">
-              {{ errors.duree }}
-            </small>
-          </div>
-          <div>
-            <label for="name" class="block font-bold mb-3"
-              >Prix du service</label
-            >
-            <input
-              type="number"
-              pInputText
-              id="name"
-              [(ngModel)]="ServiceObject.prix"
-              required
-              autofocus
-              fluid
-            />
-            <small class="text-red-500" *ngIf="submitted && !ServiceObject.prix"
-              >Prix est requis.</small
-            >
-            <small class="text-red-500" *ngIf="errors?.prix">
-              {{ errors.prix }}
-            </small>
-          </div>
-          <div>
-            <span class="block font-bold mb-4">Categories</span>
-            <div class="grid grid-cols-12 gap-4">
-              <!-- Dynamically generate radio buttons for categories -->
-              <div
-                *ngFor="let category of categories"
-                class="flex items-center gap-2 col-span-6"
-              >
-                <p-radiobutton
-                  [id]="'category' + category._id"
-                  name="categorie_service"
-                  [value]="category._id"
-                  [(ngModel)]="ServiceObject.categorie._id"
-                />
-                <label [for]="'category' + category._id">{{
-                  category.nom_categorie
-                }}</label>
-              </div>
-              <small class="text-red-500" *ngIf="errors?.categorie_service">
-                {{ errors.categorie_service }}
-              </small>
-            </div>
-          </div>
-<!-- Section pour ajouter une promotion -->
-<div class="mt-4">
-    <label class="block font-bold mb-3">Ajouter une promotion</label>
-
-    <!-- Pourcentage de réduction -->
-    <div class="mb-4">
-      <label for="pourcentage_reduction" class="block mb-1">Pourcentage de réduction (%)</label>
-      <input
-        type="number"
-        pInputText
-        id="pourcentage_reduction"
-        [(ngModel)]="promotion.pourcentage_reduction"
-        required
-        min="0"
-        max="100"
-        placeholder="Ex. 20"
-        class="w-full"
-      />
-      <small class="text-red-500" *ngIf="submitted && !promotion.pourcentage_reduction">
-        Le pourcentage est requis.
-      </small>
-    </div>
-
-    <!-- Date de début -->
-    <div class="mb-4">
-      <label for="date_debut" class="block mb-1">Date de début</label>
-      <input
-        type="date"
-        id="date_debut"
-        [(ngModel)]="promotion.date_debut"
-        required
-        class="mt-1 w-full border border-gray-300 rounded-md p-3"
-      />
-    </div>
-
-    <!-- Date de fin -->
-    <div class="mb-4">
-      <label for="date_fin" class="block mb-1">Date de fin</label>
-      <input
-        type="date"
-        id="date_fin"
-        [(ngModel)]="promotion.date_fin"
-        required
-        class="mt-1 w-full border border-gray-300 rounded-md p-3"
-      />
-      <small class="text-red-500" *ngIf="submitted && promotion.pourcentage_reduction && !promotion.date_fin">
-        La date de fin est requise.
-      </small>
-      <small class="text-red-500" *ngIf="submitted && promotion.date_debut && promotion.date_fin && promotion.date_debut > promotion.date_fin">
-        La date de fin doit être postérieure à la date de début.
-      </small>
-    </div>
-
-    <!-- Description (optionnel) -->
-    <div class="mb-4">
-      <label for="description" class="block mb-1">Description (optionnel)</label>
-      <input
-        type="text"
-        pInputText
-        id="description"
-        [(ngModel)]="promotion.description"
-        placeholder="Ex. Promotion de printemps"
-        class="w-full"
-      />
-      <button pButton type="button" label="Ajouter la promotion" (click)="addPromotion()" class="mt-2"></button>
+  [(visible)]="productDialog"
+  [style]="{ width: '600px' }"
+  header="Détails Service"
+  [modal]="true"
+>
+  <ng-template #content>
+    <div class="flex flex-col gap-6">
+      <!-- Navigation Étapes -->
+      <div class="flex justify-between items-center mb-4">
+        <p-button pButton label="« Précédent" (click)="prevStep()" [disabled]="currentStep === 0" />
+        <span class="font-semibold">Étape {{ currentStep + 1 }} / 4</span>
+        <p-button pButton label="Suivant »" (click)="nextStep()" [disabled]="currentStep === maxStep" />
       </div>
-      <!-- Affichage des promotions ajoutées (optionnel) -->
-<div class="mt-4" *ngIf="  ServiceObject.promotions?.length||0 > 0">
-  <label class="block font-bold mb-3">Promotions ajoutées</label>
-  <ul>
-    <li *ngFor="let promo of ServiceObject.promotions; let i = index">
-      {{ promo.pourcentage_reduction }}% - Du {{ promo.date_debut | date }} au {{ promo.date_fin | date }} 
-      ({{ promo.description || 'Sans description' }}) 
-      <button pButton type="button" label="Supprimer" (click)="removePromotion(i)" class="ml-2 p-button-danger"></button>
-    </li>
-  </ul>
-</div>
-<!-- Section pour ajouter des produits -->
-<div class="mt-4">
-    <label class="block font-bold mb-3">Ajouter des produits utilisés</label>
-    
-    <div class="mb-4">
-        <label for="produit" class="block mb-1">Produit</label>
-        <p-dropdown
+
+      <!-- Étape 1: Informations de base -->
+      <div *ngIf="currentStep === 0" class="flex flex-col gap-6">
+        <div>
+          <label class="block font-bold mb-3">Nom du service</label>
+          <input type="text" pInputText [(ngModel)]="ServiceObject.nom_service" required autofocus />
+          <small class="text-red-500" *ngIf="submitted && !ServiceObject.nom_service">Nom est requis.</small>
+          <small class="text-red-500" *ngIf="errors?.nom_service">{{ errors.nom_service }}</small>
+        </div>
+        <div>
+          <label class="block font-bold mb-3">Durée du service (min)</label>
+          <input type="number" pInputText [(ngModel)]="ServiceObject.duree" required />
+          <small class="text-red-500" *ngIf="submitted && !ServiceObject.duree">Durée est requise.</small>
+          <small class="text-red-500" *ngIf="errors?.duree">{{ errors.duree }}</small>
+        </div>
+        <div>
+          <label class="block font-bold mb-3">Prix du service</label>
+          <input type="number" pInputText [(ngModel)]="ServiceObject.prix" required />
+          <small class="text-red-500" *ngIf="submitted && !ServiceObject.prix">Prix est requis.</small>
+          <small class="text-red-500" *ngIf="errors?.prix">{{ errors.prix }}</small>
+        </div>
+      </div>
+
+      <!-- Étape 2: Catégories -->
+      <div *ngIf="currentStep === 1">
+        <span class="block font-bold mb-4">Catégories</span>
+        <div class="grid grid-cols-12 gap-4">
+          <div *ngFor="let category of categories" class="flex items-center gap-2 col-span-6">
+            <p-radiobutton
+              [id]="'category' + category._id"
+              name="categorie_service"
+              [value]="category._id"
+              [(ngModel)]="ServiceObject.categorie._id"
+            />
+            <label [for]="'category' + category._id">{{ category.nom_categorie }}</label>
+          </div>
+        </div>
+        <small class="text-red-500" *ngIf="errors?.categorie_service">{{ errors.categorie_service }}</small>
+      </div>
+
+      <!-- Étape 3: Promotion -->
+      <div *ngIf="currentStep === 2">
+        <label class="block font-bold mb-3">Ajouter une promotion</label>
+
+        <div class="mb-4">
+          <label class="block mb-1">Pourcentage de réduction (%)</label>
+          <input type="number" pInputText [(ngModel)]="promotion.pourcentage_reduction" min="0" max="100" class="w-full" />
+          <small class="text-red-500" *ngIf="submitted && !promotion.pourcentage_reduction">Le pourcentage est requis.</small>
+        </div>
+
+        <div class="mb-4">
+          <label class="block mb-1">Date de début</label>
+          <input type="date" [(ngModel)]="promotion.date_debut" class="w-full border rounded-md p-2" />
+        </div>
+
+        <div class="mb-4">
+          <label class="block mb-1">Date de fin</label>
+          <input type="date" [(ngModel)]="promotion.date_fin" class="w-full border rounded-md p-2" />
+          <small class="text-red-500" *ngIf="submitted && promotion.pourcentage_reduction && !promotion.date_fin">
+            La date de fin est requise.
+          </small>
+          <small class="text-red-500" *ngIf="submitted && promotion.date_debut && promotion.date_fin && promotion.date_debut > promotion.date_fin">
+            La date de fin doit être postérieure à la date de début.
+          </small>
+        </div>
+
+        <div class="mb-4">
+          <label class="block mb-1">Description (optionnel)</label>
+          <input type="text" pInputText [(ngModel)]="promotion.description" class="w-full" />
+          <p-button pButton label="Ajouter la promotion" (click)="addPromotion()" class="mt-2" />
+        </div>
+
+        <div class="mt-4" *ngIf="ServiceObject.promotions?.length||0 > 0">
+          <label class="block font-bold mb-3">Promotions ajoutées</label>
+          <ul>
+            <li *ngFor="let promo of ServiceObject.promotions; let i = index">
+              {{ promo.pourcentage_reduction }}% - Du {{ promo.date_debut | date }} au {{ promo.date_fin | date }}
+              ({{ promo.description || 'Sans description' }})
+              <p-button pButton label="Supprimer" class="ml-2 p-button-danger" (click)="removePromotion(i)" />
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Étape 4: Produits utilisés -->
+      <div *ngIf="currentStep === 3">
+        <label class="block font-bold mb-3">Ajouter des produits utilisés</label>
+
+        <div class="mb-4">
+          <label class="block mb-1">Produit</label>
+          <p-dropdown
             [options]="produits"
             [(ngModel)]="selectedProduit"
             optionLabel="nom_produit"
             optionValue="_id"
             placeholder="Sélectionner un produit"
             class="w-full"
-        ></p-dropdown>
-    </div>
-
-    <div class="mb-4">
-        <label for="quantite" class="block mb-1">Quantité</label>
-        <input
-            type="number"
-            pInputText
-            id="quantite"
-            [(ngModel)]="quantiteProduit"
-            min="1"
-            class="w-full"
-        />
-    </div>
-
-    <button 
-        pButton 
-        type="button" 
-        label="Ajouter le produit" 
-        (click)="addProduitToService()"
-        class="mt-2"
-        [disabled]="!selectedProduit"
-    ></button>
-
-    <!-- Liste des produits utilisés -->
-    <div class="mt-4" *ngIf="produitsUtilises.length > 0">
-        <label class="block font-bold mb-3">Produits utilisés</label>
-        <ul>
-            <li *ngFor="let produitUtilise of produitsUtilises">
-                {{ produitUtilise.produit.nom_produit }} - Quantité: {{ produitUtilise.quantite }}
-                <button 
-                    pButton 
-                    type="button" 
-                    label="Supprimer" 
-                    (click)="removeProduitUtilise(produitUtilise)" 
-                    class="ml-2 p-button-danger"
-                ></button>
-            </li>
-        </ul>
-    </div>
-</div>
-  </div>
+          ></p-dropdown>
         </div>
-      </ng-template>
 
-      <ng-template #footer>
-        <p-button
-          label="Annuler"
-          icon="pi pi-times"
-          text
-          (click)="hideDialog()"
-        />
-        <p-button
-          label="Enregistrer"
-          icon="pi pi-check"
-          (click)="saveProduct()"
-        />
-      </ng-template>
-    </p-dialog>
+        <div class="mb-4">
+          <label class="block mb-1">Quantité</label>
+          <input type="number" pInputText [(ngModel)]="quantiteProduit" min="1" class="w-full" />
+        </div>
+
+        <p-button pButton label="Ajouter le produit" (click)="addProduitToService()" class="mt-2" [disabled]="!selectedProduit" />
+
+        <div class="mt-4" *ngIf="produitsUtilises.length > 0">
+          <label class="block font-bold mb-3">Produits utilisés</label>
+          <ul>
+            <li *ngFor="let produitUtilise of produitsUtilises">
+              {{ produitUtilise.produit.nom_produit }} - Quantité: {{ produitUtilise.quantite }}
+              <p-button pButton label="Supprimer" class="ml-2 p-button-danger" (click)="removeProduitUtilise(produitUtilise)" />
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+
+  <ng-template #footer>
+    <p-button label="Annuler" icon="pi pi-times" text (click)="hideDialog()" />
+    <p-button label="Enregistrer" icon="pi pi-check" (click)="saveProduct()" [disabled]="currentStep < maxStep" />
+  </ng-template>
+</p-dialog>
+
 
     <p-confirmdialog [style]="{ width: '450px' }" />
   `,
   providers: [MessageService, ServiceService, ConfirmationService, ProduitService],
 })
 export class Service implements OnInit {
+  currentStep = 0;
+maxStep = 3;
+
+nextStep() {
+  if (this.currentStep < this.maxStep) {
+    this.currentStep++;
+  }
+}
+
+prevStep() {
+  if (this.currentStep > 0) {
+    this.currentStep--;
+  }
+}
+
   promotion: Promotion = {
     pourcentage_reduction: null,
     date_debut: null,

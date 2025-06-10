@@ -155,11 +155,12 @@ export class AppMenu {
                         icon: 'pi pi-fw pi-exclamation-circle',
                         routerLink: ['/pages/calendrier']
                     },
+                    ...(isAdmin ? [
                     {
                         label: 'Factures Client',
                         icon: 'pi pi-fw pi-receipt',
                         routerLink: ['/pages/factureClient']
-                    },
+                    }]:[]),
                 ]
             }
         ];

@@ -72,7 +72,6 @@ import { filter } from 'rxjs/operators';
           <th pSortableColumn="email">Email <p-sortIcon field="email" /></th>
           <th pSortableColumn="role">Rôle <p-sortIcon field="role" />
         </th>
-          <th pSortableColumn="poste">Poste <p-sortIcon field="poste" /></th>
           <th pSortableColumn="genre">Genre <p-sortIcon field="genre" /></th>
           <th pSortableColumn="date_de_naissance">Date de naissance <p-sortIcon field="date_de_naissance" /></th>
           <th style="min-width: 12rem"></th>
@@ -85,7 +84,6 @@ import { filter } from 'rxjs/operators';
           <td>{{ utilisateur.prenom }}</td>
           <td>{{ utilisateur.email }}</td>
           <td>{{ utilisateur.role }}</td>
-          <td>{{ utilisateur.poste }}</td>
           <td>{{ utilisateur.genre }}</td>
           <td>{{ utilisateur.date_de_naissance | date:'dd/MM/yyyy' }}</td>
           <td>

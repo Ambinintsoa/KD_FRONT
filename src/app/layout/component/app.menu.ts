@@ -41,7 +41,7 @@ export class AppMenu {
                 icon: 'pi pi-fw pi-briefcase',
                 routerLink: ['/pages'],
                 items: [
-                    ...(!isPersonal ? [ 
+                    ...(isPersonal ? [ 
                     {
                         label: 'Landing',
                         icon: 'pi pi-fw pi-globe',
@@ -112,7 +112,7 @@ export class AppMenu {
                                 {
                                     label: 'Historique de services',
                                     icon: 'pi pi-book',
-                                    routerLink: ['/pages/taches']
+                                    routerLink: ['/pages/historique_service']
                                 },
                             ]}
                     ] : []),
@@ -130,7 +130,7 @@ export class AppMenu {
                                         {
                                             label: 'Historique de services',
                                             icon: 'pi pi-book',
-                                            routerLink: ['/pages/taches']
+                                            routerLink: ['/pages/historique_service']
                                         },
                                     ]}]:[]),
                                     ...( isMecanicien? [

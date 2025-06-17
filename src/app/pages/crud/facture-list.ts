@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import html2canvas from 'html2canvas';
+import { jsPDF } from 'jspdf';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
@@ -13,10 +14,9 @@ import { Table, TableModule } from 'primeng/table';
 import { ToastModule } from 'primeng/toast';
 import { ToolbarModule } from 'primeng/toolbar';
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
+import '../../../assets/facture/spinner.css';
 import { PaiementComponent } from '../paiement/paiementComponent.component';
 import { FactureObject, FactureService, ListParams } from '../service/facture-list.service';
-
-import '../../../assets/facture/spinner.css';
 
 interface Column {
   field: string;

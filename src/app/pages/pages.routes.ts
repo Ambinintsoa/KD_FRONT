@@ -14,6 +14,8 @@ import { MecanicienRendezVousComponent } from './rendez_vous/mecanicien-rendez-v
 import { RDVManager } from './rendez_vous/rendez_vous_list/RDVManager';
 import { CalendarComponent } from './uikit/calendar';
 import { Marque } from './crud/marque';
+import { HistoriqueServiceComponent } from './historique_service/historique_service';
+
 export default [
     { path: 'category', component: Category , canActivate: [authGuard], data: { profile: 'admin' }},
     { path: 'marque', component: Marque , canActivate: [authGuard], data: { profile: 'admin' }},
@@ -29,6 +31,7 @@ export default [
     { path: 'calendrier_client', component:  ClientRendezVousComponent,data:{profile:'client'} },
     { path: 'calendrier_mecanicien', component:  MecanicienRendezVousComponent,data:{profile:'mecanicien'} },
     { path: 'liste_rdv_manager', component:  RDVManager,data:{profile:'admin'} },
+    {path:'historique_service',component:HistoriqueServiceComponent,data:{profile:'client'}},
     
     { path: '**', redirectTo: '/notfound' },
 ] as Routes;

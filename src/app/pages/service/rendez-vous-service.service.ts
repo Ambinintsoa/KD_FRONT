@@ -16,7 +16,7 @@ export class RendezVousService {
 
   sendRendezVousRequest(liste_tache: { service: string }[], date_rendez_vous: string, voiture: any, devis_object: any): Observable<any> {
     const url = `${this.apiUrl}/save`;
-    console.log(date_rendez_vous, "mandalo ve");
+    // console.log(date_rendez_vous, "mandalo ve");
 
     const request_body = {
       "date_heure_debut": date_rendez_vous + "T00:00:00",

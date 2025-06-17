@@ -41,7 +41,7 @@ export class AppMenu {
                 icon: 'pi pi-fw pi-briefcase',
                 routerLink: ['/pages'],
                 items: [
-                    ...(isPersonal ? [ 
+                    ...(!isPersonal ? [ 
                     {
                         label: 'Landing',
                         icon: 'pi pi-fw pi-globe',

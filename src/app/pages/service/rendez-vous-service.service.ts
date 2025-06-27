@@ -91,7 +91,7 @@ export class RendezVousService {
 
   getMecanicienDisponible(date_debut: string): Observable<any[]> {
     const url = `${this.apiUrl}/mecanicien/1`;
-    console.log(url,"huhuuu");
+    console.log(url, "huhuuu");
     return this.http.post<any>(url, { date_debut: date_debut }).pipe(
       tap((data: any) => console.log("Données brutes reçues de l'API :", data)),
       map((data: any) => data.mecaniciens || [])
@@ -99,10 +99,14 @@ export class RendezVousService {
   }
   assigner(date_inserer: string, rdv: any, mecanicien: any): Observable<any> {
     const url = `${this.apiUrl}/assign`;
-    const body = { date_inserer, rdv, mecanicien:mecanicien._id }; //TODO Check s'il y a date => changemant de date inital => nouveau date
+    const body = { date_inserer, rdv, mecanicien: mecanicien._id }; //TODO Check s'il y a date => changemant de date inital => nouveau date
     return this.http.post<any>(url, body);
   }
 
+  // fontion pour changer l'état du rendez-vous
+  changerEtatRendezVous(id_rdv: string) {
+    return this.http.put<any>(`/api/rendezvous/update`, { etat: 1, _id: id_rdv });
+  }
 
 
 }

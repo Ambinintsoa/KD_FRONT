@@ -41,7 +41,7 @@ export class AppMenu {
                 icon: 'pi pi-fw pi-briefcase',
                 routerLink: ['/pages'],
                 items: [
-                    ...(!isPersonal ? [ 
+                    ...(isPersonal ? [  // TODO Put ! before isPersonal to show this item only if not personal
                     {
                         label: 'Landing',
                         icon: 'pi pi-fw pi-globe',

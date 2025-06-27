@@ -13,7 +13,8 @@ import { PaiementService } from '../service/paiement.service';
 })
 export class PaiementComponent {
   form!: FormGroup;
-  @Output() paiementForm_attr = new EventEmitter<boolean>();
+  @Output() paiementForm_attr = new EventEmitter<[boolean,any]>();
+  @Output() new_paiement = new EventEmitter<[boolean,any]>();
   @Input() idfacture?: string = '';
 
   constructor(private fb: FormBuilder, private paiement_service: PaiementService) {
@@ -58,13 +59,15 @@ export class PaiementComponent {
       this.paiement_service.savePaiement(this.form.value).subscribe({
         next: (result) => {
           alert('Paiement enregistré avec succès');
+          console.log(result, 'resultat paiement');
+          this.paiementForm_attr.emit([result, false]);
           this.init();
         },
         error: (err) => {
           console.error('Erreur lors de l’enregistrement du paiement :', err);
         },
       });
-      this.paiementForm_attr.emit(false);
+      // this.paiementForm_attr.emit(false);
     } else {
       alert('Veuillez remplir correctement le formulaire.');
     }

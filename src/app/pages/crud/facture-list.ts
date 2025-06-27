@@ -205,7 +205,7 @@ interface Column {
                 </button>
              
                 <ng-container *ngIf="payementForm">
-                  <paiementComponent (paiementForm_attr)="setPayementForm(true)"  [idfacture]="selectedFacture?._id || 'cc'" > </paiementComponent>
+                  <paiementComponent (paiementForm_attr)="handleValues($event)"  [idfacture]="selectedFacture?._id || 'cc'" > </paiementComponent>
                 </ng-container>
               </div>
       </ng-template>
@@ -336,6 +336,15 @@ export class FactureComponent implements OnInit {
     this.payementForm = value;
   }
 
+handleValues(data:[any,boolean]) {
+  this.setPayementForm(data[1]);
+  console.log(data[1], "data from paiement component");
+  if (this.selectedFacture?.paiements) {
+    this.selectedFacture.paiements = [...this.selectedFacture.paiements, data[0].data];
+  } else {
+    console.error("selectedFacture ou paiements est null ou non défini");
+  }
+}
  //genere la facture en format pdf
 generatePdf(id:string,numero:string='') {
   this.isLoading = true; // Afficher le spinner
@@ -347,6 +356,8 @@ generatePdf(id:string,numero:string='') {
     this.isLoading = false; // Cacher le spinner si erreur
     return;
   }
+
+
 
   html2canvas(element, {
     scale: 2, // Augmente la qualité (DPI)

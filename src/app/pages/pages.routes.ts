@@ -5,16 +5,18 @@ import { StockManagement } from './crud/StockManagement';
 import { Category } from "./crud/category";
 import { FactureComponent } from './crud/facture-list';
 import { FactureClientComponent } from './crud/facture-list-client';
+import { Marque } from './crud/marque';
 import { Produit } from './crud/produit';
 import { Service } from './crud/service';
 import { UtilisateurCrudComponent } from './crud/utilisateur';
+import { HistoriqueServiceComponent } from './historique_service/historique_service';
 import { ClientRendezVousComponent } from './rendez_vous/client-rendez-vous/client-rendez-vous.component';
 import { ManagerRendezVousComponent } from './rendez_vous/manager-rendez-vous/manager-rendez-vous.component';
 import { MecanicienRendezVousComponent } from './rendez_vous/mecanicien-rendez-vous/mecanicien-rendez-vous.component';
+import { RDVClient } from './rendez_vous/rendez_vous_list/RDVClient';
 import { RDVManager } from './rendez_vous/rendez_vous_list/RDVManager';
+import { RDVMecanicien } from './rendez_vous/rendez_vous_list/RDVMecanicien';
 import { CalendarComponent } from './uikit/calendar';
-import { Marque } from './crud/marque';
-import { HistoriqueServiceComponent } from './historique_service/historique_service';
 
 export default [
     { path: 'category', component: Category , canActivate: [authGuard], data: { profile: 'admin' }},
@@ -31,6 +33,8 @@ export default [
     { path: 'calendrier_client', component:  ClientRendezVousComponent,data:{profile:'client'} },
     { path: 'calendrier_mecanicien', component:  MecanicienRendezVousComponent,data:{profile:'mecanicien'} },
     { path: 'liste_rdv_manager', component:  RDVManager,data:{profile:'admin'} },
+    { path: 'liste_rdv_client', component:  RDVClient,data:{profile:'admin'} },
+    { path: 'liste_rdv_mecanicien', component:  RDVMecanicien,data:{profile:'admin'} },     
     {path:'historique_service',component:HistoriqueServiceComponent,data:{profile:'client'}},
     
     { path: '**', redirectTo: '/notfound' },

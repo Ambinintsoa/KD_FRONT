@@ -104,8 +104,9 @@ export class RendezVousService {
   }
 
   // fontion pour changer l'état du rendez-vous
-  changerEtatRendezVous(id_rdv: string) {
-    return this.http.put<any>(`/api/rendezvous/update`, { etat: 1, _id: id_rdv });
+  changerEtatRendezVous(id_rdv: string,etat:number) {
+    const url=`${this.apiUrl}/update`;
+    return this.http.put<any>(url, { etat: etat, _id: id_rdv });
   }
 
 

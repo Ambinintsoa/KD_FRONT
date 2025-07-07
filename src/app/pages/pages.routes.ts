@@ -16,6 +16,7 @@ import { MecanicienRendezVousComponent } from './rendez_vous/mecanicien-rendez-v
 import { RDVClient } from './rendez_vous/rendez_vous_list/RDVClient';
 import { RDVManager } from './rendez_vous/rendez_vous_list/RDVManager';
 import { RDVMecanicien } from './rendez_vous/rendez_vous_list/RDVMecanicien';
+import { TacheComponent } from './taches/Tache';
 import { CalendarComponent } from './uikit/calendar';
 
 export default [
@@ -32,6 +33,8 @@ export default [
     { path: 'calendrier_manager', component:  ManagerRendezVousComponent,data:{profile:'admin'} },
     { path: 'calendrier_client', component:  ClientRendezVousComponent,data:{profile:'client'} },
     { path: 'calendrier_mecanicien', component:  MecanicienRendezVousComponent,data:{profile:'mecanicien'} },
+    { path: 'calendrier_mecanicien', component:  MecanicienRendezVousComponent,data:{profile:'mecanicien'} },
+    { path: 'tache_mecanicien/:idrdv', component:  TacheComponent,data:{profile:'mecanicien'} },
     { path: 'liste_rdv_manager', component:  RDVManager,data:{profile:'admin'} },
     { path: 'liste_rdv_client', component:  RDVClient,data:{profile:'admin'} },
     { path: 'liste_rdv_mecanicien', component:  RDVMecanicien,data:{profile:'admin'} },     

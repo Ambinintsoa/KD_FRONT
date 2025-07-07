@@ -25,13 +25,16 @@ import { RendezVousService } from '../../service/rendez-vous-service.service';
                                         <div class="text-sm">Fin : <span class="font-semibold">{{ item.date_heure_fin }}</span></div>
                                     </div>
                                     <div class="md:w-40 flex flex-col items-end gap-2">
-                                        <p-tag [value]="item.statut"></p-tag>
+                                      
                                         <span class="text-xl font-semibold">{{ item.price }}</span>
                                     </div>
                                 </div>
                             </div>
                             <div class="md:w-40 flex flex-col items-end gap-2">
-                                <p-tag [value]="item.statut"></p-tag>
+                                <p-tag 
+                                    [value]="item.etat === 0 ? 'En attente' : 'Terminé'" 
+                                    [severity]="item.etat === 0 ? 'warn' : 'success'">
+                                </p-tag>
                                 <span class="text-xl font-semibold">{{ item.price }}</span>
                                 <button class="p-button p-button-sm p-button-warning mt-2"
                                         (click)="changerEtatRdv(item)">
@@ -64,15 +67,12 @@ import { RendezVousService } from '../../service/rendez-vous-service.service';
 export class RDVMecanicien implements OnInit {
     historiqueRdv: any[] = [];
 
-    constructor(private rdvService: RendezVousService,private router: Router) { }
+    constructor(private rdvService: RendezVousService, private router: Router) { }
 
     ngOnInit() {
         this.rdvService.getRendezVousMecanicien().subscribe(
             (data) => {
-                // Filtrer pour ne garder que les rendez-vous historiques (statut = 'Terminé' ou 'Historique')
-                this.historiqueRdv = (data.rendezvous || []).filter((rdv: any) =>
-                    rdv.statut && (rdv.statut.toLowerCase() === 'terminé' || rdv.statut.toLowerCase() === 'historique')
-                );
+                this.historiqueRdv = data.rendezvous;
             },
             (error: any) => {
                 console.error('Erreur de récupération des rendez-vous', error);
@@ -81,10 +81,15 @@ export class RDVMecanicien implements OnInit {
     }
     changerEtatRdv(rdv: any) {
         // Appelle la fonction du service pour changer l'état
-        this.rdvService.changerEtatRendezVous(rdv._id).subscribe({
+        this.rdvService.changerEtatRendezVous(rdv._id, 1 - rdv.etat).subscribe({
             next: (res) => {
                 // Met à jour localement ou recharge la liste
-                rdv.etat = res.etat === 1 ? 'Terminé' : 'Non terminé';
+                console.log('État changé avec succès', res);
+                rdv.etat = 1 - rdv.etat;
+                const index = this.historiqueRdv.findIndex(item => item._id === rdv._id);
+                if (index !== -1) {
+                    this.historiqueRdv[index] = rdv; // Met à jour l'élément dans la liste
+                }
             },
             error: (err) => {
                 console.error('Erreur lors du changement d\'état', err);
@@ -94,6 +99,7 @@ export class RDVMecanicien implements OnInit {
 
     allerVersTaches(rdv: any) {
         // Navigue vers la page des tâches du rendez-vous
-        this.router.navigate(['/taches', rdv._id]);
+        this.router.navigate(['pages/tache_mecanicien', rdv._id]);
+
     }
 }

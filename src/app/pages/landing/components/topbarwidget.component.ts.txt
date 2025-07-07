@@ -1,5 +1,5 @@
 
-import { Service } from "./../../crud/service";
+import { Service } from "../../crud/service";
 import { Component, inject, OnInit } from "@angular/core";
 import { StyleClassModule } from "primeng/styleclass";
 import { Router, RouterModule } from "@angular/router";

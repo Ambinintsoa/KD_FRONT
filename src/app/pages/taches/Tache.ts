@@ -10,7 +10,7 @@ interface Tache {
         duree: number;
         prix: number;
     };
-    statut: string;
+    statut:number;
     rendez_vous: string;
 }
 
@@ -21,12 +21,15 @@ interface Tache {
     template: `
     <div class="card">
         <h2>Liste des tâches</h2>
+        <div class="mb-4 font-semibold">
+            {{ getNbTachesTerminees() }} tâche(s) terminée(s) sur {{ taches.length }}
+        </div>
         <table class="table-auto w-full">
             <thead>
                 <tr>
                     <th>Service</th>
                     <th>Durée (h)</th>
-                    <th>Prix (€)</th>
+                    <th>Prix (Ar)</th>
                     <th>Statut</th>
                     <th>Action</th>
                 </tr>
@@ -38,9 +41,9 @@ interface Tache {
                     <td>{{ tache.service.prix }}</td>
                     <td>
                            <span [ngClass]="{
-                                'text-yellow-600': tache.statut === 'A faire' || tache.statut === 0,
-                                'text-green-600': tache.statut === 'Terminé' || tache.statut === 1
-                            }">
+                                'text-yellow-600':tache.statut === 0,
+                                'text-green-600':  tache.statut === 1
+                    }">
                                 {{ tache.statut === 0 ? 'A faire' : tache.statut === 1 ? 'Terminé' : tache.statut }}
                             </span>
                     </td>
@@ -74,11 +77,13 @@ export class TacheComponent implements OnInit {
 
     ngOnInit() {
         // Récupère l'id du rendez-vous depuis l'URL
-        this.rendezVousId = this.route.snapshot.paramMap.get('id') || '';
+        this.rendezVousId = this.route.snapshot.paramMap.get('idrdv') || '';
+        console.log('ID du rendez-vous:', this.rendezVousId);
         if (this.rendezVousId) {
             this.tacheService.getTachesByRendezVous(this.rendezVousId).subscribe({
                 next: (data) => {
-                    this.taches = data.taches || [];
+                    console.log(data, 'Tâches récupérées avec succès');
+                    this.taches = data || [];
                 },
                 error: (err) => {
                     console.error('Erreur lors de la récupération des tâches', err);
@@ -89,13 +94,21 @@ export class TacheComponent implements OnInit {
     toggleStatut(tache: Tache, nouveauStatut: number) {
         this.tacheService.changerStatutTache(tache._id, nouveauStatut).subscribe({
             next: (res) => {
-                 tache.statut = res.statut === 0 ? 'A faire' : 'Terminé';
+                //  tache.statut = res.statut === 0 ? 'A faire' : 'Terminé';
+                tache.statut = nouveauStatut;
+                 const index=this.taches.findIndex(item=>item._id===tache._id);
+                if (index!==-1){
+                    this.taches[index]=tache;
+                 }
             },
             error: (err) => {
                 console.error('Erreur lors du changement de statut', err);
             }
         });
     }
+    getNbTachesTerminees(): number {
+    return this.taches.filter(t => t.statut === 1).length;
+}
 
   
 }

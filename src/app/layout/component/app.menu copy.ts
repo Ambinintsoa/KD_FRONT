@@ -88,7 +88,11 @@ export class AppMenu {
                                     icon: 'pi pi-fw pi-objects-column',
                                     routerLink: ['/pages/utilisateur']
                                 },
-                             
+                                {
+                                    label: 'Factures',
+                                    icon: 'pi pi-fw pi-receipt',
+                                    routerLink: ['/pages/facture']
+                                },
                                
                             ]
                         }, {
@@ -105,7 +109,11 @@ export class AppMenu {
                                     icon: 'pi pi-bell',
                                     routerLink: ['/pages/liste_rdv_manager']
                                 },
-                                
+                                {
+                                    label: 'Historique de services',
+                                    icon: 'pi pi-book',
+                                    routerLink: ['/pages/historique_service']
+                                },
                             ]}
                     ] : []),
                      
@@ -124,12 +132,6 @@ export class AppMenu {
                                             icon: 'pi pi-book',
                                             routerLink: ['/pages/historique_service']
                                         },
-                                        {
-                                            label: 'Demande de rendez Vous',
-                                            icon: 'pi pi-bell',
-                                            routerLink: ['/pages/factureClient']
-                                        }
-                                        
                                     ]}]:[]),
                                     ...( isMecanicien? [
                                         {
@@ -144,7 +146,7 @@ export class AppMenu {
                                                 {
                                                     label: 'Liste des rendez-vous',
                                                     icon: 'pi pi-book',
-                                                    routerLink: ['/pages/liste_rdv_mecanicien']
+                                                    routerLink: ['/pages/taches']
                                                 },
                                             ]}]:[]),
                                      // Ne pas inclure "Paramétrages" si l'utilisateur n'est pas admin
@@ -157,7 +159,7 @@ export class AppMenu {
                     {
                         label: 'Factures Client',
                         icon: 'pi pi-fw pi-receipt',
-                        routerLink: ['/pages/facture']
+                        routerLink: ['/pages/factureClient']
                     }]:[]),
                 ]
             }

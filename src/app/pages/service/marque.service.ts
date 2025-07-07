@@ -24,7 +24,7 @@ export class MarqueService {
   constructor(private http: HttpClient) { }
 
   getAllMarques(): Observable<MarqueResponse> {
-    return this.http.get<MarqueResponse>(`${this.apiUrl}/1`).pipe(  // TODO :change the 1 to getAll
+    return this.http.get<MarqueResponse>(`${this.apiUrl}`).pipe(  
       tap((data) => console.log("Données brutes reçues de l'API :", data)), // Vérification
       map(data => ({
         marques: data.marques.map((item: any) => ({

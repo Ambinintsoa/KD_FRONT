@@ -1,0 +1,47 @@
+<div *ngIf="isLoading" class="spinner-overlay">
+  <div class="spinner"></div>
+</div>
+
+<p-table
+  #dt
+  [value]="historiqueServiceObjects"
+  [columns]="cols"
+  [lazy]="true"
+  [paginator]="true"
+  [totalRecords]="totalRecords"
+  [globalFilterFields]="['nom_service', 'statut_service']"
+  [tableStyle]="{ 'min-width': '75rem' }"
+  [(selection)]="selectedHistoriqueServices"
+  [rowHover]="true"
+  dataKey="_id"
+  [sortField]="sortBy"
+  [sortOrder]="orderBy === 'asc' ? 1 : -1"
+  [rows]="limit"
+  [first]="first"
+  currentPageReportTemplate=" {first} à {last} sur {totalRecords} services"
+  [showCurrentPageReport]="true"
+  [rowsPerPageOptions]="[10,20,30]"
+  (onLazyLoad)="onLazyLoad($event)"
+  (onSort)="onSortChange($event)"
+>
+  <ng-template #caption>
+    <div class="flex items-center justify-between">
+      <h5 class="m-0">Historique des Services</h5>
+      <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Recherche..." />
+    </div>
+  </ng-template>
+  <ng-template #header>
+    <tr>
+      <th pSortableColumn="nom_service">Nom Service<p-sortIcon field="nom_service" /></th>
+      <th pSortableColumn="date_service">Date Service<p-sortIcon field="date_service" /></th>
+      <th pSortableColumn="statut_service">Statut du Service<p-sortIcon field="statut_service" /></th>
+    </tr>
+  </ng-template>
+  <ng-template #body let-historiqueService>
+    <tr>
+      <td>{{ historiqueService.nom_service }}</td>
+      <td>{{ historiqueService.date | date:'short }}</td>
+      <td>{{ historiqueService.statut === 0 ? 'Non effectué' : 'Effectué' }}</td>
+    </tr>
+  </ng-template>
+</p-table>

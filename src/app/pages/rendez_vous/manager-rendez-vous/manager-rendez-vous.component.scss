@@ -1,12 +1,8 @@
-::host ::ng-deep .fc {
-    background-color: white !important;
-}
-
+:host ::ng-deep .fc,
+:host ::ng-deep .fc-view-harness,
 :host ::ng-deep .fc-view-container {
-    background-color: white !important;
-    margin: 20px;
+  background: #fff !important;
 }
-
 .fc {
     margin: 20px !important;
     padding: 10px !important;

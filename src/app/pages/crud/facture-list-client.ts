@@ -1,18 +1,18 @@
 // facture.component.ts
-import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ConfirmationService, MessageService } from 'primeng/api';
-import { Table, TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { DialogModule } from 'primeng/dialog';
+import { InputTextModule } from 'primeng/inputtext';
 import { RippleModule } from 'primeng/ripple';
+import { Table, TableModule } from 'primeng/table';
 import { ToastModule } from 'primeng/toast';
 import { ToolbarModule } from 'primeng/toolbar';
-import { InputTextModule } from 'primeng/inputtext';
-import { DialogModule } from 'primeng/dialog';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { FactureService, FactureObject, ListParams, DetailFacture, Paiement } from '../service/facture-list.service';
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
+import { FactureObject, FactureService, ListParams } from '../service/facture-list.service';
 
 interface Column {
   field: string;
@@ -93,7 +93,8 @@ interface Column {
 
     <!-- Details Dialog -->
     <p-dialog [(visible)]="detailsDialog" [style]="{ width: '800px' }" header="Détails de la Facture" [modal]="true">
-      <ng-template #content>
+    
+    <ng-template #content>
         <div class="flex flex-col gap-6">
           <!-- Invoice Basic Info -->
           <div class="grid grid-cols-2 gap-4">
@@ -102,6 +103,7 @@ interface Column {
             <div><strong>Client:</strong> {{ selectedFacture?.client?.nom }}</div>
             <div><strong>Montant Total:</strong> {{ selectedFacture?.montant_total }}</div>
             <div><strong>Statut:</strong> {{ selectedFacture?.statut === 0 ? 'Non payé' : 'Confirmé' }}</div>
+          
           </div>
 
           <!-- Invoice Details -->
@@ -130,8 +132,9 @@ interface Column {
                 </tr>
               </ng-template>
             </p-table>
-          </div>
 
+          </div>
+      
           <!-- Payments -->
           <div>
             <h3 class="font-bold mb-2">Paiements</h3>
@@ -159,7 +162,8 @@ interface Column {
       </ng-template>
       <ng-template #footer>
         <p-button label="Fermer" icon="pi pi-times" text (click)="detailsDialog = false" />
-      </ng-template>
+      
+        </ng-template>
     </p-dialog>
 
     <p-confirmdialog [style]="{ width: '450px' }" />
@@ -270,5 +274,4 @@ export class FactureClientComponent implements OnInit {
     this.factureDialog = false;
     this.submitted = false;
   }
-
 }

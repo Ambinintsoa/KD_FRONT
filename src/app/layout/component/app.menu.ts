@@ -148,11 +148,11 @@ export class AppMenu {
                                                 },
                                             ]}]:[]),
                                      // Ne pas inclure "Paramétrages" si l'utilisateur n'est pas admin
-                    {
-                        label: 'Calendrier',
+               /*  {
+                           label: 'Calendrier',
                         icon: 'pi pi-fw pi-exclamation-circle',
                         routerLink: ['/pages/calendrier']
-                    },
+                    },*/
                     ...(isAdmin ? [
                     {
                         label: 'Factures Client',
